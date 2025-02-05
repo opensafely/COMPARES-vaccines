@@ -1,0 +1,919 @@
+id,name,active,notes
+428416002,Radiotherapy to neck (procedure),y,direct mapping
+228715004,Making of bite block for radiotherapy (procedure),y,direct mapping
+722480002,Chemotherapy started (situation),y,direct mapping
+169357002,Radiotherapy: infiltrate tissue (regime/therapy),y,direct mapping
+169361008,Radiotherapy: seeds into brain (regime/therapy),y,direct mapping
+292220002,Mitomycin adverse reaction (disorder),y,direct mapping
+584221000000105,Introduction of removable radioactive material into organ NOC (procedure),y,direct mapping
+46044009,Megavoltage radiation therapy (procedure),y,direct mapping
+292208005,Estramustine adverse reaction (disorder),y,direct mapping
+80347004,Teleradiotherapy neutrons (procedure),y,direct mapping
+395074007,Selectron therapy (procedure),y,direct mapping
+169402000,Radiochemotherapy: local artery (regime/therapy),y,direct mapping
+169394006,Afterload radiotherapy of oropharyngeal cavity (procedure),y,direct mapping
+429685005,Radiotherapy by body site (procedure),y,direct mapping
+399042005,Chemotherapy cycle (procedure),y,direct mapping
+236231000000101,Delivery of a fraction of intracavitary radiotherapy (procedure),y,direct mapping
+379641000000109,Preparation for brachytherapy (procedure),y,direct mapping
+228677009,Cesium 137 brachytherapy (regime/therapy),y,direct mapping
+169331000,Combined radiotherapy (procedure),y,direct mapping
+228700000,Iodine 131 meta-iodobenzylguanidine therapy (regime/therapy),y,direct mapping
+292235001,Etoposide adverse reaction (disorder),y,direct mapping
+232681000000103,Chemotherapy delivery (procedure),y,direct mapping
+231737005,Radiotherapy to ciliary body (procedure),y,direct mapping
+228696008,Yttrium 90 brachytherapy (regime/therapy),y,direct mapping
+312235007,Radiolabeled antibody therapy (procedure),y,direct mapping
+312248006,Heavy ion teletherapy (procedure),y,direct mapping
+428923005,Radiotherapy to breast (procedure),y,direct mapping
+292204007,Cyclophosphamide adverse reaction (disorder),y,direct mapping
+229556008,Pulsed electromagnetic energy therapy (regime/therapy),y,direct mapping
+829591000000101,Neoadjuvant chemotherapy (procedure),y,direct mapping
+228675001,Deuterium on tritium neutron teletherapy (procedure),y,direct mapping
+228693000,Ruthenium 106 brachytherapy (regime/therapy),y,direct mapping
+395075008,Iridium wire therapy (procedure),y,direct mapping
+169347003,Combined internal radiotherapy (regime/therapy),y,direct mapping
+26543004,Poisoning caused by daunorubicin (disorder),y,direct mapping
+442429002,Percutaneous radiofrequency ablation of lesion of bone (procedure),y,direct mapping
+228687008,Selectron brachytherapy (regime/therapy),y,direct mapping
+183469007,Radiotherapy emergency hospital admission (procedure),y,direct mapping
+292252002,Vincristine adverse reaction (disorder),y,direct mapping
+380101000000100,Introduction of radioactive substance into organ for brachytherapy NOC (procedure),y,direct mapping
+228681009,Cobalt 60 brachytherapy (procedure),y,direct mapping
+379601000000106,Preparation for intensity modulated radiation therapy (procedure),y,direct mapping
+379541000000105,Preparation for external beam radiotherapy (procedure),y,direct mapping
+228718002,Making of docking unit for radiotherapy (procedure),y,direct mapping
+228717007,Making of cut-out for radiotherapy (procedure),y,direct mapping
+235541004,Bile duct endoluminal radiotherapy (procedure),y,direct mapping
+292203001,Chlorambucil adverse reaction (disorder),y,direct mapping
+169359004,Internal radiotherapy - permanent seeds (regime/therapy),y,direct mapping
+292217005,Dactinomycin adverse reaction (disorder),y,direct mapping
+379591000000100,Preparation for hemi body irradiation (procedure),y,direct mapping
+292234002,Fluorouracil adverse reaction (disorder),y,direct mapping
+265760000,Intravenous chemotherapy (procedure),y,direct mapping
+895121000000103,Hypofractionated stereotactic radiotherapy using megavoltage radiation (procedure),y,direct mapping
+228689006,Gold 198 brachytherapy (regime/therapy),y,direct mapping
+380061000000102,Technical support for preparation for radiotherapy (procedure),y,direct mapping
+191247005,Aplastic anemia caused by radiation (disorder),y,direct mapping
+395096001,Stereotactic radiotherapy (procedure),y,direct mapping
+171952002,Implantation of radioactive substance into pituitary gland (procedure),y,direct mapping
+185274003,Seen in radiotherapy clinic (finding),y,direct mapping
+77613002,Teleradiotherapy with iodine-125 (regime/therapy),y,direct mapping
+238051000000104,Delivery of a fraction of simple radiotherapy on a megavoltage machine (procedure),y,direct mapping
+314604005,Palliative course of deep X-ray therapy (procedure),y,direct mapping
+427118006,Endoscopic radiofrequency ablation of lesion of prostate (procedure),y,direct mapping
+228688003,Californium 252 brachytherapy (regime/therapy),y,direct mapping
+228705005,Radiotherapy planning using a simulator (procedure),y,direct mapping
+228690002,Iodine 125 brachytherapy (regime/therapy),y,direct mapping
+53721003,Bolus design and fabrication (procedure),y,direct mapping
+169307005,Fast-electron therapy (procedure),y,direct mapping
+425767004,Implantation of radioactive seed into prostate (procedure),y,direct mapping
+168519005,Purpose of radiotherapy (procedure),y,direct mapping
+379681000000101,Preparation for intracavitary brachytherapy (procedure),y,direct mapping
+169341002,Thyroid gland ablation - irradiation (regime/therapy),y,direct mapping
+113117004,Teleradiotherapy particulate radiation (procedure),y,direct mapping
+183649005,Combined therapy follow-up (procedure),y,direct mapping
+228723002,Calculation of teletherapy (procedure),y,direct mapping
+313092005,Electromagnetic energy therapy (regime/therapy),y,direct mapping
+169400008,Radiochemotherapy via intravenous route (procedure),y,direct mapping
+228720004,Making of shielding block for radiotherapy (procedure),y,direct mapping
+428829005,Radiotherapy to pelvis (procedure),y,direct mapping
+5304008,"Deep radiation therapy, 200-300 KVP (procedure)",y,direct mapping
+169354009,Radiotherapy: endolymphatic infusion (regime/therapy),y,direct mapping
+292207000,Melphalan adverse reaction (disorder),y,direct mapping
+384692006,Intracavitary brachytherapy (regime/therapy),y,direct mapping
+169291001,X-ray beam therapy (procedure),y,direct mapping
+10611004,Teleradiotherapy protons (procedure),y,direct mapping
+228698009,Iodine 131 therapy (regime/therapy),y,direct mapping
+228724008,Calculation of teletherapy parameters (procedure),y,direct mapping
+380041000000103,Megavoltage treatment for complex radiotherapy (procedure),y,direct mapping
+169345006,Bone tumor/metastasis irradiation (regime/therapy),y,direct mapping
+169342009,Thyroid tumor/metastasis irradiation (regime/therapy),y,direct mapping
+380021000000105,Megavoltage treatment for adaptive radiotherapy (procedure),y,direct mapping
+24242005,Cobalt-60 therapy (procedure),y,direct mapping
+292240009,Procarbazine adverse reaction (disorder),y,direct mapping
+33195004,Teleradiotherapy procedure (procedure),y,direct mapping
+38104006,Teleradiotherapy by linear accelerator (procedure),y,direct mapping
+231711000000108,Radiotherapy delivery (procedure),y,direct mapping
+413147004,Intramuscular injection of methylprednisolone (procedure),y,direct mapping
+583351000000106,Introduction of radium into organ NOC (procedure),y,direct mapping
+231568007,Radiotherapy to lesion of medial canthus (procedure),y,direct mapping
+228714000,Making of beam direction shell for radiotherapy (procedure),y,direct mapping
+426332009,External beam radiotherapy to lesion of retina (procedure),y,direct mapping
+583341000000108,Introduction of iridium wire into organ NOC (procedure),y,direct mapping
+309700001,Intravenous injection of Methotrexate (procedure),y,direct mapping
+238861000000108,Delivery of simple parenteral chemotherapy for neoplasm at first attendance (procedure),y,direct mapping
+231981000000103,Radioactive seed implantation NOC (procedure),y,direct mapping
+169321007,Gamma ray and intermediate distance curietherapy (procedure),y,direct mapping
+169356006,Radiotherapy: infuse organ cavity (regime/therapy),y,direct mapping
+228682002,Cobalt 60 brachytherapy manual loading (procedure),y,direct mapping
+315601005,Ambulatory chemotherapy (regime/therapy),y,direct mapping
+427661008,Transurethral radiofrequency needle ablation of prostate (procedure),y,direct mapping
+290674009,Daunorubicin poisoning of undetermined intent (disorder),y,direct mapping
+228703003,Radiotherapy planning (procedure),y,direct mapping
+292201004,Thiotepa adverse reaction (disorder),y,direct mapping
+228685000,Gammamed brachytherapy (regime/therapy),y,direct mapping
+169352008,Radiotherapy: infuse pleural cavity (regime/therapy),y,direct mapping
+169355005,Radiotherapy: infuse urinary bladder (regime/therapy),y,direct mapping
+176609003,Implantation of radioactive substance into vulva (procedure),y,direct mapping
+228664000,Van der Graaff X-ray therapy (procedure),y,direct mapping
+228666003,Teletherapy with dual headed cobalt unit (procedure),y,direct mapping
+292237009,Carboplatin adverse reaction (disorder),y,direct mapping
+228716003,Making of compensator for radiotherapy (procedure),y,direct mapping
+228662001,Betatron X-ray therapy (procedure),y,direct mapping
+394918006,Iodine seed radiotherapy (regime/therapy),y,direct mapping
+265761001,Intramuscular chemotherapy (procedure),y,direct mapping
+228719005,Making of template for radiotherapy (procedure),y,direct mapping
+898251000000109,Pulsed dose rate brachytherapy (procedure),y,direct mapping
+380071000000109,Support for preparation for radiotherapy (procedure),y,direct mapping
+380091000000108,Introduction of non-removable radioactive substance into organ for brachytherapy NOC (procedure),y,direct mapping
+292221003,Plicamycin adverse reaction (disorder),y,direct mapping
+843671000000104,Electrochemotherapy (procedure),y,direct mapping
+169369005,Radiotherapy: temporary abdominal implant (regime/therapy),y,direct mapping
+292212004,Carmustine adverse reaction (disorder),y,direct mapping
+169350000,Radiotherapy: infuse skull/brain (regime/therapy),y,direct mapping
+183566003,Referred for radiotherapy (finding),y,direct mapping
+394902000,High dose brachytherapy (regime/therapy),y,direct mapping
+292238004,Cisplatin adverse reaction (disorder),y,direct mapping
+426987001,Percutaneous radiofrequency ablation of lesion of lung (procedure),y,direct mapping
+182975000,Tuberculosis chemotherapy (procedure),y,direct mapping
+169365004,Radiotherapy: temporary brain implant (regime/therapy),y,direct mapping
+228722007,Radiotherapy calculation (procedure),y,direct mapping
+235331000000103,Delivery of oral chemotherapy for neoplasm (regime/therapy),y,direct mapping
+169403005,Radiochemotherapy: into cavity (regime/therapy),y,direct mapping
+292196008,Antineoplastic adverse reaction (disorder),y,direct mapping
+292230006,Mercaptopurine adverse reaction (disorder),y,direct mapping
+379571000000104,Preparation for simple radiotherapy with imaging and simple calculation (procedure),y,direct mapping
+63506005,Destruction of lesion of choroid by radiation therapy (procedure),y,direct mapping
+45643008,Teleradiotherapy using electrons (procedure),y,direct mapping
+290673003,Intentional daunorubicin poisoning (event),y,direct mapping
+312244008,Cobalt 60 brachytherapy remote afterloading (procedure),y,direct mapping
+228694006,Strontium 90 brachytherapy (regime/therapy),y,direct mapping
+31394004,Light therapy (procedure),y,direct mapping
+169396008,Radiomimetic chemotherapy (regime/therapy),y,direct mapping
+216958003,Overdose of radiation in therapy (event),y,direct mapping
+292239007,Hydroxyurea adverse reaction (disorder),y,direct mapping
+53373004,"Superficial teletherapy procedure, Grenz type (procedure)",y,direct mapping
+228721000,Making of surface mold for brachytherapy (procedure),y,direct mapping
+314605006,Preoperative course of deep X-ray therapy (procedure),y,direct mapping
+292231005,Thioguanine adverse reaction (disorder),y,direct mapping
+394935005,Combined post-operative chemotherapy and radiotherapy (procedure),y,direct mapping
+309698005,Continuous infusion of chemotherapy (procedure),y,direct mapping
+218326006,Adverse reaction caused by antineoplastic antibiotics (disorder),y,direct mapping
+228699001,Phosphorus 32 therapy (regime/therapy),y,direct mapping
+228691003,Phosphorus 32 brachytherapy (regime/therapy),y,direct mapping
+314606007,Postoperative course of deep X-ray therapy (procedure),y,direct mapping
+292241008,Razoxane adverse reaction (disorder),y,direct mapping
+228674002,Cyclotron neutron teletherapy (procedure),y,direct mapping
+21372000,Radium therapy (regime/therapy),y,direct mapping
+169346007,Radioactive drug therapy (regime/therapy),y,direct mapping
+238841000000107,Delivery of complex chemotherapy for neoplasm including prolonged infusional treatment at first attendance (procedure),y,direct mapping
+183971003,Radiotherapy treatment groups (procedure),y,direct mapping
+169101002,Image: field control:radiother (situation),y,direct mapping
+232051000000102,Introduction of radioactive substance into organ for interstitial brachytherapy NOC (procedure),y,direct mapping
+228668002,Teletherapy with radium collar (regime/therapy),y,direct mapping
+228713006,Radiotherapy planning using mold room preparation (procedure),y,direct mapping
+428412000,Radiotherapy to head (procedure),y,direct mapping
+616781000000104,Introduction of radioactive caesium into organ NOC (procedure),y,direct mapping
+429774000,Radiotherapy to abdomen (procedure),y,direct mapping
+422181004,Antibiotic prophylaxis (procedure),y,direct mapping
+228701001,Strontium 89 therapy (regime/therapy),y,direct mapping
+183372004,Convalescence after radiotherapy (finding),y,direct mapping
+169372003,Radiotherapy: temporary lymphatic implant (regime/therapy),y,direct mapping
+169301006,High-energy beam therapy (procedure),y,direct mapping
+169399001,Radiochemotherapy: oral route (regime/therapy),y,direct mapping
+45747003,Poisoning caused by antineoplastic antibiotic (disorder),y,direct mapping
+292223000,Mitozantrone adverse reaction (disorder),y,direct mapping
+292227004,Antimetabolite adverse reaction (disorder),y,direct mapping
+228707002,Radiotherapy planning using a simulator X-ray film (procedure),y,direct mapping
+764677008,Selective internal radiotherapy of liver using yttrium (90-Y) labeled microspheres (procedure),y,direct mapping
+292224006,Doxorubicin adverse reaction (disorder),y,direct mapping
+231764006,Radiotherapy to retina (procedure),y,direct mapping
+235391000000102,Delivery of chemotherapy for neoplasm (procedure),y,direct mapping
+239071000000100,Delivery of subsequent element of cycle of chemotherapy for neoplasm (procedure),y,direct mapping
+428624002,Radiotherapy to chest wall (procedure),y,direct mapping
+379581000000102,Preparation for simple radiotherapy with imaging and dosimetry (procedure),y,direct mapping
+169398009,Radiochemotherapy: to stop spread (regime/therapy),y,direct mapping
+52338008,Treatment planning for brachytherapy (procedure),y,direct mapping
+53438000,Radiation therapy procedure or service (procedure),y,direct mapping
+53523003,Poisoning caused by cactinomycin (disorder),y,direct mapping
+38443001,Vaginal implantation of radium (procedure),y,direct mapping
+231585009,Radiotherapy to lesion of lateral canthus (procedure),y,direct mapping
+292199001,Busulfan adverse reaction (disorder),y,direct mapping
+169349000,Internal radiotherapy - unsealed source (regime/therapy),y,direct mapping
+292218000,Bleomycin adverse reaction (disorder),y,direct mapping
+169343004,Bone marrow suppression - irradiation (regime/therapy),y,direct mapping
+176860004,Introduction of radioactive substance into uterine cavity (procedure),y,direct mapping
+228708007,Radiotherapy planning using diagnostic radiology (procedure),y,direct mapping
+711613003,Administration of cytotoxic agent via oral route (procedure),y,direct mapping
+183503009,Non-urgent radiotherapy admission (procedure),y,direct mapping
+178020005,Intraperitoneal administration of radioactive substance (procedure),y,direct mapping
+266719004,Oral chemotherapy (regime/therapy),y,direct mapping
+231544004,Radiotherapy to orbital lesion (procedure),y,direct mapping
+228725009,Outlining for radiotherapy dose calculation (procedure),y,direct mapping
+268500004,Prophylactic chemotherapy (regime/therapy),y,direct mapping
+236441000000109,Delivery of a fraction of radiotherapy on a superficial or orthovoltage machine (procedure),y,direct mapping
+716872004,Antineoplastic chemotherapy regimen (regime/therapy),y,direct mapping
+169340001,Internal metabolic radiotherapy (regime/therapy),y,direct mapping
+172408001,Radiotherapy of corneal lesion (procedure),y,direct mapping
+292213009,Lomustine adverse reaction (disorder),y,direct mapping
+426830009,Percutaneous radiofrequency ablation of lesion of liver (procedure),y,direct mapping
+228673008,Strontium 90 electron teletherapy (procedure),y,direct mapping
+394895009,Postoperative chemotherapy (procedure),y,direct mapping
+290672008,Accidental daunorubicin poisoning (event),y,direct mapping
+367336001,Chemotherapy (procedure),y,direct mapping
+309699002,Intramuscular injection of Methotrexate (procedure),y,direct mapping
+284701000000103,Oral delivery of radiotherapy for thyroid ablation (procedure),y,direct mapping
+169367007,Radiotherapy: temporary tongue implant (regime/therapy),y,direct mapping
+169407006,Radiosensitizing measure (procedure),y,direct mapping
+228706006,Radiotherapy planning using simulator fluoroscopy (procedure),y,direct mapping
+4914002,Treatment planning for teletherapy (procedure),y,direct mapping
+379551000000108,Preparation for complex conformal radiotherapy (procedure),y,direct mapping
+169409009,Radioprotective drug (procedure),y,direct mapping
+390927002,Awaiting radiotherapy (situation),y,direct mapping
+169362001,Radiotherapy: seeds into cavity (regime/therapy),y,direct mapping
+169371005,Radiotherapy: temporary limb implant (regime/therapy),y,direct mapping
+228667007,Stereotactic cobalt teletherapy (procedure),y,direct mapping
+292229001,Methotrexate adverse reaction (disorder),y,direct mapping
+228686004,Microselectron brachytherapy (regime/therapy),y,direct mapping
+300976007,Radiotherapy to lesion of canthus (procedure),y,direct mapping
+169397004,Radiochemotherapy: local infiltration (regime/therapy),y,direct mapping
+228702008,Gold 198 therapy (regime/therapy),y,direct mapping
+236251000000108,Preparation for total body irradiation (procedure),y,direct mapping
+429579007,Radiotherapy to axilla (procedure),y,direct mapping
+169360009,Radiotherapy: seeds into hypophysis (regime/therapy),y,direct mapping
+267540007,Neutropenia caused by irradiation (disorder),y,direct mapping
+24689001,"Computed tomography guidance for treatment planning, teletherapy (procedure)",y,direct mapping
+169406002,Give radiosensitizing drug (procedure),y,direct mapping
+169351001,Radiotherapy: infuse head/neck (regime/therapy),y,direct mapping
+183651009,Chemotherapy follow-up (regime/therapy),y,direct mapping
+228697004,Yttrium 90 therapy (regime/therapy),y,direct mapping
+271291003,Temporary implant radiotherapy (regime/therapy),y,direct mapping
+394934009,Combined pre-operative chemotherapy and radiotherapy (context-dependent category),y,direct mapping
+429057009,Plaque radiotherapy of lesion of retina (procedure),y,direct mapping
+169344005,Polycythemia irradiation (regime/therapy),y,direct mapping
+228729003,Calculation of brachytherapy (procedure),y,direct mapping
+169401007,Radiochemotherapy: for immunosuppression (regime/therapy),y,direct mapping
+379671000000103,Preparation for interstitial brachytherapy (procedure),y,direct mapping
+238831000000103,Delivery of exclusively oral chemotherapy for neoplasm (regime/therapy),y,direct mapping
+228726005,Calculation of radiotherapy isodose distribution (procedure),y,direct mapping
+399315003,Radionuclide therapy (procedure),y,direct mapping
+238851000000105,Delivery of complex parenteral chemotherapy for neoplasm at first attendance (procedure),y,direct mapping
+228692005,Radon 222 brachytherapy (regime/therapy),y,direct mapping
+379561000000106,Preparation for superficial radiotherapy with simple calculation (procedure),y,direct mapping
+897661000000105,High cost chemotherapy drugs (procedure),y,direct mapping
+228676000,Hiletron neutron teletherapy (procedure),y,direct mapping
+171809001,Radiotherapy to lesion of peripheral nerve (procedure),y,direct mapping
+228672003,Microtron electron teletherapy (procedure),y,direct mapping
+171765004,Intrathecal injection of chemotherapeutic agent (procedure),y,direct mapping
+38183002,Preparation of radiation therapy aid (procedure),y,direct mapping
+426697007,Percutaneous radiofrequency ablation of lesion of kidney (procedure),y,direct mapping
+394894008,Pre-operative chemotherapy (procedure),y,direct mapping
+312649009,Intramuscular injection of betamethasone (procedure),y,direct mapping
+169370006,Radiotherapy: temporary pelvic implant (regime/therapy),y,direct mapping
+169366003,Radiotherapy: temporary head/neck implant (regime/therapy),y,direct mapping
+292233008,Cytarabine adverse reaction (disorder),y,direct mapping
+228663006,Microtron X-ray therapy (procedure),y,direct mapping
+292200003,Treosulfan adverse reaction (disorder),y,direct mapping
+228730008,Calculation of radionuclide therapy (procedure),y,direct mapping
+312243002,Cesium 137 brachytherapy remote afterloading (regime/therapy),y,direct mapping
+265762008,Subcutaneous chemotherapy (procedure),y,direct mapping
+228704009,Radiotherapy planning using a free set up (procedure),y,direct mapping
+108290001,Radiation oncology AND/OR radiotherapy (procedure),y,direct mapping
+236221000000103,Delivery of a fraction of total body irradiation (procedure),y,direct mapping
+380031000000107,Megavoltage treatment for simple radiotherapy (procedure),y,direct mapping
+1064281000000106,Cancer chemotherapy management plan (record artifact),y,direct mapping
+228695007,Tantalum 182 brachytherapy (regime/therapy),y,direct mapping
+292209002,Mustine adverse reaction (disorder),y,direct mapping
+429584001,Stereotactic radiosurgery of brain tissue (procedure),y,direct mapping
+228684001,Iridium 192 brachytherapy (regime/therapy),y,direct mapping
+309730009,Diagnostic intravenous injection of Camsilon (procedure),y,direct mapping
+238041000000102,Delivery of a fraction of interstitial radiotherapy (procedure),y,direct mapping
+172286002,Radiotherapy to lacrimal gland (procedure),y,direct mapping
+228727001,Calculation of radiotherapy dose corrections (procedure),y,direct mapping
+228671005,Linear accelerator electron teletherapy (procedure),y,direct mapping
+62867004,Teleradiotherapy with radioactive cesium (regime/therapy),y,direct mapping
+428831001,Radiotherapy to perineum (procedure),y,direct mapping
+169353003,Radiotherapy: infuse peritoneal cavity (regime/therapy),y,direct mapping
+228728006,Calculation of radiotherapy dose-volume histogram (procedure),y,direct mapping
+65952009,Gamma ray therapy (procedure),y,direct mapping
+292251009,Vinblastine adverse reaction (disorder),y,direct mapping
+169368002,Radiotherapy: temporary thorax implant (regime/therapy),y,direct mapping
+379691000000104,Preparation for intraluminal brachytherapy (procedure),y,direct mapping
+290652003,Accidental aclarubicin poisoning (event),y,descendant of concept mapped from leaf
+50917001,Preparation of radioactive source (procedure),y,descendant of concept mapped from leaf
+862921000000106,Intravesical electrochemotherapy (procedure),y,descendant of concept mapped from leaf
+431530008,Percutaneous brachytherapy of hepatic artery using fluoroscopic guidance (procedure),y,descendant of concept mapped from leaf
+169327006,Radium contact therapy (procedure),y,descendant of concept mapped from leaf
+293231001,Cyproterone acetate and ethinylestradiol adverse reaction (disorder),y,descendant of concept mapped from leaf
+722491009,"Rituximab, cyclophosphamide, doxorubicin, vincristine and prednisone chemotherapy regimen (regime/therapy)",y,descendant of concept mapped from leaf
+431399005,Brachytherapy using iodine (131-I) ethiodized oil (procedure),y,descendant of concept mapped from leaf
+304418001,Pulsed electromagnetic energy to back (regime/therapy),y,descendant of concept mapped from leaf
+292214003,Triazene antineoplastic adverse reaction (disorder),y,descendant of concept mapped from leaf
+722472009,"Rituximab, ifosfamide, carboplatin and etoposide chemotherapy regimen (regime/therapy)",y,descendant of concept mapped from leaf
+428083009,Combined photochemotherapy and ultraviolet B light therapy to skin (procedure),y,descendant of concept mapped from leaf
+290667004,Epirubicin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+290650006,Plicamycin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+169310003,Betatron electron therapy (procedure),y,descendant of concept mapped from leaf
+473237008,Stereotactic radiosurgery for acoustic neuroma (procedure),y,descendant of concept mapped from leaf
+87390000,"Radiation therapy, central axis depth dose computation (procedure)",y,descendant of concept mapped from leaf
+38915000,Radionuclide therapy for gland ablation (regime/therapy),y,descendant of concept mapped from leaf
+442993000,Percutaneous radiofrequency ablation of lesion of liver using ultrasound guidance (procedure),y,descendant of concept mapped from leaf
+428908000,Combined photochemotherapy and ultraviolet A light therapy to skin (procedure),y,descendant of concept mapped from leaf
+821871000000102,Percutaneous photodynamic therapy of lesion of bile duct using fluoroscopic guidance (procedure),y,descendant of concept mapped from leaf
+306828004,Low power laser therapy to knee (procedure),y,descendant of concept mapped from leaf
+229591000,Theraktin treatment (procedure),y,descendant of concept mapped from leaf
+444247007,Photodynamic therapy of neovascular membrane of choroid (procedure),y,descendant of concept mapped from leaf
+290655001,Aclarubicin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+290661003,Accidental doxorubicin poisoning (event),y,descendant of concept mapped from leaf
+228660009,Contact therapy (procedure),y,descendant of concept mapped from leaf
+426234008,Ultraviolet B light therapy to skin (procedure),y,descendant of concept mapped from leaf
+85257004,Destruction of chorioretinal lesion by radiation therapy (procedure),y,descendant of concept mapped from leaf
+169317000,Neutron capture therapy (procedure),y,descendant of concept mapped from leaf
+290662005,Intentional doxorubicin poisoning (event),y,descendant of concept mapped from leaf
+441783000,Conformal radiotherapy (procedure),y,descendant of concept mapped from leaf
+306821005,Low power laser therapy to elbow (procedure),y,descendant of concept mapped from leaf
+169336005,External beam with chemotherapy (procedure),y,descendant of concept mapped from leaf
+169298007,Intracavitary X-ray therapy (procedure),y,descendant of concept mapped from leaf
+169315008,Deuteron therapy (procedure),y,descendant of concept mapped from leaf
+290645000,Mitomycin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+840981000000104,Interstitial photodynamic therapy of malignant tumour of parotid gland (procedure),y,descendant of concept mapped from leaf
+306826000,Low power laser therapy to abdomen (procedure),y,descendant of concept mapped from leaf
+169311004,Positron therapy (procedure),y,descendant of concept mapped from leaf
+47668009,Intracavitary radium application (regime/therapy),y,descendant of concept mapped from leaf
+169296006,Ultrahard X-rays 400-2000 kV (procedure),y,descendant of concept mapped from leaf
+169335009,External beam - surgery with chemotherapy (procedure),y,descendant of concept mapped from leaf
+290693006,Accidental pentostatin poisoning (event),y,descendant of concept mapped from leaf
+290647008,Accidental plicamycin poisoning (event),y,descendant of concept mapped from leaf
+16560241000119104,Oral radionuclide therapy (procedure),y,descendant of concept mapped from leaf
+427561000119104,Intravenous radionuclide therapy using samarium Sm 153 lexidronam (procedure),y,descendant of concept mapped from leaf
+426931009,Subacute bacterial endocarditis prophylaxis (procedure),y,descendant of concept mapped from leaf
+26802008,"Radiation therapy isodose plan, arc field (procedure)",y,descendant of concept mapped from leaf
+433150007,Radiolabeled indium 111 antibody therapy (procedure),y,descendant of concept mapped from leaf
+182668004,Ultraviolet lesion destruction (procedure),y,descendant of concept mapped from leaf
+440069001,Rhinophototherapy using ultraviolet and visible light (procedure),y,descendant of concept mapped from leaf
+431667009,Intracoronary brachytherapy using fluoroscopic guidance (procedure),y,descendant of concept mapped from leaf
+35587007,"Supervision, handling and loading of radioelement (procedure)",y,descendant of concept mapped from leaf
+49097004,"Special dosimetry, thermoluminescent dosimetry (procedure)",y,descendant of concept mapped from leaf
+169303009,Betatron photon therapy (procedure),y,descendant of concept mapped from leaf
+700356003,Radium 226 brachytherapy (procedure),y,descendant of concept mapped from leaf
+31344000,"Radiation therapy treatment planning, patient contour and localization of internal structures (procedure)",y,descendant of concept mapped from leaf
+10492003,Radionuclide therapy for glandular suppression (regime/therapy),y,descendant of concept mapped from leaf
+229593002,Mercury vapor lamp treatment (procedure),y,descendant of concept mapped from leaf
+290666008,Intentional epirubicin poisoning (event),y,descendant of concept mapped from leaf
+306817003,Low power laser therapy to neck (procedure),y,descendant of concept mapped from leaf
+169332007,External beam with internal radiotherapy (procedure),y,descendant of concept mapped from leaf
+50632006,Cyclotron teleradiotherapy (procedure),y,descendant of concept mapped from leaf
+853301000000101,Stereotactic focused gamma radiosurgery of trigeminal nerve (procedure),y,descendant of concept mapped from leaf
+290636001,Cytotoxic antibiotic poisoning (disorder),y,descendant of concept mapped from leaf
+304421004,Pulsed electromagnetic energy to hip (regime/therapy),y,descendant of concept mapped from leaf
+290658004,Intentional mitozantrone poisoning (event),y,descendant of concept mapped from leaf
+306822003,Low power laser therapy to wrist (procedure),y,descendant of concept mapped from leaf
+169410004,Support transfusion therapy (procedure),y,descendant of concept mapped from leaf
+47191007,Poisoning caused by bleomycin (disorder),y,descendant of concept mapped from leaf
+32626001,Provision of external compensating shield (procedure),y,descendant of concept mapped from leaf
+290663000,Doxorubicin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+431743005,Yttrium 90 somatostatin analog therapy (procedure),y,descendant of concept mapped from leaf
+304416002,Pulsed electromagnetic energy to wrist (regime/therapy),y,descendant of concept mapped from leaf
+10226009,Disposal of radioactive source (procedure),y,descendant of concept mapped from leaf
+448385000,Megavoltage radiation therapy using photons (procedure),y,descendant of concept mapped from leaf
+169295005,Deep X-ray therapy 150-400 kV (procedure),y,descendant of concept mapped from leaf
+306827009,Low power laser therapy to hip (procedure),y,descendant of concept mapped from leaf
+306829007,Low power laser therapy to ankle (procedure),y,descendant of concept mapped from leaf
+447912004,Fractionated dose stereotactic radiosurgery using linear accelerator system (procedure),y,descendant of concept mapped from leaf
+589631000119102,Intravenous radioimmunotherapy using monoclonal antibodies (procedure),y,descendant of concept mapped from leaf
+9990009,Radiation therapy treatment planning service (procedure),y,descendant of concept mapped from leaf
+448137007,Brachytherapy using radioiodine (procedure),y,descendant of concept mapped from leaf
+275843000,Weil's disease prophylaxis (procedure),y,descendant of concept mapped from leaf
+406175001,Phototherapy: sleep regulation (procedure),y,descendant of concept mapped from leaf
+292225007,Epirubicin adverse reaction (disorder),y,descendant of concept mapped from leaf
+399124002,Unsealed radionuclide procedure (procedure),y,descendant of concept mapped from leaf
+169292008,Grenz ray therapy up to 10 kV (procedure),y,descendant of concept mapped from leaf
+306820006,Low power laser therapy to shoulder (procedure),y,descendant of concept mapped from leaf
+29722002,Photochemotherapy with petrolatum and ultraviolet B (procedure),y,descendant of concept mapped from leaf
+46733005,Provision of molds or casts for immobilization (procedure),y,descendant of concept mapped from leaf
+293232008,Cyproterone adverse reaction (disorder),y,descendant of concept mapped from leaf
+169329009,Mold technique gamma/beta (procedure),y,descendant of concept mapped from leaf
+169316009,Pi-meson therapy (procedure),y,descendant of concept mapped from leaf
+8502007,Radiation physics consultation with therapeutic radiologist (procedure),y,descendant of concept mapped from leaf
+219076007,Adverse reaction caused by bacillus Calmette-Guerin vaccine (disorder),y,descendant of concept mapped from leaf
+304415003,Pulsed electromagnetic energy to elbow (regime/therapy),y,descendant of concept mapped from leaf
+441799006,Intensity modulated radiation therapy (procedure),y,descendant of concept mapped from leaf
+60478006,Local actinotherapy (procedure),y,descendant of concept mapped from leaf
+115960007,Total skin electron beam therapy (procedure),y,descendant of concept mapped from leaf
+292247007,Trilostane adverse reaction (disorder),y,descendant of concept mapped from leaf
+428822001,Photodynamic therapy of subretinal lesion (procedure),y,descendant of concept mapped from leaf
+448467008,Interstitial brachytherapy using cesium needle (procedure),y,descendant of concept mapped from leaf
+446504008,Stereotactic destruction of lesion using gamma radiation (procedure),y,descendant of concept mapped from leaf
+59690005,Compensating filter design and fabrication (procedure),y,descendant of concept mapped from leaf
+304414004,Pulsed electromagnetic energy to shoulder (regime/therapy),y,descendant of concept mapped from leaf
+51534007,Oral chemotherapy for malignant neoplasm (regime/therapy),y,descendant of concept mapped from leaf
+290668009,Idarubicin poisoning (disorder),y,descendant of concept mapped from leaf
+700357007,Radium 223 brachytherapy (procedure),y,descendant of concept mapped from leaf
+90982009,Wedge filter design and fabrication (procedure),y,descendant of concept mapped from leaf
+80893007,Hyperthermia generated by intracavitary probes (procedure),y,descendant of concept mapped from leaf
+292210007,Nitrosurea adverse reaction (disorder),y,descendant of concept mapped from leaf
+292244000,Fludarabine adverse reaction (disorder),y,descendant of concept mapped from leaf
+47479005,Total body irradiation (procedure),y,descendant of concept mapped from leaf
+43111005,Destruction of lesion of retina by implantation of radiation source (procedure),y,descendant of concept mapped from leaf
+292206009,Ifosfamide adverse reaction (disorder),y,descendant of concept mapped from leaf
+33356009,Betatron teleradiotherapy (procedure),y,descendant of concept mapped from leaf
+449157000,Interstitial brachytherapy using iridium wire (procedure),y,descendant of concept mapped from leaf
+56636003,Isodose computation for teletherapy (procedure),y,descendant of concept mapped from leaf
+169333002,External beam - surgery with preoperative radiotherapy (procedure),y,descendant of concept mapped from leaf
+712746000,Total body electron beam therapy (procedure),y,descendant of concept mapped from leaf
+229587005,Ultraviolet A therapy (procedure),y,descendant of concept mapped from leaf
+290692001,Pentostatin poisoning (disorder),y,descendant of concept mapped from leaf
+292846009,Idoxuridine in dimethylsulfoxide adverse reaction (disorder),y,descendant of concept mapped from leaf
+46467001,Photochemotherapy with psoralens and ultraviolet A (procedure),y,descendant of concept mapped from leaf
+290651005,Aclarubicin poisoning (disorder),y,descendant of concept mapped from leaf
+290643007,Accidental mitomycin poisoning (event),y,descendant of concept mapped from leaf
+292205008,Ethoglucid adverse reaction (disorder),y,descendant of concept mapped from leaf
+290638000,Intentional dactinomycin poisoning (event),y,descendant of concept mapped from leaf
+292836007,Human interferon gamma-1b adverse reaction (disorder),y,descendant of concept mapped from leaf
+168521000,Radiotherapy for hemopoietic irradiation (procedure),y,descendant of concept mapped from leaf
+168528006,Palliative course of radiotherapy (procedure),y,descendant of concept mapped from leaf
+304417006,Pulsed electromagnetic energy to hand (regime/therapy),y,descendant of concept mapped from leaf
+765813009,Intracavitary brachytherapy of mouth (procedure),y,descendant of concept mapped from leaf
+168526005,Radiotherapy for analgesia (procedure),y,descendant of concept mapped from leaf
+169293003,Superficial X-ray therapy 10-60 kV (procedure),y,descendant of concept mapped from leaf
+385798007,Radiation therapy care (regime/therapy),y,descendant of concept mapped from leaf
+363695005,Ultraviolet light therapy (procedure),y,descendant of concept mapped from leaf
+292243006,Paclitaxel adverse reaction (disorder),y,descendant of concept mapped from leaf
+292249005,Formestane adverse reaction (disorder),y,descendant of concept mapped from leaf
+290665007,Accidental epirubicin poisoning (event),y,descendant of concept mapped from leaf
+290664006,Epirubicin poisoning (disorder),y,descendant of concept mapped from leaf
+16554781000119103,Intravenous radionuclide therapy using strontium 89 (procedure),y,descendant of concept mapped from leaf
+306824002,Low power laser therapy to back (procedure),y,descendant of concept mapped from leaf
+168527001,Radiotherapy for inflammation (procedure),y,descendant of concept mapped from leaf
+168520004,Radiotherapy for immunosuppression (procedure),y,descendant of concept mapped from leaf
+290648003,Intentional plicamycin poisoning (event),y,descendant of concept mapped from leaf
+9728002,"Special dosimetry, microdosimetry (procedure)",y,descendant of concept mapped from leaf
+169299004,Combined X-ray therapy (procedure),y,descendant of concept mapped from leaf
+714029009,Preoperative high dose brachytherapy (procedure),y,descendant of concept mapped from leaf
+290642002,Bleomycin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+1127003,Interstitial radium application (regime/therapy),y,descendant of concept mapped from leaf
+290640005,Accidental bleomycin poisoning (event),y,descendant of concept mapped from leaf
+292228009,Mercuric oxide adverse reaction (disorder),y,descendant of concept mapped from leaf
+229565001,Low power laser therapy (procedure),y,descendant of concept mapped from leaf
+438629002,High dose rate electronic brachytherapy (procedure),y,descendant of concept mapped from leaf
+433224001,Radionuclide rhenium 186 hydroxyethylidene diphosphonate therapy (procedure),y,descendant of concept mapped from leaf
+78110003,Destruction of lesion of choroid by implantation of radiation source (procedure),y,descendant of concept mapped from leaf
+168525009,Postoperative course of radiotherapy (procedure),y,descendant of concept mapped from leaf
+448288001,Targeted radionuclide therapy (procedure),y,descendant of concept mapped from leaf
+182655007,Local heating - infrared irradiation (regime/therapy),y,descendant of concept mapped from leaf
+169421008,Infrared radiation therapy (regime/therapy),y,descendant of concept mapped from leaf
+64978007,Radionuclide therapy for hyperthyroidism (regime/therapy),y,descendant of concept mapped from leaf
+169419003,Light therapy for inflammation (procedure),y,descendant of concept mapped from leaf
+292222005,Aclarubicin adverse reaction (disorder),y,descendant of concept mapped from leaf
+1051921000000109,Photodynamic laser therapy to lesion of skin (procedure),y,descendant of concept mapped from leaf
+12566000,"Consultation in computer dosimetry and isodose chart, teletherapy (procedure)",y,descendant of concept mapped from leaf
+290695004,Pentostatin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+432094005,Radiolabeled Iodine 131 antibody therapy (procedure),y,descendant of concept mapped from leaf
+680007,Radiation physics consultation (procedure),y,descendant of concept mapped from leaf
+304412000,Pulsed electromagnetic energy to trunk (regime/therapy),y,descendant of concept mapped from leaf
+58873006,Modified Goeckerman regimen (procedure),y,descendant of concept mapped from leaf
+168523002,Preoperative course of radiotherapy (procedure),y,descendant of concept mapped from leaf
+448608009,Intracavitary brachytherapy of female genital tract (procedure),y,descendant of concept mapped from leaf
+35683002,Phototherapy of newborn (procedure),y,descendant of concept mapped from leaf
+726549007,Radioimmunoguided surgery (procedure),y,descendant of concept mapped from leaf
+169302004,Linear accelerator photon therapy (procedure),y,descendant of concept mapped from leaf
+292242001,Crisantaspase adverse reaction (disorder),y,descendant of concept mapped from leaf
+304419009,Pulsed electromagnetic energy to pelvis (regime/therapy),y,descendant of concept mapped from leaf
+406174002,Phototherapy: mood regulation (procedure),y,descendant of concept mapped from leaf
+451017006,Radiotherapy planning using four dimensional computed tomography (procedure),y,descendant of concept mapped from leaf
+448167001,Intraluminal brachytherapy of rectum (procedure),y,descendant of concept mapped from leaf
+28563001,Poisoning caused by actinomycin (disorder),y,descendant of concept mapped from leaf
+1103661000000108,Lutetium (177-Lu) labelled somatostatin analogue therapy (procedure),y,descendant of concept mapped from leaf
+292216001,Cytotoxic antibiotic adverse reaction (disorder),y,descendant of concept mapped from leaf
+113120007,Interstitial brachytherapy (regime/therapy),y,descendant of concept mapped from leaf
+287590002,Local skin ultraviolet therapy (procedure),y,descendant of concept mapped from leaf
+306819000,Low power laser therapy to lower limb (procedure),y,descendant of concept mapped from leaf
+293283008,Leuprorelin adverse reaction (disorder),y,descendant of concept mapped from leaf
+63771003,General actinotherapy (procedure),y,descendant of concept mapped from leaf
+69497001,"Brachytherapy isodose calculation, intermediate (procedure)",y,descendant of concept mapped from leaf
+445232009,Boost radiation therapy (procedure),y,descendant of concept mapped from leaf
+10075000,Photochemotherapy with tar and ultraviolet B (procedure),y,descendant of concept mapped from leaf
+115959002,Stereotactic radiosurgery (procedure),y,descendant of concept mapped from leaf
+703423002,Combined chemotherapy and radiation therapy (procedure),y,descendant of concept mapped from leaf
+399180008,Interstitial radioactive colloid therapy (procedure),y,descendant of concept mapped from leaf
+426963003,Endoscopic retrograde photodynamic laser therapy of lesion of bile duct (procedure),y,descendant of concept mapped from leaf
+290654002,Intentional aclarubicin poisoning (event),y,descendant of concept mapped from leaf
+450522005,Narrowband ultraviolet B phototherapy (procedure),y,descendant of concept mapped from leaf
+293281005,Triptorelin adverse reaction (disorder),y,descendant of concept mapped from leaf
+168524008,Radiotherapy - intraoperative control (procedure),y,descendant of concept mapped from leaf
+420529003,Radiotherapy using radioactive plaque on eye (procedure),y,descendant of concept mapped from leaf
+152198000,Brachytherapy (procedure),y,descendant of concept mapped from leaf
+304413005,Pulsed electromagnetic energy to lower limb (regime/therapy),y,descendant of concept mapped from leaf
+449255003,Intraluminal brachytherapy of tracheobronchial tree (procedure),y,descendant of concept mapped from leaf
+449290006,Megavoltage radiation therapy using photons and electrons (procedure),y,descendant of concept mapped from leaf
+169323005,Intermediate distance curietherapy (procedure),y,descendant of concept mapped from leaf
+74023000,Teleradiotherapy of 1 to 25 mega electronvolt protons (procedure),y,descendant of concept mapped from leaf
+293230000,Bicalutamide adverse reaction (disorder),y,descendant of concept mapped from leaf
+290637005,Accidental dactinomycin poisoning (event),y,descendant of concept mapped from leaf
+292236000,Amsacrine adverse reaction (disorder),y,descendant of concept mapped from leaf
+64134004,Stereotactic focused gamma radiosurgery of cerebrum (procedure),y,descendant of concept mapped from leaf
+229588000,Ultraviolet B therapy (procedure),y,descendant of concept mapped from leaf
+169312006,Combined fast-electron therapy (procedure),y,descendant of concept mapped from leaf
+429223009,Percutaneous photodynamic therapy of lesion of bile duct (procedure),y,descendant of concept mapped from leaf
+292835006,Interferons adverse reaction (disorder),y,descendant of concept mapped from leaf
+722470001,Phototherapy of neonate using ultraviolet light (procedure),y,descendant of concept mapped from leaf
+292837003,Interferon-A-2a adverse reaction (disorder),y,descendant of concept mapped from leaf
+431588009,Radionuclide iodine 131 therapy for thyrotoxicosis (procedure),y,descendant of concept mapped from leaf
+14473006,Surface brachytherapy (procedure),y,descendant of concept mapped from leaf
+118641002,Three dimensional treatment planning for teleradiotherapy (procedure),y,descendant of concept mapped from leaf
+290670000,Intentional idarubicin poisoning (event),y,descendant of concept mapped from leaf
+425893002,Ultraviolet A light therapy to skin (procedure),y,descendant of concept mapped from leaf
+448168006,Intracavitary brachytherapy of nasopharynx (procedure),y,descendant of concept mapped from leaf
+290659007,Mitozantrone poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+448987004,Intraluminal brachytherapy of biliary tract (procedure),y,descendant of concept mapped from leaf
+170450005,Meningococcus prophylaxis (procedure),y,descendant of concept mapped from leaf
+293229005,Flutamide adverse reaction (disorder),y,descendant of concept mapped from leaf
+439149000,Intermittent phototherapy (procedure),y,descendant of concept mapped from leaf
+448461009,Stereotactic radiation therapy using megavoltage radiation (procedure),y,descendant of concept mapped from leaf
+169305002,Combined photon therapy (procedure),y,descendant of concept mapped from leaf
+292197004,Alkylating drug adverse reaction (disorder),y,descendant of concept mapped from leaf
+700496000,Postoperative administration of antineoplastic agent into peritoneal cavity (procedure),y,descendant of concept mapped from leaf
+49963009,"Radiation therapy isodose plan, moving strip field (procedure)",y,descendant of concept mapped from leaf
+290660002,Doxorubicin poisoning (disorder),y,descendant of concept mapped from leaf
+306818008,Low power laser therapy to trunk (procedure),y,descendant of concept mapped from leaf
+268502007,Leptospirosis prophylaxis (procedure),y,descendant of concept mapped from leaf
+292202006,Nitrogen mustard derivative adverse reaction (disorder),y,descendant of concept mapped from leaf
+292253007,Vindesine adverse reaction (disorder),y,descendant of concept mapped from leaf
+699618001,Tuberculosis prophylaxis (procedure),y,descendant of concept mapped from leaf
+90564003,Field block design and fabrication (procedure),y,descendant of concept mapped from leaf
+292215002,Dacarbazine adverse reaction (disorder),y,descendant of concept mapped from leaf
+84755001,Radiation therapy treatment management (procedure),y,descendant of concept mapped from leaf
+304411007,Pulsed electromagnetic energy to neck (regime/therapy),y,descendant of concept mapped from leaf
+64522003,Destruction of chorioretinal lesion by implantation of radiation source (procedure),y,descendant of concept mapped from leaf
+257891001,Photodynamic therapy (procedure),y,descendant of concept mapped from leaf
+61109003,Therapeutic radiology port film interpretation and verification (procedure),y,descendant of concept mapped from leaf
+1092151000000100,Intranasal phototherapy (procedure),y,descendant of concept mapped from leaf
+304424007,Pulsed electromagnetic energy to foot (regime/therapy),y,descendant of concept mapped from leaf
+290644001,Intentional mitomycin poisoning (event),y,descendant of concept mapped from leaf
+31632008,Stereotactic focused proton beam on cerebrum (procedure),y,descendant of concept mapped from leaf
+169324004,Combined teletherapy and intermediate distance curietherapy (procedure),y,descendant of concept mapped from leaf
+113115007,"Radiation therapy isodose plan, wedge fields (procedure)",y,descendant of concept mapped from leaf
+290657009,Accidental mitozantrone poisoning (event),y,descendant of concept mapped from leaf
+32947004,"Radiation therapy isodose plan, isocentric (procedure)",y,descendant of concept mapped from leaf
+292838008,Interferon-A-2b adverse reaction (disorder),y,descendant of concept mapped from leaf
+384691004,Intraluminal brachytherapy (regime/therapy),y,descendant of concept mapped from leaf
+82350007,Photochemotherapy (procedure),y,descendant of concept mapped from leaf
+35437002,Consultation in computer dosimetry and isodose chart for brachytherapy (procedure),y,descendant of concept mapped from leaf
+449155008,Intraluminal brachytherapy of esophagus (procedure),y,descendant of concept mapped from leaf
+306825001,Low power laser therapy to pelvis (procedure),y,descendant of concept mapped from leaf
+304423001,Pulsed electromagnetic energy to ankle (regime/therapy),y,descendant of concept mapped from leaf
+1699009,Special dosimetry (procedure),y,descendant of concept mapped from leaf
+429730002,Photodynamic therapy of skin of whole body (procedure),y,descendant of concept mapped from leaf
+290694000,Intentional pentostatin poisoning (event),y,descendant of concept mapped from leaf
+447704003,Single dose stereotactic radiosurgery using linear accelerator system (procedure),y,descendant of concept mapped from leaf
+290669001,Accidental idarubicin poisoning (event),y,descendant of concept mapped from leaf
+869901000000105,Retroorbital radiotherapy (procedure),y,descendant of concept mapped from leaf
+428604001,Photodynamic therapy of skin (procedure),y,descendant of concept mapped from leaf
+169297002,Short distance X-ray therapy (procedure),y,descendant of concept mapped from leaf
+22638002,Photochemotherapy with tar and petrolatum (procedure),y,descendant of concept mapped from leaf
+447759004,Brachytherapy of breast (procedure),y,descendant of concept mapped from leaf
+229592007,Kromayer treatment (procedure),y,descendant of concept mapped from leaf
+292190002,Aldesleukin adverse reaction (disorder),y,descendant of concept mapped from leaf
+168522007,Radiotherapy for lymphatic irradiation (procedure),y,descendant of concept mapped from leaf
+169319002,Combined heavy particle therapy (procedure),y,descendant of concept mapped from leaf
+711299007,Radiotherapy to thorax (procedure),y,descendant of concept mapped from leaf
+448552007,Interstitial brachytherapy using gold grain (procedure),y,descendant of concept mapped from leaf
+292232003,Pentostatin adverse reaction (disorder),y,descendant of concept mapped from leaf
+17876001,"Radiation therapy treatment planning, interpretation of special testing ordered by radiation therapist (procedure)",y,descendant of concept mapped from leaf
+84778007,Radiation therapy simulator aided field setting (procedure),y,descendant of concept mapped from leaf
+16554931000119102,Intravenous radionuclide therapy using radium 223 dichloride (procedure),y,descendant of concept mapped from leaf
+292245004,Aminoglutethimide adverse reaction (disorder),y,descendant of concept mapped from leaf
+473279002,Photodynamic therapy of chorioretinal lesion (procedure),y,descendant of concept mapped from leaf
+20117002,Poisoning caused by mitomycin (disorder),y,descendant of concept mapped from leaf
+169418006,Visible light therapy (procedure),y,descendant of concept mapped from leaf
+292226008,Idarubicin adverse reaction (disorder),y,descendant of concept mapped from leaf
+441858005,Adverse reaction caused by trastuzumab administered by infusion (disorder),y,descendant of concept mapped from leaf
+69568002,Oral radiation (procedure),y,descendant of concept mapped from leaf
+169322000,Gamma-ray telecurie therapy (procedure),y,descendant of concept mapped from leaf
+292254001,Dimethyl sulfoxide adverse reaction (disorder),y,descendant of concept mapped from leaf
+304422006,Pulsed electromagnetic energy to knee (regime/therapy),y,descendant of concept mapped from leaf
+169294009,Half-deep therapy 60-150 kV (procedure),y,descendant of concept mapped from leaf
+290646004,Plicamycin poisoning (disorder),y,descendant of concept mapped from leaf
+304409003,Pulsed electromagnetic energy to upper limb (regime/therapy),y,descendant of concept mapped from leaf
+304410008,Pulsed electromagnetic energy to face (regime/therapy),y,descendant of concept mapped from leaf
+290639008,Dactinomycin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+290656000,Mitozantrone poisoning (disorder),y,descendant of concept mapped from leaf
+84336003,"Radiation therapy isodose plan, rotation field (procedure)",y,descendant of concept mapped from leaf
+428545002,Phototherapy of skin (procedure),y,descendant of concept mapped from leaf
+290641009,Intentional bleomycin poisoning (event),y,descendant of concept mapped from leaf
+57966002,"Radiation therapy, tissue and geometric inhomogeneity correction (procedure)",y,descendant of concept mapped from leaf
+431778005,Brachytherapy of prostate using fluoroscopic guidance (procedure),y,descendant of concept mapped from leaf
+290671001,Idarubicin poisoning of undetermined intent (disorder),y,descendant of concept mapped from leaf
+292839000,Interferon-A-N1 adverse reaction (disorder),y,descendant of concept mapped from leaf
+39646005,Hemibody irradiation (procedure),y,descendant of concept mapped from leaf
+49569001,Consultation in teletherapy (procedure),y,descendant of concept mapped from leaf
+169334008,External beam - surgery with postoperative radiotherapy (procedure),y,descendant of concept mapped from leaf
+304420003,Pulsed electromagnetic energy to abdomen (regime/therapy),y,descendant of concept mapped from leaf
+722482005,"Doxorubicin, bleomycin, vinblastine and dacarbazine chemotherapy regimen (regime/therapy)",y,descendant of concept mapped from leaf
+448294009,External radiation therapy using superficial radiation (procedure),y,descendant of concept mapped from leaf
+292248002,Tamoxifen adverse reaction (disorder),y,descendant of concept mapped from leaf
+292246003,Estrogen antagonist adverse reaction (disorder),y,descendant of concept mapped from leaf
+169318005,Fast neutron therapy (procedure),y,descendant of concept mapped from leaf
+1086741000000104,Epiretinal brachytherapy (procedure),y,descendant of concept mapped from leaf
+292250005,Vinca alkaloid adverse reaction (disorder),y,descendant of concept mapped from leaf
+169422001,Inflammatory infrared therapy (regime/therapy),y,descendant of concept mapped from leaf
+169304003,Van der Graaff photon therapy (procedure),y,descendant of concept mapped from leaf
+431200001,Radionuclide iodine 131 therapy to thyroid (procedure),y,descendant of concept mapped from leaf
+306815006,Low power laser therapy to upper limb (procedure),y,descendant of concept mapped from leaf
+306816007,Low power laser therapy to face (procedure),y,descendant of concept mapped from leaf
+169328001,Beta source contact therapy (procedure),y,descendant of concept mapped from leaf
+804811000000103,Phototherapy using 311 nanometres narrowband ultraviolet B lamp (procedure),y,descendant of concept mapped from leaf
+300041008,Penicillin prophylaxis (procedure),y,descendant of concept mapped from leaf
+306823008,Low power laser therapy to hand (procedure),y,descendant of concept mapped from leaf
+427541000119103,Intravenous radionuclide therapy (procedure),y,descendant of concept mapped from leaf
+36679009,Vaginal cone irradiation (procedure),y,descendant of concept mapped from leaf
+169309008,Linear accelerator electrons (procedure),y,descendant of concept mapped from leaf
+15543008,Isodose computation for brachytherapy (procedure),y,descendant of concept mapped from leaf
+306830002,Low power laser therapy to foot (procedure),y,descendant of concept mapped from leaf
+65381004,Intra-articular radionuclide therapy (regime/therapy),y,descendant of concept mapped from leaf
+1092191000000108,Intraoral low power laser therapy (procedure),y,descendant of concept mapped from leaf
+229589008,Ultraviolet C therapy (procedure),y,descendant of concept mapped from leaf
+293081004,Dapsone adverse reaction (disorder),y,descendant of concept mapped from leaf
+65263004,General radiation therapy consultation and report (procedure),y,descendant of concept mapped from leaf
+169314007,Proton therapy (procedure),y,descendant of concept mapped from leaf
+118640001,Radioimmunotherapy (procedure),y,descendant of concept mapped from leaf
+292198009,Mitobronitol adverse reaction (disorder),y,descendant of concept mapped from leaf
+438816004,Radiolabeled technetium 99m antibody therapy (procedure),y,descendant of concept mapped from leaf
+238811000000106,Delivery of oral chemotherapy for neoplasm NOS (regime/therapy),n,via Query Table
+560611000000108,Radiation/phototherapy NOS (procedure),n,via Query Table
+468111000000107,[X]Other chemotherapy (situation),n,via Query Table
+222771000000107,Stereotactic radiosurgery (procedure),n,via Query Table
+267661000000100,Delivery of a fraction of interstitial radiotherapy ,n,via Query Table
+490271000000105,Preparation for intensity modulated radiation therapy ,n,via Query Table
+170449005,Antibiotic cover - surgery (procedure),n,via Query Table
+262671000000105,Transurethral radiofrequency needle ablation of prostate ,n,via Query Table
+576601000000103,Other nuclear therapy NOS (procedure),n,via Query Table
+236241000000105,Radiotherapy delivery NOS (procedure),n,via Query Table
+267981000000103,Delivery of exclusively oral chemotherapy for neoplasm ,n,via Query Table
+282621000000108,Phototherapy to skin (procedure),n,via Query Table
+916171000000104,Radiotherapy,n,via Query Table
+250621000000102,Photodynamic therapy ,n,via Query Table
+238091000000107,Volume definition for simple radiotherapy with imaging and dosimetry (procedure),n,via Query Table
+267921000000104,Delivery of complex parenteral chemotherapy for neoplasm at first attendance ,n,via Query Table
+213881000000103,Chemotherapy started,n,via Query Table
+290651000000100,Photodynamic therapy of skin,n,via Query Table
+273601000000102,Photodynamic therapy ,n,via Query Table
+267641000000101,Delivery of a fraction of total body irradiation (TBI) ,n,via Query Table
+268451000000102,Radiotherapy procedures NOS ,n,via Query Table
+575551000000108,Infrared therapy NOS (procedure),n,via Query Table
+490441000000100,Megavoltage treatment for complex radiotherapy ,n,via Query Table
+231671000000107,Radiotherapy volume definition (procedure),n,via Query Table
+169384001,Preload radiotherapy - rectum (regime/therapy),n,via Query Table
+267491000000109,Volume definition for radiotherapy with imaging and intensity-modulated radiation therapy (IMRT) dosimetry ,n,via Query Table
+379661000000105,Other specified preparation for brachytherapy (procedure),n,via Query Table
+282671000000107,Ultraviolet B light therapy to skin (procedure),n,via Query Table
+180521006,Introduction of radium into organ NOC (procedure),n,via Query Table
+490491000000105,Technical support for preparation for radiotherapy ,n,via Query Table
+267911000000105,Delivery of complex chemotherapy for neoplasm including prolonged infusional treatment at first attendance ,n,via Query Table
+490321000000104,Preparation for superficial radiotherapy with simple calculation ,n,via Query Table
+290681000000106,Photodynamic therapy of skin NOS,n,via Query Table
+2966007,Aplastic anemia secondary to radiation (disorder),n,via Query Table
+238871000000101,Delivery of chemotherapy for neoplasm NOS (procedure),n,via Query Table
+290731000000102,Combined photochemotherapy and ultraviolet B light therapy to skin,n,via Query Table
+268161000000105,Introduction of radioactive substance into organ for interstitial brachytherapy NOC ,n,via Query Table
+550941000000105,Internal metabolic radiotherapy NOS (procedure),n,via Query Table
+268501000,Antibiotic cover - dentistry (procedure),n,via Query Table
+916781000000103,High cost chemotherapy drugs,n,via Query Table
+169390002,Afterload radiotherapy - respiratory system (regime/therapy),n,via Query Table
+169393000,Afterload radiotherapy - rectum (regime/therapy),n,via Query Table
+169385000,Preload radiotherapy of oropharyngeal cavity (procedure),n,via Query Table
+236461000000105,Delivery of a fraction of complex radiotherapy on a megavoltage machine (procedure),n,via Query Table
+268431000000109,Delivery of a fraction of radiotherapy on a superficial or orthovoltage machine ,n,via Query Table
+198551000000104,Chemotherapy started (situation),n,via Query Table
+490451000000102,Megavoltage treatment for simple radiotherapy ,n,via Query Table
+677911000000104,Other nuclear therapy (procedure),n,via Query Table
+327451000000104,Radionuclide iodine 131 therapy for thyrotoxicosis (procedure),n,via Query Table
+894551000000100,Electroporation therapy ,n,via Query Table
+441515002,Delivery of a fraction of intraluminal brachytherapy (procedure),n,via Query Table
+834441000000106,Neoadjuvant chemotherapy,n,via Query Table
+180518009,Introduction of removable radioactive material into organ NOC (procedure),n,via Query Table
+232261000000105,Other specified radiotherapy procedures (procedure),n,via Query Table
+169380005,Preload radiotherapy - upper gastrointestinal tract (regime/therapy),n,via Query Table
+290751000000109,Phototherapy to skin NOS,n,via Query Table
+583361000000109,Other specified introduction of removable radioactive material into organ NOC (procedure),n,via Query Table
+490291000000109,Preparation for hemi body irradiation ,n,via Query Table
+305971000000102,Radiotherapy to chest wall (procedure),n,via Query Table
+169379007,Preload radiotherapy - ear (regime/therapy),n,via Query Table
+490261000000103,Preparation for external beam radiotherapy ,n,via Query Table
+916771000000100,High cost chemotherapy drugs,n,via Query Table
+898261000000107,Pulsed dose rate brachytherapy ,n,via Query Table
+489381000000105,Percutaneous radiofrequency ablation of lesion of bone ,n,via Query Table
+562641000000105,Other radiotherapy NOS (procedure),n,via Query Table
+267581000000108,Preparation for total body irradiation ,n,via Query Table
+698739008,Radionuclide lutetium 177 somatostatin analog therapy (procedure),n,via Query Table
+253331000000101,Stereotactic radiosurgery on tissue of brain ,n,via Query Table
+228678004,Cesium 137 brachytherapy manual loading (regime/therapy),n,via Query Table
+226221000000101,Plaque radiotherapy to lesion of retina (procedure),n,via Query Table
+169392005,Afterload radiotherapy - urinary (regime/therapy),n,via Query Table
+169386004,Preload cavity radiotherapy NOS (regime/therapy),n,via Query Table
+334311000000104,Yttrium 90 somatostatin analog therapy (procedure),n,via Query Table
+327471000000108,Radionuclide rhenium 186 hydroxyethylidene diphosphonate therapy (procedure),n,via Query Table
+380161000000101,Other specified support for preparation for radiotherapy (procedure),n,via Query Table
+267541000000100,"Volume definition for superficial or deep X-ray, electron or megavoltage radiotherapy with simple calculation ",n,via Query Table
+447957008,Selective internal radiation using yttrium (procedure),n,via Query Table
+1051341000000103,Radioimmunoguided surgery (procedure),n,via Query Table
+169381009,Preload radiotherapy - respiratory organs (regime/therapy),n,via Query Table
+306041000000101,Radiotherapy to pelvis (procedure),n,via Query Table
+244821000000108,Radioactive seed implantation into prostate (procedure),n,via Query Table
+69960004,Antineoplastic chemotherapy regimen (regime/therapy),n,via Query Table
+282461000000103,Photodynamic therapy of skin (procedure),n,via Query Table
+536181000000101,X-ray beam therapy NOS (procedure),n,via Query Table
+305941000000108,Radiotherapy to perineum (procedure),n,via Query Table
+267481000000107,Radiotherapy volume definition,n,via Query Table
+182934007,Prophylactic antibiotic therapy (procedure),n,via Query Table
+857171000000101,Electrochemotherapy,n,via Query Table
+169383007,Preload radiotherapy - urinary system (regime/therapy),n,via Query Table
+267571000000106,Radiotherapy preparation,n,via Query Table
+348791000000100,Goeckerman regime (procedure),n,via Query Table
+262061000000106,Percutaneous radiofrequency ablation of lesion of kidney ,n,via Query Table
+267901000000108,Delivery of chemotherapy for neoplasm ,n,via Query Table
+282471000000105,Photodynamic therapy of skin of whole body (procedure),n,via Query Table
+223941000000105,Selective internal radiotherapy with microspheres to lesion of liver (procedure),n,via Query Table
+238061000000101,Other specified radiotherapy delivery (procedure),n,via Query Table
+290711000000105,Ultraviolet B light therapy to skin,n,via Query Table
+490471000000106,Megavoltage treatment for adaptive radiotherapy ,n,via Query Table
+916741000000106,Cancer hormonal treatment drugs Band 1,n,via Query Table
+536221000000106,Heavy particle therapy NOS (procedure),n,via Query Table
+710121000000106,Cancer chemotherapy management plan ,n,via Query Table
+238101000000104,Volume definition for radiotherapy with imaging and intensity-modulated radiation therapy dosimetry (procedure),n,via Query Table
+262661000000103,Seed implantation into prostate ,n,via Query Table
+291401000000106,Oral delivery of radiotherapy for thyroid ablation,n,via Query Table
+490331000000102,Preparation for complex conformal radiotherapy ,n,via Query Table
+490421000000107,Introduction of radioactive substance into organ for brachytherapy NOC ,n,via Query Table
+289211000000109,Percutaneous radiofrequency ablation of lesion of lung,n,via Query Table
+710111000000100,Cancer chemotherapy management plan (qualifier value),n,via Query Table
+169375001,Preload radiotherapy - orbit (regime/therapy),n,via Query Table
+282711000000108,Phototherapy to skin NOS (procedure),n,via Query Table
+223135008,[X]BCG vaccine causing adverse effects in therapeutic use (disorder),n,via Query Table
+262651000000101,Endoscopic radiofrequency ablation of lesion of prostate ,n,via Query Table
+379621000000102,Other specified preparation for external beam radiotherapy (procedure),n,via Query Table
+268171000000103,Radioactive seed implantation NOC ,n,via Query Table
+469981000000107,[V]Maintenance chemotherapy (context-dependent category),n,via Query Table
+223791000000103,Percutaneous photodynamic therapy of lesion of bile duct (procedure),n,via Query Table
+254781000000103,Photodynamic therapy to subretinal lesion ,n,via Query Table
+675231000000108,Cytotoxic drug therapy NOS (procedure),n,via Query Table
+379651000000107,Preparation for brachytherapy NOS (procedure),n,via Query Table
+479871000000108,[X]Follow-up examination after chemotherapy for other conditions (situation),n,via Query Table
+229791000000101,Transurethral radiofrequency needle ablation of prostate (procedure),n,via Query Table
+321551000000106,Fluoroscopy guided intracoronary brachytherapy (procedure),n,via Query Table
+453671000000106,[V]Follow-up examination after chemotherapy for other conditions (context-dependent category),n,via Query Table
+267501000000103,"Volume definition for radiotherapy with imaging, dosimetry and technical support ",n,via Query Table
+267531000000109,Volume definition for simple radiotherapy with imaging and simple calculation ,n,via Query Table
+548741000000108,Antineoplastic antibiotic poisoning NOS (disorder),n,via Query Table
+228680005,Curietron brachytherapy (regime/therapy),n,via Query Table
+267521000000107,Volume definition for simple radiotherapy with imaging and dosimetry ,n,via Query Table
+490391000000101,Preparation for interstitial brachytherapy ,n,via Query Table
+490481000000108,Support for preparation for radiotherapy ,n,via Query Table
+406311000000106,[X]Overdose of radiation given during therapy (disorder),n,via Query Table
+916891000000109,High dose brachytherapy,n,via Query Table
+490311000000105,Preparation for simple radiotherapy with imaging and simple calculation ,n,via Query Table
+316439001,[V]Convalescence after radiotherapy (situation),n,via Query Table
+449438004,Selective internal radiation using iodine radioisotope labeled ethiodized oil (procedure),n,via Query Table
+282701000000106,Other specified phototherapy to skin (procedure),n,via Query Table
+169382002,Preload radiotherapy - female genital (regime/therapy),n,via Query Table
+169391003,Afterload radiotherapy - female genital (regime/therapy),n,via Query Table
+305951000000106,Radiotherapy to abdomen (procedure),n,via Query Table
+257971000000109,Selective internal radiotherapy with microspheres to lesion of liver ,n,via Query Table
+380411000000105,Delivery of a fraction of intraluminal brachytherapy (procedure),n,via Query Table
+236331000000107,Volume definition for multiple phases of complex radiotherapy with dosimetry (procedure),n,via Query Table
+66746006,Prescription of prophylactic antibiotic (procedure),n,via Query Table
+267681000000109,Radiotherapy delivery NOS ,n,via Query Table
+169374002,Preload cavity radiotherapy - sealed (regime/therapy),n,via Query Table
+490251000000101,Delivery of a fraction of intraluminal brachytherapy ,n,via Query Table
+510091000000109,Photodynamic therapy to choroidal neovascular membrane,n,via Query Table
+64819008,Intracavitary radionuclide therapy (regime/therapy),n,via Query Table
+452971000000105,[V]Chemotherapy follow-up (context-dependent category),n,via Query Table
+223951000000108,Percutaneous radiofrequency ablation of lesion of liver (procedure),n,via Query Table
+228679007,Cesium 137 brachytherapy manual loading with Heyman's capsules (regime/therapy),n,via Query Table
+232251000000107,Radiotherapy procedures NOS (procedure),n,via Query Table
+536241000000104,Short distance/contact radiotherapy NOS (procedure),n,via Query Table
+490361000000107,Preparation for brachytherapy ,n,via Query Table
+267591000000105,Preparation for intracavitary radiotherapy ,n,via Query Table
+398511000000106,[V]Convalescence after radiotherapy (situation),n,via Query Table
+29860002,Intravascular radionuclide therapy (regime/therapy),n,via Query Table
+306201000000107,Radiotherapy by body site (procedure),n,via Query Table
+323151000000101,Radiolabelled Iodine 131 antibody therapy (procedure),n,via Query Table
+288106005,Cytotoxic given orally (procedure),n,via Query Table
+239091000000101,Other specified delivery of oral chemotherapy for neoplasm (regime/therapy),n,via Query Table
+169326002,Short distance and contact radiotherapy (procedure),n,via Query Table
+218327002,Adverse reaction to actinomycin D (disorder),n,via Query Table
+180520007,Introduction of iridium wire into organ NOC (procedure),n,via Query Table
+257981000000106,Percutaneous radiofrequency ablation of lesion of liver ,n,via Query Table
+268401000000103,Radiotherapy procedures ,n,via Query Table
+229601000000101,Endoscopic radiofrequency ablation of lesion of prostate (procedure),n,via Query Table
+562571000000100,Radiotherapy purpose - NOS (procedure),n,via Query Table
+916751000000109,Cancer supportive drugs Band 1,n,via Query Table
+916181000000102,Radionuclide therapy,n,via Query Table
+545141000000103,Prophylactic chemotherapy NOS (procedure),n,via Query Table
+323171000000105,Radiolabelled indium 111 antibody therapy (procedure),n,via Query Table
+226671000000104,Stereotactic radiosurgery on tissue of brain (procedure),n,via Query Table
+536211000000100,Fast-electron therapy NOS (procedure),n,via Query Table
+169388003,Afterload radiotherapy - head (regime/therapy),n,via Query Table
+921401000000101,Preoperative high dose brachytherapy (procedure),n,via Query Table
+282481000000107,Other specified photodynamic therapy of skin (procedure),n,via Query Table
+536191000000104,High-energy beam therapy NOS (procedure),n,via Query Table
+280721000000103,Percutaneous radiofrequency ablation of lesion of lung (procedure),n,via Query Table
+231661000000100,Radiotherapy preparation (procedure),n,via Query Table
+327551000000100,Fluoroscopy guided percutaneous brachytherapy of hepatic artery (procedure),n,via Query Table
+916731000000102,High cost chemotherapy drugs,n,via Query Table
+290721000000104,Combined photochemotherapy and ultraviolet A light therapy to skin,n,via Query Table
+238081000000105,"Volume definition for radiotherapy with imaging, dosimetry and technical support (procedure)",n,via Query Table
+490381000000103,Preparation for intracavitary brachytherapy ,n,via Query Table
+394900008,Administration of cancer treatment (procedure),n,via Query Table
+490351000000109,Preparation for external beam radiotherapy NOS ,n,via Query Table
+490281000000107,Preparation for total body irradiation ,n,via Query Table
+490411000000101,Preparation for brachytherapy NOS ,n,via Query Table
+268421000000107,Delivery of a fraction of simple radiotherapy on a megavoltage machine ,n,via Query Table
+254361000000108,Plaque radiotherapy to lesion of retina ,n,via Query Table
+267511000000101,Volume definition for multiple phases of complex radiotherapy with dosimetry ,n,via Query Table
+169378004,Preload radiotherapy - mouth (regime/therapy),n,via Query Table
+239081000000103,Other specified delivery of chemotherapy for neoplasm (procedure),n,via Query Table
+533231000000101,Radiotherapy: temporary implant NOS (procedure),n,via Query Table
+238071000000108,Preparation for interstitial radiotherapy (procedure),n,via Query Table
+228841000000105,Percutaneous radiofrequency ablation of lesion of kidney (procedure),n,via Query Table
+213871000000100,Chemotherapy started,n,via Query Table
+180519001,Introduction of radioactive cesium into organ NOC (procedure),n,via Query Table
+916791000000101,High cost chemotherapy drugs,n,via Query Table
+316718009,[X]Follow-up examination after chemotherapy for other conditions (situation),n,via Query Table
+290701000000108,Ultraviolet A light therapy to skin,n,via Query Table
+562601000000107,Radiochemotherapy NOS (procedure),n,via Query Table
+916711000000105,High cost chemotherapy drugs,n,via Query Table
+916761000000107,High cost chemotherapy drugs,n,via Query Table
+306031000000105,Radiotherapy to head (procedure),n,via Query Table
+916301000000109,Brachytherapy,n,via Query Table
+258271000000104,Endoscopic retrograde photodynamic laser therapy of lesion of bile duct ,n,via Query Table
+290381000000104,Radioactive seed implantation into prostate,n,via Query Table
+403991000000108,"[X]Antigonadotrophins, antiestrogens, antiandrogens causing adverse effects in therapeutic use, not elswhere classified (disorder)",n,via Query Table
+428784009,Selective internal radiotherapy to lesion of liver using microspheres (procedure),n,via Query Table
+182831000,Drug therapy (procedure),n,via Query Table
+258291000000100,Percutaneous photodynamic therapy of lesion of bile duct ,n,via Query Table
+285031000000107,Radioactive seed implantation into prostate (procedure),n,via Query Table
+267651000000103,Delivery of a fraction of intracavitary radiotherapy ,n,via Query Table
+576591000000109,Other radiotherapy miscellaneous (procedure),n,via Query Table
+490431000000109,Introduction of non-removable radioactive substance into organ for brachytherapy NOC ,n,via Query Table
+169377009,Preload radiotherapy - nose (regime/therapy),n,via Query Table
+230121000000105,External beam radiotherapy to lesion of retina (procedure),n,via Query Table
+282661000000100,Ultraviolet A light therapy to skin (procedure),n,via Query Table
+352951000000109,Radiolabelled technetium 99m antibody therapy (procedure),n,via Query Table
+361261000000103,Intermittent phototherapy (procedure),n,via Query Table
+306011000000102,Radiotherapy to axilla (procedure),n,via Query Table
+533201000000107,External radiotherapy NOS (procedure),n,via Query Table
+380051000000100,Superficial or orthovoltage treatment for radiotherapy (procedure),n,via Query Table
+236311000000104,"Volume definition for superficial or deep X-ray, electron or megavoltage radiotherapy with simple calculation (procedure)",n,via Query Table
+169376000,Preload radiotherapy - paranasal sinus (regime/therapy),n,via Query Table
+268411000000101,Delivery of a fraction of complex radiotherapy on a megavoltage machine ,n,via Query Table
+884151000000105,Radium 223 therapy (procedure),n,via Query Table
+267971000000100,Delivery of oral chemotherapy for neoplasm ,n,via Query Table
+323161000000103,Iodine 131 lipiodol therapy (procedure),n,via Query Table
+282581000000108,Combined photochemotherapy and ultraviolet B light therapy to skin (procedure),n,via Query Table
+475191000000101,[X]BCG vaccine causing adverse effects in therapeutic use (disorder),n,via Query Table
+267601000000104,Preparation for interstitial radiotherapy ,n,via Query Table
+169387008,Afterloading cavity radiotherapy (regime/therapy),n,via Query Table
+223771000000102,Endoscopic retrograde photodynamic laser therapy of lesion of bile duct (procedure),n,via Query Table
+550971000000104,Preload cavity radiotherapy NOS (procedure),n,via Query Table
+536231000000108,Distant gamma therapy NOS (procedure),n,via Query Table
+254391000000102,External beam radiotherapy to lesion of retina ,n,via Query Table
+312247001,Iridium 192 brachytherapy remote afterloading (regime/therapy),n,via Query Table
+533191000000105,Combined radiotherapy NOS (procedure),n,via Query Table
+267931000000102,Delivery of simple parenteral chemotherapy for neoplasm at first attendance ,n,via Query Table
+690221000000109,Ultraviolet therapy NOS (procedure),n,via Query Table
+378871000000108,Percutaneous radiofrequency ablation of lesion of bone (procedure),n,via Query Table
+228683007,Cathetron brachytherapy (regime/therapy),n,via Query Table
+916821000000106,High cost chemotherapy drugs,n,via Query Table
+507971000000108,Photodynamic therapy to choroidal neovascular membrane (procedure),n,via Query Table
+19278001,Bililite therapy with ultraviolet light (procedure),n,via Query Table
+794511000000101,Radionuclide lutetium 177 somatostatin analogue therapy (procedure),n,via Query Table
+284461000000106,Delivery of a fraction of external beam radiotherapy NEC (procedure),n,via Query Table
+533221000000103,Radiotherapy: permanent seeds NOS (procedure),n,via Query Table
+895131000000101,Hypofractionated stereotactic radiotherapy using megavoltage radiation ,n,via Query Table
+306021000000108,Radiotherapy to breast (procedure),n,via Query Table
+236261000000106,Preparation for intracavitary radiotherapy (procedure),n,via Query Table
+290691000000108,Phototherapy to skin,n,via Query Table
+803941000000109,Induction chemotherapy (procedure),n,via Query Table
+327441000000102,Radionuclide iodine 131 thyroid therapy (procedure),n,via Query Table
+379631000000100,Preparation for external beam radiotherapy NOS (procedure),n,via Query Table
+490301000000108,Preparation for simple radiotherapy with imaging and dosimetry ,n,via Query Table
+169389006,Afterload radiotherapy - upper gastrointestinal tract (regime/therapy),n,via Query Table
+282491000000109,Photodynamic therapy of skin NOS (procedure),n,via Query Table
+550951000000108,Internal unsealed radiotherapy NOS (procedure),n,via Query Table
+305961000000109,Radiotherapy to neck (procedure),n,via Query Table
+236321000000105,Volume definition for simple radiotherapy with imaging and simple calculation (procedure),n,via Query Table
+267941000000106,Delivery of subsequent element of cycle of chemotherapy for neoplasm ,n,via Query Table
+267631000000105,Radiotherapy delivery ,n,via Query Table
+576641000000100,Visible light therapy NOS (procedure),n,via Query Table
+380081000000106,Support for preparation for radiotherapy NOS (procedure),n,via Query Table
+258321000000105,Bile duct endoluminal radiotherapy ,n,via Query Table
+226051000000101,Photodynamic therapy to subretinal lesion (procedure),n,via Query Table
+290661000000102,Photodynamic therapy of skin of whole body,n,via Query Table
+321611000000106,Fluoroscopy guided brachytherapy of prostate (procedure),n,via Query Table
+671071000000100,Adverse reaction to antineoplastic antibiotics NOS (disorder),n,via Query Table
+223188002,[X]Overdose of radiation given during therapy (disorder),n,via Query Table
+882661000000108,Postoperative intraperitoneal chemotherapy (procedure),n,via Query Table
+282571000000106,Combined photochemotherapy and ultraviolet A light therapy to skin (procedure),n,via Query Table
+490371000000100,Preparation for intraluminal brachytherapy ,n,via Query Table

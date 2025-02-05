@@ -1,8 +1,98 @@
-version: '4.0'
+version: '3.0'
+
+expectations:
+
+  population_size: 1000
 
 actions:
-  generate_dataset:
-    run: ehrql:v1 generate-dataset analysis/dataset_definition.py --output output/dataset.csv.gz
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## DO NOT EDIT project.yaml DIRECTLY 
+  ## This file is created by create-project.R 
+  ## Edit and run create-project.R to update the project.yaml 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Pre-server scripts 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Extract and tidy 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  extract:
+    run: ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py --output
+      output/1-extract/extract.arrow --dummy-data-file output/1-extract/dummy_extract.arrow
+    needs: []
     outputs:
       highly_sensitive:
-        dataset: output/dataset.csv.gz
+        arrow: output/1-extract/extract.arrow
+
+  prepare:
+    run: r:v2 analysis/2-prepare/data_prepare.R
+    needs:
+    - extract
+    outputs:
+      highly_sensitive:
+        arrow: output/2-prepare/*.arrow
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Cohort: age75plus 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  data_selection_age75plus:
+    run: r:v2 analysis/2-prepare/data_selection.R age75plus
+    needs:
+    - prepare
+    outputs:
+      highly_sensitive:
+        arrow: output/3-cohorts/age75plus/*.arrow
+      moderately_sensitive:
+        csv: output/3-cohorts/age75plus/*.csv
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## matching set A 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  match_age75plus_A:
+    run: r:v2 analysis/3-matching/match.R age75plus A
+    needs:
+    - data_selection_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/3-cohorts/age75plus/matchA/*.arrow
+
+  match_report_age75plus_A:
+    run: r:v2 analysis/3-matching/match_report.R age75plus A
+    needs:
+    - data_selection_age75plus
+    - match_age75plus_A
+    outputs:
+      moderately_sensitive:
+        csv: output/3-cohorts/age75plus/matchA/report/*.csv
+        png: output/3-cohorts/age75plus/matchA/report/*.png
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## weighting set A 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  weight_age75plus_A:
+    run: r:v2 analysis/3-weighting/weight.R age75plus A
+    needs:
+    - data_selection_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/3-cohorts/age75plus/weightA/*.arrow
+
+  weight_report_age75plus_A:
+    run: r:v2 analysis/3-weighting/weight_report.R age75plus A
+    needs:
+    - data_selection_age75plus
+    - weight_age75plus_A
+    outputs:
+      moderately_sensitive:
+        csv: output/3-cohorts/age75plus/weightA/report/*.csv
+        png: output/3-cohorts/age75plus/weightA/report/*.png
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## End 
+  ## # # # # # # # # # # # # # # # # # # # 
+
