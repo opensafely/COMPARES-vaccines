@@ -170,7 +170,7 @@ obj_matchit <-
     data = data_prematch,
     method = "nearest", distance = "glm", # these two options don't really do anything because we only want exact + caliper matching
     replace = FALSE,
-    estimand = "ATT", # since we are doing exact matching, ATT is equivalent to ATO (average treatment in the overlap)
+    estimand = "ATT", # since we are doing exact matching, ATT is equivalent to ATU. although we'll actually get the ATO (average treatment in the overlap)
     exact = matching_variables[[matchset]]$exact,
     caliper = matching_variables[[matchset]]$caliper, std.caliper=FALSE,
     m.order = "data", # data is sorted on (effectively random) patient ID
@@ -184,7 +184,7 @@ data_matches <-
     patient_id = data_prematch$patient_id,
     matched = !is.na(obj_matchit$subclass),
     thread_id = 1L,
-    threadmatch_id = obj_matchit$subclass,
+    threadmatch_id = as.integer(obj_matchit$subclass),
     treatment = obj_matchit$treat,
     weight = obj_matchit$weights,
   ) 
@@ -196,13 +196,16 @@ data_matches <-
 
 data_matches <-
   data_matches |>
-  left_join(data_cohort |> select(patient_id, vax_date), by="patient_id") |>
   arrange(thread_id, threadmatch_id) |>
   mutate(
-    match_id = dense_rank(threadmatch_id * max(thread_id) + thread_id) # create unique match id across all threads
+    match_id = dense_rank(threadmatch_id * max(thread_id) + (thread_id - 1L))  # create unique match id across all threads
   )
 
 write_feather(data_matches, fs::path(output_dir, "data_matches.arrow"))
+
+
+
+summary(obj_matchit)
 
 data_matches |>
   group_by(treatment, matched) |>
@@ -243,21 +246,21 @@ data_matches |>
 ## and provides consistency across different analyses
 ## but the leg work is still done by the analysis scripts
 
-boot_n <- 500 # more than necessary, can select fewer in the analysis scripts
-
-boot_id <- seq_len(boot_n)
-
-match_ids <- unique(data_matches$match_id[!is.na(data_matches$match_id)])
-
-set.seed(20230401)
-
-boot_samples <-
-  tibble(boot_id) |>
-  mutate(
-    match_id = map(boot_id, ~sample(match_ids, size=length(match_ids), replace=TRUE))
-  ) |>
-  unnest(match_id)
-
-write_feather(boot_samples, fs::path(output_dir, "boot_samples.arrow"))
+# boot_n <- 500 # more than necessary, can select fewer in the analysis scripts
+# 
+# boot_id <- seq_len(boot_n)
+# 
+# match_ids <- unique(data_matches$match_id[!is.na(data_matches$match_id)])
+# 
+# set.seed(20230401)
+# 
+# boot_samples <-
+#   tibble(boot_id) |>
+#   mutate(
+#     match_id = map(boot_id, ~sample(match_ids, size=length(match_ids), replace=TRUE))
+#   ) |>
+#   unnest(match_id)
+# 
+# write_feather(boot_samples, fs::path(output_dir, "boot_samples.arrow"))
 
 
