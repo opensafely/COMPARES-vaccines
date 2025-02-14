@@ -232,7 +232,7 @@ write_csv(total_n_rounded, fs::path(output_dir, "total_rounded.csv"))
 remove(data_inclusioncriteria)
 
 ## create a table of baseline characteristics between each treatment group, before matching / weighting
-tab_summary_prematch <-
+tab_summary_unadjusted <-
   data_cohort |>
   mutate(
     N=1L,
@@ -244,5 +244,4 @@ tab_summary_prematch <-
     threshold = sdc.limit
   )
 
-
-write_csv(tab_summary_prematch, fs::path(output_dir, "table1.csv"))
+write_csv(tab_summary_unadjusted, fs::path(output_dir, "table1.csv"))
