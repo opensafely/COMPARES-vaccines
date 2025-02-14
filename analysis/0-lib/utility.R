@@ -99,7 +99,7 @@ standardise_characteristics <-
 ## factor levels provided in a sensible order, as this won't happen directly from opensafely ----
 
 factor_levels <-
-  lst(
+  tibble::lst(
     ethnicity5 = c(
       "White",
       "Mixed",
@@ -210,25 +210,24 @@ table1_summary <- function(.data, group, labels, threshold) {
       label = labels,
       statistic = list(
         N ~ "{N}",
-        all_continuous() ~ "{median} ({p25}, {p75});  {mean} ({sd})"
+        all_categorical() ~ "{n} ({p}%)",
+        all_continuous() ~ "{mean} ({sd}); ({p10}, {p25}, {median}, {p75}, {p90})"
       ),
     )
   
   ## extract structured info from tbl_summary object to apply SDC to the counts 
   raw_stats <- 
     tab_summary$cards$tbl_summary |> 
+    mutate(
+      variable = factor(variable, levels = names(labels)),
+      variable_label = factor(variable, levels = names(labels),  labels = labels),
+    ) |>
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
     select(-fmt_fn, -warning, -error, -gts_column) |>
     pivot_wider(
-      id_cols = c("group1", "group1_level", "variable", "variable_level", "context"), 
+      id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"), 
       names_from = stat_name, 
       values_from = stat
-    ) |> 
-    left_join(
-      tab_summary$cards$tbl_summary |> 
-        filter(context == "attributes", stat_name == "label") |>
-        select(variable, variable_label=stat),
-      by="variable"
     ) |>
     mutate(
       across(
@@ -240,7 +239,7 @@ table1_summary <- function(.data, group, labels, threshold) {
         }
       ),
       across(
-        c(p, median, p25, p75, mean, sd),
+        c(p, median, p10, p25, p75, p90, mean, sd),
         ~{
           map_dbl(., ~{
             if(is.null(.)) NA else as.numeric(.)
@@ -248,14 +247,15 @@ table1_summary <- function(.data, group, labels, threshold) {
         }
       ),
       across(
-        c(group1_level, variable_level, variable_label),
+        c(group1_level, variable_level),
         ~{
           map_chr(., ~{
             if(is.null(.)) NA else as.character(.)
           })
         }
       ),
-    )
+    )|>
+    arrange(variable_label, group1, group1_level)
   
   raw_stats_redacted <- 
     raw_stats |>
@@ -263,8 +263,94 @@ table1_summary <- function(.data, group, labels, threshold) {
       n = roundmid_any(n, threshold),
       N = roundmid_any(N, threshold),
       p = n / N,
-      # variable_label = factor(variable_label, levels = map_chr(variable_label[-c(1, 2)], ~ last(as.character(.)))),
-      #variable_levels = replace_na(as.character(variable_levels), "")
+    )
+  
+  return(raw_stats_redacted)
+}
+
+
+
+
+## Create table1-style summary of characteristics, with SDC applied, with weighting applied ----
+
+table1_svysummary <- function(.data, group, weight, labels, threshold) {
+  
+  group_quo <- enquo(group)
+  weight_quo <- enquo(weight)
+  
+    ## create a table of baseline characteristics between each treatment group, before matching / weighting
+  tab_svysummary <-
+    .data |>
+    select(
+      !!group_quo,
+      !!weight_quo,
+      all_of(names(labels)),
+    ) |>
+    srvyr::as_survey(
+      weight = !!weight_quo
+    ) |>
+    tbl_svysummary(
+      by = !!group_quo,
+      label = labels,
+      statistic = list(
+        #N ~ "{N}",
+        all_categorical() ~ "{n} ({p}%)",
+        all_continuous() ~ "{mean} ({sd}); ({p10}, {p25}, {median}, {p75}, {p90})"
+      ),
+    )
+  
+  ## extract structured info from tbl_summary object to apply SDC to the counts 
+  raw_stats <- 
+    tab_svysummary$cards$tbl_svysummary |> 
+    mutate(
+      variable = factor(variable, levels = names(labels)),
+      variable_label = factor(variable, levels = names(labels),  labels = labels),
+    ) |>
+    filter(!(context %in% c("missing", "attributes", "total_n"))) |>
+    select(-fmt_fn, -warning, -error, -gts_column) |>
+    pivot_wider(
+      id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"), 
+      names_from = stat_name, 
+      values_from = stat
+    ) |>
+    mutate(
+      across(
+        c(n, N),
+        ~{
+          map_int(., ~{
+            if(is.null(.)) NA else as.integer(.)
+          })
+        }
+      ),
+      across(
+        c(p, median, p10, p25, p75, p90, mean, sd),
+        ~{
+          map_dbl(., ~{
+            if(is.null(.)) NA else as.numeric(.)
+          })
+        }
+      ),
+      across(
+        c(group1_level, variable_level),
+        ~{
+          map_chr(., ~{
+            if(is.null(.)) NA else as.character(.)
+          })
+        }
+      ),
+    )|>
+    arrange(variable_label, group1, group1_level)
+  
+  raw_stats_redacted <- 
+    raw_stats |>
+    mutate(
+      n = roundmid_any(n, threshold),
+      N = roundmid_any(N, threshold),
+      p = n / N,
+    ) |>
+    select(
+      # remove variables related to sampling weights that are not needed
+      -deff, -p.std.error, -n_unweighted, -N_unweighted, -p_unweighted
     )
   
   return(raw_stats_redacted)
