@@ -79,10 +79,9 @@ data_weights <-
   tibble(
     patient_id = data_preweight$patient_id,
     treatment = obj_weightit$treat,
-    weight = obj_weightit$weights,
-    ps = obj_weightit$ps
+    ps = obj_weightit$ps,
+    weight = obj_weightit$weights, # weight = get_w_from_ps(ps=ps, treat=treatment,  estimand = "ATE")
   ) 
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Summarise weighted population and export ----
@@ -95,5 +94,7 @@ data_weights <-
 write_feather(data_weights, fs::path(output_dir, "data_weights.arrow"))
 
 summary(obj_weightit)
+
+
 
 
