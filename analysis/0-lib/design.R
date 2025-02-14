@@ -194,6 +194,8 @@ variable_labels <-
   list(
     N  = "Total N",
     treatment_descr = "Vaccine product",
+    #vax_date = "Vaccination date",
+    vax_day = "Vaccination day",
     prior_vax_interval = "Days since previous vaccine",
     prior_vax_count_group = "Previous vaccine count",
     age_eligible = "Age",
@@ -318,13 +320,13 @@ local({
   
   # weighting set A
 
-  weighting_formulae$A = "age + cv + sex + region"
+  weighting_formulae$A = "vax_day + age + cv + sex + region"
   
   weighting_variables$A <- all.vars(as.formula(paste("~", weighting_formulae$A)))
   
   # weighting set B
   
-  weighting_formulae$B = "age + cv + sex + region + multimorb"
+  weighting_formulae$B = "vax_day + age + cv + sex + region + multimorb"
   
   weighting_variables$B <- all.vars(as.formula(paste("~", weighting_formulae$B)))
   
