@@ -132,6 +132,31 @@ action_weight <- function(cohort, weightset){
   )
 }
 
+
+
+## get km or ci actions function ----
+action_incidence <- function(
+    cohort, method, set, subgroup, outcome
+){
+  
+  ## kaplan-meier action
+  action(
+    name = glue("cmlinc_{cohort}_{method}_{set}_{subgroup}_{outcome}"),
+    run = glue("kaplan-meier-function:v0.0.5"),
+    arguments = c(cohort, method, set, subgroup, outcome),
+    needs = list(
+      glue("{method}_{cohort}_{set}"),
+    ),
+    highly_sensitive = lst(
+      arrow = glue("output/{cohort}/{method}{set}/{subgroup}/{outcome}/*.arrow"),
+    ),
+    moderately_sensitive = lst(
+      png = glue("output/{cohort}/{method}{set}/{subgroup}/{outcome}/*.png"),
+    )
+  )
+}
+
+
 ## get km or ci actions function ----
 action_contrasts <- function(
   cohort, matchset, subgroup, outcome
