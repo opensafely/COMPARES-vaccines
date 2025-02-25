@@ -83,6 +83,10 @@ data_weights <-
     weight = obj_weightit$weights, # weight = get_w_from_ps(ps=ps, treat=treatment,  estimand = "ATE")
   ) 
 
+## weights and PS relationship:
+# weight = (treatment/ps) + ((1-treatment)/(1-ps)),
+# ps = (treatment/weight) + ((1-treatment)*(1-(1/weight)))
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Summarise weighted population and export ----
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
