@@ -261,7 +261,7 @@ local({
   
   matching_variables = list()
 
-  # matching set A
+  # matching specification A
   exact <- c(
     "ageband",
     "cv",
@@ -281,7 +281,7 @@ local({
   all <- c(exact, names(caliper))
     matching_variables$A = lst(exact, caliper, all)
 
-  # matching set B
+  # matching specification B
   exact <- c(
     "ageband",
     "cv",
@@ -318,13 +318,13 @@ local({
   weighting_formulae = list()
   weighting_variables = list()
   
-  # weighting set A
+  # weighting specification A
 
   weighting_formulae$A = "vax_day + age + cv + sex + region"
   
   weighting_variables$A <- all.vars(as.formula(paste("~", weighting_formulae$A)))
   
-  # weighting set B
+  # weighting specification B
   
   weighting_formulae$B = "vax_day + age + cv + sex + region + multimorb"
   
@@ -337,5 +337,25 @@ local({
   
   
 })
+
+
+
+## metaparameter dataset ---
+
+#TODO: check this is capturing everything
+
+metaparams <-
+  expand_grid(
+    cohort = c("age75plus"),
+    method = c("match", "weight"),
+    spec = c("A", "B"),
+    outcome = factor(c("covid_emergency", "covid_admitted", "covid_critcare", "covid_death", "noncovid_death", "fracture", "pericarditis", "myocarditis")),
+    subgroup = factor(recoder$subgroups),
+  ) %>%
+  mutate(
+    #cohort_descr = fct_recoderelevel(cohort, recoder$cohort),
+    outcome_descr = fct_recoderelevel(outcome,  recoder$outcome),
+    subgroup_descr = fct_recoderelevel(subgroup,  recoder$subgroups),
+  )
 
 
