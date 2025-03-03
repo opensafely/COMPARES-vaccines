@@ -200,7 +200,7 @@ action_km_contrast <- function(
         "df_input" = glue("output/3-adjust/{cohort}/combine/data_weights.arrow"), 
         "dir_output" = dir_output,
         "exposure" = "treatment",
-        "subgroups" = glue("{subgroup}"),
+        "subgroups" = subgroup,
         "origin_date" = "vax_date",
         "event_date" = glue("{outcome}_date"),
         "censor_date" = "death_date",
