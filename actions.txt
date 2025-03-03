@@ -2,4 +2,6 @@ extract prepare
 data_selection_age75plus
 match_age75plus_A match_report_age75plus_A
 weight_age75plus_A weight_report_age75plus_A
+combine_weights_age75plus
+km_age75plus_weight_A_all_covid_admitted plr_age75plus_weight_A_all_covid_admitted
 

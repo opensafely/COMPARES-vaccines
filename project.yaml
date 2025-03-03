@@ -44,53 +44,97 @@ actions:
     - prepare
     outputs:
       highly_sensitive:
-        arrow: output/3-cohorts/age75plus/*.arrow
+        arrow: output/2-prepare/age75plus/*.arrow
       moderately_sensitive:
-        csv: output/3-cohorts/age75plus/*.csv
+        csv: output/2-prepare/age75plus/*.csv
 
   ## # # # # # # # # # # # # # # # # # # # 
   ## matching set A 
   ## # # # # # # # # # # # # # # # # # # # 
 
   match_age75plus_A:
-    run: r:v2 analysis/3-matching/match.R age75plus A
+    run: r:v2 analysis/3-adjust/match.R age75plus A
     needs:
     - data_selection_age75plus
     outputs:
       highly_sensitive:
-        arrow: output/3-cohorts/age75plus/matchA/*.arrow
+        arrow: output/3-adjust/age75plus/match-A/*.arrow
 
   match_report_age75plus_A:
-    run: r:v2 analysis/3-matching/match_report.R age75plus A
+    run: r:v2 analysis/3-adjust/report.R age75plus match A
     needs:
     - data_selection_age75plus
     - match_age75plus_A
     outputs:
       moderately_sensitive:
-        csv: output/3-cohorts/age75plus/matchA/report/*.csv
-        png: output/3-cohorts/age75plus/matchA/report/*.png
+        csv: output/3-adjust/age75plus/match-A/report/*.csv
+        png: output/3-adjust/age75plus/match-A/report/*.png
 
   ## # # # # # # # # # # # # # # # # # # # 
   ## weighting set A 
   ## # # # # # # # # # # # # # # # # # # # 
 
   weight_age75plus_A:
-    run: r:v2 analysis/3-weighting/weight.R age75plus A
+    run: r:v2 analysis/3-adjust/weight.R age75plus A
     needs:
     - data_selection_age75plus
     outputs:
       highly_sensitive:
-        arrow: output/3-cohorts/age75plus/weightA/*.arrow
+        arrow: output/3-adjust/age75plus/weight-A/*.arrow
 
   weight_report_age75plus_A:
-    run: r:v2 analysis/3-weighting/weight_report.R age75plus A
+    run: r:v2 analysis/3-adjust/report.R age75plus weight A
     needs:
     - data_selection_age75plus
     - weight_age75plus_A
     outputs:
       moderately_sensitive:
-        csv: output/3-cohorts/age75plus/weightA/report/*.csv
-        png: output/3-cohorts/age75plus/weightA/report/*.png
+        csv: output/3-adjust/age75plus/weight-A/report/*.csv
+        png: output/3-adjust/age75plus/weight-A/report/*.png
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## combine weights from all adjustment strategies 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  combine_weights_age75plus:
+    run: r:v2 analysis/3-adjust/combine.R age75plus
+    needs:
+    - data_selection_age75plus
+    - match_age75plus_A
+    - weight_age75plus_A
+    outputs:
+      highly_sensitive:
+        arrow: output/3-adjust/age75plus/combine/*.arrow
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Estimate cumulative incidence curves 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  km_age75plus_weight_A_all_covid_admitted:
+    run: kaplan-meier-function:v0.0.10 --df_input=output/3-adjust/{cohort}/combine/*.arrow
+      --dir_output=output/4-contrast/age75plus/weight-A/all/covid_admitted/km/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_admitted_date --censor_date=censor_date
+      --weight=weight_age75plus_weight_A --min_count=6 --method=constant --contrast=TRUE
+    needs:
+    - combine_weights_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/all/covid_admitted/km/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/all/covid_admitted/km/*.csv
+        png: output/4-contrast/age75plus/weight-A/all/covid_admitted/km/*.png
+
+  plr_age75plus_weight_A_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=A
+      --subgroup=all --outcome=covid_admitted
+    needs:
+    - combine_weights_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/all/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/all/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/weight-A/all/covid_admitted/plr/*.png
 
   ## # # # # # # # # # # # # # # # # # # # 
   ## End 

@@ -1,7 +1,33 @@
+######################################
+# Purpose: 
+# create the project-yaml file 
+######################################
+
+
+# Preliminaries ----
+
+## Import libraries ----
 library('tidyverse')
 library('yaml')
 library('here')
 library('glue')
+
+
+## Import custom user functions from lib
+source(here("analysis", "0-lib", "utility.R"))
+
+## Import design elements
+source(here("analysis", "0-lib", "design.R"))
+
+
+## restrict metaparams to those current available:
+metaparams <- 
+  metaparams |>
+  select(cohort, method, spec) |>
+  unique() |>
+  filter(
+    spec == "A"
+  )
 
 # create action functions ----
 
@@ -40,6 +66,11 @@ action <- function(
   )
   outputs[sapply(outputs, is.null)] <- NULL
 
+  
+  if(!is.null(names(arguments))){
+    arguments <- paste0("--", names(arguments), "=", arguments)
+  }
+  
   action <- list(
     run = paste(c(run, arguments), collapse=" "),
     needs = needs,
@@ -64,134 +95,192 @@ action_selection <- function(cohort){
     arguments = c(cohort),
     needs = list("prepare"),
     highly_sensitive = lst(
-      arrow = glue("output/3-cohorts/{cohort}/*.arrow"),
+      arrow = glue("output/2-prepare/{cohort}/*.arrow"),
     ),
     moderately_sensitive = lst(
-      csv = glue("output/3-cohorts/{cohort}/*.csv"),
+      csv = glue("output/2-prepare/{cohort}/*.csv"),
     )
   )
 }
 
 ## match actions function ----
-action_match <- function(cohort, matchset){
+action_match <- function(cohort, spec){
 
   splice(
 
     action(
-      name = glue("match_{cohort}_{matchset}"),
-      run = "r:v2 analysis/3-matching/match.R",
-      arguments = c(cohort, matchset),
+      name = glue("match_{cohort}_{spec}"),
+      run = "r:v2 analysis/3-adjust/match.R",
+      arguments = c(cohort, spec),
       needs = list(glue("data_selection_{cohort}")),
       highly_sensitive = lst(
-        arrow = glue("output/3-cohorts/{cohort}/match{matchset}/*.arrow")
+        arrow = glue("output/3-adjust/{cohort}/match-{spec}/*.arrow")
       )
     ),
 
     action(
-      name = glue("match_report_{cohort}_{matchset}"),
-      run = "r:v2 analysis/3-matching/match_report.R",
-      arguments = c(cohort, matchset),
-      needs = list(glue("data_selection_{cohort}"),  glue("match_{cohort}_{matchset}")),
+      name = glue("match_report_{cohort}_{spec}"),
+      run = "r:v2 analysis/3-adjust/report.R",
+      arguments = c(cohort, "match", spec),
+      needs = list(glue("data_selection_{cohort}"),  glue("match_{cohort}_{spec}")),
+      # highly_sensitive = lst(
+      #   arrow = glue("output/3-adjust/{cohort}/match-{spec}/report/*.arrow"),
+      # ),
       moderately_sensitive = lst(
-        csv = glue("output/3-cohorts/{cohort}/match{matchset}/report/*.csv"),
-        png = glue("output/3-cohorts/{cohort}/match{matchset}/report/*.png")
+        csv = glue("output/3-adjust/{cohort}/match-{spec}/report/*.csv"),
+        png = glue("output/3-adjust/{cohort}/match-{spec}/report/*.png")
       )
     )
   )
 
 
 }
-
 
 
 ## match actions function ----
-action_weight <- function(cohort, weightset){
+action_weight <- function(cohort, spec){
   
   splice(
     
     action(
-      name = glue("weight_{cohort}_{weightset}"),
-      run = "r:v2 analysis/3-weighting/weight.R",
-      arguments = c(cohort, weightset),
+      name = glue("weight_{cohort}_{spec}"),
+      run = "r:v2 analysis/3-adjust/weight.R",
+      arguments = c(cohort, spec),
       needs = list(glue("data_selection_{cohort}")),
       highly_sensitive = lst(
-        arrow = glue("output/3-cohorts/{cohort}/weight{weightset}/*.arrow")
+        arrow = glue("output/3-adjust/{cohort}/weight-{spec}/*.arrow")
       )
     ),
     
     action(
-      name = glue("weight_report_{cohort}_{weightset}"),
-      run = "r:v2 analysis/3-weighting/weight_report.R",
-      arguments = c(cohort, weightset),
-      needs = list(glue("data_selection_{cohort}"),  glue("weight_{cohort}_{weightset}")),
+      name = glue("weight_report_{cohort}_{spec}"),
+      run = "r:v2 analysis/3-adjust/report.R",
+      arguments = c(cohort, "weight", spec),
+      needs = list(glue("data_selection_{cohort}"),  glue("weight_{cohort}_{spec}")),
+      # highly_sensitive = lst(
+      #   arrow = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.arrow"),
+      # ),
       moderately_sensitive = lst(
-        csv = glue("output/3-cohorts/{cohort}/weight{weightset}/report/*.csv"),
-        png = glue("output/3-cohorts/{cohort}/weight{weightset}/report/*.png")
+        csv = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.csv"),
+        png = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.png")
       )
     )
   )
 }
 
-
-
-## get km or ci actions function ----
-action_incidence <- function(
-    cohort, method, set, subgroup, outcome
-){
+action_combine_weights <- function(cohort){
   
-  ## kaplan-meier action
   action(
-    name = glue("cmlinc_{cohort}_{method}_{set}_{subgroup}_{outcome}"),
-    run = glue("kaplan-meier-function:v0.0.5"),
-    arguments = c(cohort, method, set, subgroup, outcome),
+    name = glue("combine_weights_{cohort}"),
+    run = glue("r:v2 analysis/3-adjust/combine.R {cohort}"),
     needs = list(
-      glue("{method}_{cohort}_{set}"),
+      glue("data_selection_{cohort}"),
+      glue("match_{cohort}_A"),
+      glue("weight_{cohort}_A")#'
+      #  more actions here
     ),
     highly_sensitive = lst(
-      arrow = glue("output/{cohort}/{method}{set}/{subgroup}/{outcome}/*.arrow"),
-    ),
-    moderately_sensitive = lst(
-      png = glue("output/{cohort}/{method}{set}/{subgroup}/{outcome}/*.png"),
+      arrow = glue("output/3-adjust/{cohort}/combine/*.arrow"),
     )
   )
 }
 
-
 ## get km or ci actions function ----
-action_contrasts <- function(
-  cohort, matchset, subgroup, outcome
+action_km_contrast <- function(
+  cohort, method, spec, subgroup, outcome
 ){
-
+    dir_output <- glue("output/4-contrast/{cohort}/{method}-{spec}/{subgroup}/{outcome}/km/")
+  
     ## kaplan-meier action
     action(
-      name = glue("km_{cohort}_{matchset}_{subgroup}_{outcome}"),
-      run = glue("r:v2 analysis/km.R"),
-      arguments = c(cohort, matchset, subgroup, outcome),
+      name = glue("km_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
+      run = glue(
+        "kaplan-meier-function:v0.0.10"
+        # "--df_input=output/3-adjust/{cohort}/combine/*.arrow", 
+        # "--dir_output={dir_output}",
+        # "--exposure=treatment",
+        # "--subgroups={subgroup}",
+        # "--origin_date=vax_date",
+        # "--event_date={outcome}_date",
+        # "--censor_date=censor_date",
+        # "--weight=weight_{method}-{spec}",
+        # "--min_count={sdc.limit}",
+        # "--method=constant",
+        # "--contrast=TRUE",
+        # sep = " "
+      ),
+      #arguments = c(cohort, method, spec, subgroup, outcome),
+      arguments = c(
+        "df_input" = "output/3-adjust/{cohort}/combine/*.arrow", 
+        "dir_output" = dir_output,
+        "exposure" = "treatment",
+        "subgroups" = glue("{subgroup}"),
+        "origin_date" = "vax_date",
+        "event_date" = glue("{outcome}_date"),
+        "censor_date" = "censor_date",
+        "weight" = glue("weight_{cohort}_{method}_{spec}"),
+        "min_count" = sdc.limit,
+        "method" = "constant",
+        "contrast" = "TRUE"
+      ),
+      
       needs = list(
-        glue("match_{cohort}_{matchset}"),
-        glue("data_selection_{cohort}")
+        glue("combine_weights_{cohort}")
       ),
       highly_sensitive = lst(
-        rds = glue("output/{cohort}/{matchset}/km/{subgroup}/{outcome}/*.rds"),
+        arrow = fs::path(dir_output,"*.arrow"),
       ),
       moderately_sensitive = lst(
-        png = glue("output/{cohort}/{matchset}/km/{subgroup}/{outcome}/*.png"),
+        csv = fs::path(dir_output,"*.csv"),
+        png = fs::path(dir_output,"*.png"),
       )
     )
 }
 
 
-action_eventcounts <- function(cohort, matchset) {
+
+## get km or ci actions function ----
+action_plr_contrast <- function(
+    cohort, method, spec, subgroup, outcome
+){
+  dir_output <- glue("output/4-contrast/{cohort}/{method}-{spec}/{subgroup}/{outcome}/plr/")
+  
   action(
-    name = glue("eventcounts_{cohort}_{matchset}"),
-    run = glue("r:v2 analysis/eventcounts.R"),
-    arguments = c(cohort, matchset),
+    name = glue("plr_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
+    run = "r:v2 analysis/4-contrast/plr.R", 
+    arguments = c(
+      "cohort" = cohort, 
+      "method" = method, 
+      "spec" = spec,
+      "subgroup" = subgroup,
+      "outcome" = outcome
+    ),
     needs = list(
-      glue("match_{cohort}_{matchset}"),
+      #glue("data_selection_{cohort}"),
+      glue("combine_weights_{cohort}")
+    ),
+    highly_sensitive = lst(
+      arrow = fs::path(dir_output,"*.arrow"),
+    ),
+    moderately_sensitive = lst(
+      csv = fs::path(dir_output,"*.csv"),
+      png = fs::path(dir_output,"*.png"),
+    )
+  )
+}
+
+
+action_eventcounts <- function(cohort, spec) {
+  action(
+    name = glue("eventcounts_{cohort}_{spec}"),
+    run = glue("r:v2 analysis/eventcounts.R"),
+    arguments = c(cohort, spec),
+    needs = list(
+      glue("match_{cohort}_{spec}"),
       glue("data_selection_{cohort}")
     ),
     highly_sensitive = lst(
-      rds = glue("output/{cohort}/{matchset}/eventcounts/*.rds"),
+      rds = glue("output/{cohort}/{spec}/eventcounts/*.rds"),
     )
   )
 }
@@ -224,11 +313,11 @@ action_combine <- function(
       arguments = c(cohort),
       needs = glue_data(
         .x=expand_grid(
-          matchset = c("A", "B"),
+          spec = c("A", "B"),
           subgroup=c("all", "ageband", "cv", "vax_previous_group"),
           outcome=c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis")
         ) %>% filter(cohort!=subgroup),
-        "km_{cohort}_{matchset}_{subgroup}_{outcome}"
+        "km_{cohort}_{spec}_{subgroup}_{outcome}"
       ),
       moderately_sensitive = lst(
         csv = glue("output/combine/{cohort}/contrasts/*.csv"),
@@ -297,17 +386,30 @@ actions_list <- splice(
   comment("# # # # # # # # # # # # # # # # # # #", "matching set A", "# # # # # # # # # # # # # # # # # # #"),
 
   action_match("age75plus", "A"),
+  # action_match("age75plus", "B"),....
+  
+  comment("# # # # # # # # # # # # # # # # # # #", "weighting set A", "# # # # # # # # # # # # # # # # # # #"),
+  
+  action_weight("age75plus", "A"),
+  # action_weight("age75plus", "B"),....
+  
+  comment("# # # # # # # # # # # # # # # # # # #", "combine weights from all adjustment strategies", "# # # # # # # # # # # # # # # # # # #"),
+  
+  action_combine_weights("age75plus"),
+  
+  comment("# # # # # # # # # # # # # # # # # # #", "Estimate cumulative incidence curves", "# # # # # # # # # # # # # # # # # # #"),
   
 #   comment("### Overall models ('all')"),
 #
-#   action_contrasts("age75plus", "A", "all", "covidemergency"),
-#   action_contrasts("age75plus", "A", "all", "covidadmitted"),
-#   action_contrasts("age75plus", "A", "all", "covidcritcare"),
-#   action_contrasts("age75plus", "A", "all", "coviddeath"),
-#   action_contrasts("age75plus", "A", "all", "noncoviddeath"),
-#   action_contrasts("age75plus", "A", "all", "fracture"),
-#   action_contrasts("age75plus", "A", "all", "pericarditis"),
-#   action_contrasts("age75plus", "A", "all", "myocarditis"),
+#   action_km_contrasts("age75plus", "A", "all", "covidemergency"),
+  action_km_contrast("age75plus", "weight", "A", "all", "covid_admitted"),
+  action_plr_contrast("age75plus", "weight", "A", "all", "covid_admitted"),
+#   action_km_contrasts("age75plus", "A", "all", "covidcritcare"),
+#   action_km_contrasts("age75plus", "A", "all", "coviddeath"),
+#   action_km_contrasts("age75plus", "A", "all", "noncoviddeath"),
+#   action_km_contrasts("age75plus", "A", "all", "fracture"),
+#   action_km_contrasts("age75plus", "A", "all", "pericarditis"),
+#   action_km_contrasts("age75plus", "A", "all", "myocarditis"),
 #
 #   comment("### Models by age-band ('ageband')"),
 #
@@ -418,12 +520,7 @@ actions_list <- splice(
 #   action_eventcounts("age75plus", "B"),
 #
 
-  comment("# # # # # # # # # # # # # # # # # # #", "weighting set A", "# # # # # # # # # # # # # # # # # # #"),
 
-  action_weight("age75plus", "A"),
-
-
-#
 #   comment("# # # # # # # # # # # # # # # # # # #", "Cohort: cv", "# # # # # # # # # # # # # # # # # # #"),
 #
 #   action_selection("cv"),
@@ -532,7 +629,7 @@ actions_list <- splice(
 #   action_eventcounts("cv", "B"),
 #
 #
-#   comment("# # # # # # # # # # # # # # # # # # #", "Combine estimates across cohorts, matchsets, outcomes and subgroups", "# # # # # # # # # # # # # # # # # # #"),
+#   comment("# # # # # # # # # # # # # # # # # # #", "Combine estimates across cohorts, specs, outcomes and subgroups", "# # # # # # # # # # # # # # # # # # #"),
 #
 #   # action_contrasts_combine(
 #   #   "age75plus",
