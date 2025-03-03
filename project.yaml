@@ -111,7 +111,7 @@ actions:
   ## # # # # # # # # # # # # # # # # # # # 
 
   km_age75plus_weight_A_all_covid_admitted:
-    run: kaplan-meier-function:v0.0.10 --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+    run: kaplan-meier-function:v0.0.11 --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
       --dir_output=output/4-contrast/age75plus/weight-A/all/covid_admitted/km/ --exposure=treatment
       --subgroups=all --origin_date=vax_date --event_date=covid_admitted_date --censor_date=death_date
       --weight=wt_age75plus_weight_A --max_fup=168 --min_count=6 --method=constant
