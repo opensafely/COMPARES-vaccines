@@ -204,7 +204,7 @@ action_km_contrast <- function(
         "origin_date" = "vax_date",
         "event_date" = glue("{outcome}_date"),
         "censor_date" = "censor_date",
-        "weight" = glue("weight_{cohort}_{method}_{spec}"),
+        "weight" = glue("wt_{cohort}_{method}_{spec}"),
         "min_count" = sdc.limit,
         "method" = "constant",
         "contrast" = "TRUE"
