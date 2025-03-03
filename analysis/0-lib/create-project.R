@@ -361,7 +361,11 @@ actions_list <- splice(
 
   action(
     name = "extract",
-    run = "ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py --output output/1-extract/extract.arrow --dummy-data-file output/1-extract/dummy_extract.arrow",
+    run = paste(
+      "ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py", 
+      "--output output/1-extract/extract.arrow",
+      "--dummy-data-file analysis/dummy_extract.arrow"
+    ),
     needs = list(),
     highly_sensitive = lst(
       arrow = "output/1-extract/extract.arrow"
