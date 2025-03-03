@@ -205,6 +205,7 @@ action_km_contrast <- function(
         "event_date" = glue("{outcome}_date"),
         "censor_date" = "death_date",
         "weight" = glue("wt_{cohort}_{method}_{spec}"),
+        "max_fup" = maxfup,
         "min_count" = sdc.limit,
         "method" = "constant",
         "contrast" = "TRUE"
