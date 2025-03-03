@@ -12,7 +12,6 @@ library('glue')
 library("arrow")
 library('survival')
 library('MatchIt')
-library("WeightIt")
 library("cobalt")
 library("doParallel")
 
@@ -33,23 +32,23 @@ if(length(args)==0){
   # use for interactive testing
   removeobjects <- FALSE
   cohort <- "age75plus" #currently `age75plus` or `cv`
-  matchset <- "A"
+  spec <- "A"
 } else {
   removeobjects <- TRUE
   cohort <- args[[1]]
-  matchset <- args[[2]]
+  spec <- args[[2]]
 }
 
 
 ## create output directories ----
 
-output_dir <- here_glue("output", "3-cohorts", cohort, "match{matchset}")
+output_dir <- here_glue("output", "3-adjust", cohort, "match-{spec}")
 fs::dir_create(output_dir)
 
 # Import and prepare data ----
 
 ## one pow per patient ----
-data_cohort <- read_feather(here("output", "3-cohorts", cohort, "data_cohort.arrow"))
+data_cohort <- read_feather(here("output", "2-prepare", cohort, "data_cohort.arrow"))
 
 print_data_size(data_cohort)
 
@@ -69,7 +68,7 @@ data_prematch <-
     vax_product,
     treatment,
     vax_date,
-    all_of(matching_variables[[matchset]]$all),
+    all_of(matching_variables[[spec]]$all),
   ) |>
   arrange(patient_id)
 
@@ -125,8 +124,8 @@ data_prematch <-
 #         method = "nearest", distance = "glm", # these two options don't really do anything because we only want exact + caliper matching
 #         replace = FALSE,
 #         estimand = "ATT",
-#         exact = matching_variables[[matchset]]$exact,
-#         caliper = matching_variables[[matchset]]$caliper, std.caliper=FALSE,
+#         exact = matching_variables[[spec]]$exact,
+#         caliper = matching_variables[[spec]]$caliper, std.caliper=FALSE,
 #         m.order = "data", # data is sorted on (effectively random) patient ID
 #         #verbose = TRUE,
 #         ratio = 1L # could also consider exact matching only, with n:m ratio, determined by availability
@@ -171,8 +170,8 @@ obj_matchit <-
     method = "nearest", distance = "glm", # these two options don't really do anything because we only want exact + caliper matching
     replace = FALSE,
     estimand = "ATT", # since we are doing exact matching, ATT is equivalent to ATU. although we'll actually get the ATO (average treatment in the overlap)
-    exact = matching_variables[[matchset]]$exact,
-    caliper = matching_variables[[matchset]]$caliper, std.caliper=FALSE,
+    exact = matching_variables[[spec]]$exact,
+    caliper = matching_variables[[spec]]$caliper, std.caliper=FALSE,
     m.order = "data", # data is sorted on (effectively random) patient ID
     #verbose = TRUE,
     ratio = 1L # could also consider exact matching only, with n:m ratio, determined by availability
@@ -187,6 +186,7 @@ data_matches <-
     threadmatch_id = as.integer(obj_matchit$subclass),
     treatment = obj_matchit$treat,
     weight = obj_matchit$weights,
+    ps = (treatment/weight) + ((1-treatment)*(1-(1/weight)))
   ) 
 
 
@@ -201,9 +201,7 @@ data_matches <-
     match_id = dense_rank(threadmatch_id * max(thread_id) + (thread_id - 1L))  # create unique match id across all threads
   )
 
-write_feather(data_matches, fs::path(output_dir, "data_matches.arrow"))
-
-
+write_feather(data_matches, fs::path(output_dir, "data_adjusted.arrow"))
 
 summary(obj_matchit)
 
@@ -212,19 +210,6 @@ data_matches |>
   summarise(
     n=n()
   )
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

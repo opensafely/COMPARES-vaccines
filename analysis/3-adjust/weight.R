@@ -12,7 +12,6 @@ library('here')
 library('glue')
 library("arrow")
 library('survival')
-library('MatchIt')
 library("WeightIt")
 library("cobalt")
 library("doParallel")
@@ -34,23 +33,23 @@ if(length(args)==0){
   # use for interactive testing
   removeobjects <- FALSE
   cohort <- "age75plus" #currently `age75plus` or `cv`
-  weightset <- "A"
+  spec <- "A"
 } else {
   removeobjects <- TRUE
   cohort <- args[[1]]
-  weightset <- args[[2]]
+  spec <- args[[2]]
 }
 
 
 ## create output directories ----
 
-output_dir <- here_glue("output", "3-cohorts", cohort, "weight{weightset}")
+output_dir <- here_glue("output", "3-adjust", cohort, "weight-{spec}")
 fs::dir_create(output_dir)
 
 # Import and prepare data ----
 
 ## one pow per patient ----
-data_cohort <- read_feather(here_glue("output", "3-cohorts", cohort, "data_cohort.arrow"))
+data_cohort <- read_feather(here_glue("output", "2-prepare", cohort, "data_cohort.arrow"))
 
 print_data_size(data_cohort)
 
@@ -62,17 +61,18 @@ data_preweight <-
     vax_product,
     treatment,
     vax_date,
-    all_of(weighting_variables[[weightset]]),
+    all_of(weighting_variables[[spec]]),
   ) |>
   arrange(patient_id)
 
 # calculate balancing weights using the weightit function
 obj_weightit <- 
   weightit(
-    formula = formula(paste0("treatment ~ ", weighting_formulae[[weightset]])),
+    formula = formula(paste0("treatment ~ ", weighting_formulae[[spec]])),
     data = data_preweight,
     method = "glm", 
-    estimand = "ATE"
+    estimand = "ATE",
+    stabilize = TRUE
   )
 
 data_weights <- 
@@ -95,7 +95,7 @@ data_weights <-
   data_weights |>
   left_join(data_cohort |> select(patient_id, vax_date), by="patient_id") 
 
-write_feather(data_weights, fs::path(output_dir, "data_weights.arrow"))
+write_feather(data_weights, fs::path(output_dir, "data_adjusted.arrow"))
 
 summary(obj_weightit)
 
