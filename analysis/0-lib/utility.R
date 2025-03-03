@@ -47,6 +47,21 @@ fct_recoderelevel <- function(x, lookup){
   factor(x, levels=lookup, labels=names(lookup))
 }
 
+# create a vector of event times, given an origin date, event date, and censoring date
+# returns time-to-event date or time to censor date, which is earlier
+tte <- function(origin_date, event_date, censor_date, na.censor=FALSE){
+  if (na.censor) {
+    censor_date <- dplyr::if_else(censor_date>event_date, as.Date(NA), censor_date)
+  }
+  as.numeric(pmin(event_date-origin_date, censor_date-origin_date, na.rm=TRUE))
+}
+
+# returns FALSE if event_date is censored by censor_date, or if event_date is NA. Otherwise TRUE
+# if censor_date is the same day as event_date, it is assumed that event_date occurs first (ie, the event happened)
+censor_indicator <- function(event_date, censor_date){
+   stopifnot("all censoring dates must be non-missing" =  all(!is.na(censor_date)))
+  !((event_date>censor_date) | is.na(event_date))
+}
 
 
 # function to convert ethnicity 16 group into 5 group
@@ -194,7 +209,10 @@ import_extract <- function(custom_file_path, ehrql_file_path) {
 
 ## Create table1-style summary of characteristics, with SDC applied ----
 
-table1_summary <- function(.data, group, labels, threshold) {
+table1_summary <- function(.data, group, label, threshold) {
+  
+  ## this function is highly dependent on the structure of tbl_summary object internals!
+  ## be careful if this package is updated
   
   group_quo <- enquo(group)
   
@@ -203,24 +221,24 @@ table1_summary <- function(.data, group, labels, threshold) {
     .data |>
     select(
       !!group_quo,
-      all_of(names(labels)),
+      any_of(names(label)),
     ) %>%
-    tbl_summary(
+    gtsummary::tbl_summary(
       by = !!group_quo,
-      label = labels,
+      label = label[names(label) %in% names(.)],
       statistic = list(
         N ~ "{N}",
         all_categorical() ~ "{n} ({p}%)",
         all_continuous() ~ "{mean} ({sd}); ({p10}, {p25}, {median}, {p75}, {p90})"
       ),
     )
-  
+
   ## extract structured info from tbl_summary object to apply SDC to the counts 
   raw_stats <- 
     tab_summary$cards$tbl_summary |> 
     mutate(
-      variable = factor(variable, levels = names(labels)),
-      variable_label = factor(variable, levels = names(labels),  labels = labels),
+      variable = factor(variable, levels = names(label)),
+      variable_label = factor(variable, levels = names(label),  labels = label),
     ) |>
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
     select(-fmt_fn, -warning, -error, -gts_column) |>
@@ -273,7 +291,10 @@ table1_summary <- function(.data, group, labels, threshold) {
 
 ## Create table1-style summary of characteristics, with SDC applied, with weighting applied ----
 
-table1_svysummary <- function(.data, group, weight, labels, threshold) {
+table1_svysummary <- function(.data, group, weight, label, threshold) {
+  
+  ## this function is highly dependent on the structure of tbl_summary object internals!
+  ## be careful if this package is updated
   
   group_quo <- enquo(group)
   weight_quo <- enquo(weight)
@@ -284,27 +305,30 @@ table1_svysummary <- function(.data, group, weight, labels, threshold) {
     select(
       !!group_quo,
       !!weight_quo,
-      all_of(names(labels)),
+      any_of(names(label)),
     ) |>
-    srvyr::as_survey(
-      weight = !!weight_quo
-    ) |>
-    tbl_svysummary(
+    survey::svydesign(
+      id = ~1,
+      weights = ~weight,
+      data = _
+    ) %>%
+    gtsummary::tbl_svysummary(
       by = !!group_quo,
-      label = labels,
+      label = label[names(label) %in% names(.)],
       statistic = list(
         #N ~ "{N}",
         all_categorical() ~ "{n} ({p}%)",
         all_continuous() ~ "{mean} ({sd}); ({p10}, {p25}, {median}, {p75}, {p90})"
       ),
+      include = -!!weight_quo
     )
   
   ## extract structured info from tbl_summary object to apply SDC to the counts 
   raw_stats <- 
     tab_svysummary$cards$tbl_svysummary |> 
     mutate(
-      variable = factor(variable, levels = names(labels)),
-      variable_label = factor(variable, levels = names(labels),  labels = labels),
+      variable = factor(variable, levels = names(label)),
+      variable_label = factor(variable, levels = names(label),  labels = label),
     ) |>
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
     select(-fmt_fn, -warning, -error, -gts_column) |>
@@ -354,6 +378,110 @@ table1_svysummary <- function(.data, group, weight, labels, threshold) {
     )
   
   return(raw_stats_redacted)
+}
+
+
+
+## Combine info from table1-style summary with smd data from cobalt, with SDC applied, with weighting applied ----
+
+# note that we use cobalt here rather than calculated directly because the
+# pooled standard deviation used in the calculation of the SMD is based on 
+# the cohort before weighting, not on the weighted SDs (eg `sqrt(mean(sd^2))`)
+# so it's easier just to grab from cobalt than to get the weighted and unweighted 
+# stats each time
+
+table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
+  
+  treatment_quo <- enquo(treatment)
+  weight_quo <- enquo(weight)
+  
+  table1 <-
+    .data |>
+    table1_svysummary(
+      group = !!treatment_quo, 
+      weight = !!weight_quo,
+      label = label, 
+      threshold = sdc.limit
+    )
+  
+  # Balance table ----
+  
+  ## get variable-level names as provided by the cobalt package
+  ## so they can be joined with data from the gtsummary package
+  
+  cobalt_variable_names <-
+    table1 |>
+    filter(group1 == quo_name(enquo(treatment))) |>
+    transmute(
+      variable,
+      variable_label,
+      variable_level,
+      context,
+      cobalt_name = case_when(
+        context %in% c("dichotomous", "continuous") ~ variable,
+        TRUE ~ paste0(variable, "_", variable_level)
+      )
+    ) |>
+    unique()
+  
+  ## invoke `bal.tab` to get standardised mean differences
+  ## and add process variable names
+  obj_balance <- 
+    cobalt::bal.tab(
+      x = .data |> select(any_of(names(label))), 
+      data = .data |> select(!!weight_quo, !!treatment_quo) ,
+      weights = "weight",
+      treat = "treatment",
+      stats = c("mean.diffs"), 
+      disp = c("m", "sd"),
+      s.d.denom = "pooled", 
+      binary = "std", 
+      continuous = "std"
+    ) 
+  
+  # print balance info to log
+  # print(obj_balance)
+  
+  table_smd <- 
+    obj_balance %>%
+    `[[`("Balance") |>
+    tibble::rownames_to_column("cobalt_name") |>
+    right_join(
+      x = cobalt_variable_names,
+      y = _,
+      by = "cobalt_name"
+    ) |>
+    transmute(
+      variable,
+      variable_label = droplevels(factor(variable_label, levels=map_chr(variable_labels, ~.))),
+      variable_label,
+      variable_level,
+      smd = Diff.Adj, 
+    ) |>
+    arrange(variable_label) 
+  
+  table_balance <- 
+    table1 |>
+    select(-group1) |>
+    filter(!is.na(group1_level))  |>
+    pivot_wider(
+      id_cols = c(variable, variable_label, variable_level, context),
+      names_from = group1_level,
+      names_sep= "_",
+      values_from = c(n, N, p, mean, sd, p10, p25, median, p75, p90),
+      names_vary = "slowest"
+    ) |>
+    left_join(
+      table_smd,
+      by = c("variable", "variable_label", "variable_level")
+    )
+  
+  ## note that the adjusted SMDis calculated as follows in cobalt:
+  
+  # obj_balance1$Balance |>
+  #   mutate(
+  #     smd = (M.1.Adj  - M.0.Adj) / sqrt(((SD.1.Un^2)+(SD.0.Un^2))/2)
+  #   )
 }
 
 
