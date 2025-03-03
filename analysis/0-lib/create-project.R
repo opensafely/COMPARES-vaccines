@@ -197,7 +197,7 @@ action_km_contrast <- function(
       run = "kaplan-meier-function:v0.0.10",
       #arguments = c(cohort, method, spec, subgroup, outcome),
       arguments = c(
-        "df_input" = glue("output/3-adjust/{cohort}/combine/*.arrow"), 
+        "df_input" = glue("output/3-adjust/{cohort}/combine/data_weights.arrow"), 
         "dir_output" = dir_output,
         "exposure" = "treatment",
         "subgroups" = glue("{subgroup}"),
