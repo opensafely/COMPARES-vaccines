@@ -60,6 +60,8 @@ data_prepared <-
       TRUE ~ NA_integer_
     ),
 
+    vax_date = vax_date - 1L,
+    
     # vaccination date represented as an integer, using for matching instead of date-formatted variable to avoid issues
     vax_day = as.integer(vax_date - study_dates$studystart_date),
     
