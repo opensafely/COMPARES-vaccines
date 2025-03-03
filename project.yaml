@@ -20,7 +20,7 @@ actions:
 
   extract:
     run: ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py --output
-      output/1-extract/extract.arrow --dummy-data-file analysis/dummy_extract.arrow
+      output/1-extract/extract.arrow --dummy-data-file analysis/1-extract/dummy_extract.arrow
     needs: []
     outputs:
       highly_sensitive:
@@ -111,7 +111,7 @@ actions:
   ## # # # # # # # # # # # # # # # # # # # 
 
   km_age75plus_weight_A_all_covid_admitted:
-    run: kaplan-meier-function:v0.0.10 --df_input=output/3-adjust/{cohort}/combine/*.arrow
+    run: kaplan-meier-function:v0.0.10 --df_input=output/3-adjust/age75plus/combine/*.arrow
       --dir_output=output/4-contrast/age75plus/weight-A/all/covid_admitted/km/ --exposure=treatment
       --subgroups=all --origin_date=vax_date --event_date=covid_admitted_date --censor_date=censor_date
       --weight=weight_age75plus_weight_A --min_count=6 --method=constant --contrast=TRUE

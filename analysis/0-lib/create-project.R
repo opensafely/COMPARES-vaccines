@@ -194,24 +194,10 @@ action_km_contrast <- function(
     ## kaplan-meier action
     action(
       name = glue("km_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
-      run = glue(
-        "kaplan-meier-function:v0.0.10"
-        # "--df_input=output/3-adjust/{cohort}/combine/*.arrow", 
-        # "--dir_output={dir_output}",
-        # "--exposure=treatment",
-        # "--subgroups={subgroup}",
-        # "--origin_date=vax_date",
-        # "--event_date={outcome}_date",
-        # "--censor_date=censor_date",
-        # "--weight=weight_{method}-{spec}",
-        # "--min_count={sdc.limit}",
-        # "--method=constant",
-        # "--contrast=TRUE",
-        # sep = " "
-      ),
+      run = "kaplan-meier-function:v0.0.10",
       #arguments = c(cohort, method, spec, subgroup, outcome),
       arguments = c(
-        "df_input" = "output/3-adjust/{cohort}/combine/*.arrow", 
+        "df_input" = glue("output/3-adjust/{cohort}/combine/*.arrow"), 
         "dir_output" = dir_output,
         "exposure" = "treatment",
         "subgroups" = glue("{subgroup}"),
@@ -364,7 +350,7 @@ actions_list <- splice(
     run = paste(
       "ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py", 
       "--output output/1-extract/extract.arrow",
-      "--dummy-data-file analysis/dummy_extract.arrow"
+      "--dummy-data-file analysis/1-extract/dummy_extract.arrow"
     ),
     needs = list(),
     highly_sensitive = lst(
