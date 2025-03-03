@@ -42,7 +42,7 @@ if(length(args)==0){
 cohort_sym <- sym(cohort)
 
 ## create output directories for data ----
-output_dir <- here("output", "3-cohorts", cohort)
+output_dir <- here("output", "2-prepare", cohort)
 fs::dir_create(output_dir)
 
 
@@ -127,6 +127,30 @@ data_cohort <-
   droplevels()
 
 write_feather(data_cohort, fs::path(output_dir, "data_cohort.arrow"))
+
+
+## report unadjusted balance for baseline variables between levels  of treatment ---- 
+# This output includes SDC
+
+table_cohort <- 
+  data_cohort |>
+  mutate(
+    N = 1L,
+    weight = 1L
+  ) %>%
+  table1_summary_smd(
+    treatment = treatment,
+    weight = weight, 
+    label = variable_labels,
+    threshold = sdc.limit
+  )
+
+write_csv(table_cohort, fs::path(output_dir, "table_cohort.csv"))
+
+
+## output simple datasete containing exlcusions criteria met ----
+
+## TODO: check if outputting this is necessary
 
 data_inclusioncriteria <- data_criteria |>
   transmute(
@@ -230,18 +254,3 @@ write_csv(total_n_rounded, fs::path(output_dir, "total_rounded.csv"))
 
 ## remove large in-memory objects
 remove(data_inclusioncriteria)
-
-## create a table of baseline characteristics between each treatment group, before matching / weighting
-tab_summary_unadjusted <-
-  data_cohort |>
-  mutate(
-    N=1L,
-    treatment_descr = fct_recoderelevel(as.character(treatment), recoder$treatment),
-  ) %>%
-  table1_summary(
-    group = treatment_descr,
-    labels = variable_labels[names(variable_labels) %in% names(.)],
-    threshold = sdc.limit
-  )
-
-write_csv(tab_summary_unadjusted, fs::path(output_dir, "table1.csv"))
