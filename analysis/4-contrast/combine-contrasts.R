@@ -78,7 +78,7 @@ combine_model_outputs <- function(type, strategy, split){
 estimates_plr <- combine_model_outputs("estimates", "plr")
 contrasts_plr <- combine_model_outputs("contrasts", "plr")
 estimates_km <- combine_model_outputs("estimates", "km")
-contrasts_km <- combine_estimates("contrasts", "km")
+contrasts_km <- combine_model_outputs("contrasts", "km")
 
 
 ## write to csv ----
