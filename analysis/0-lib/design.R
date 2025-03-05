@@ -15,6 +15,9 @@
 library('tidyverse')
 library('here')
 
+## Import custom user functions from lib
+source(here("analysis", "0-lib", "utility.R"))
+
 ## create output directories ----
 fs::dir_create(here("analysis", "0-lib"))
 
@@ -27,7 +30,7 @@ fs::dir_create(here("analysis", "0-lib"))
 # - end_date is when we stop the observation period. Most likely the day before the start of the next campaign.
 
 study_dates <-
-  jsonlite::read_json(path = here("analysis", "0-lib", "study-dates.json")) %>%
+  jsonlite::read_json(path = here("analysis", "0-lib", "study-dates.json")) |>
   map(as.Date)
 
 # make these available in the global environment
@@ -145,8 +148,7 @@ recoder <-
       `Main` = "all",
       `Age` = "ageband",
       `Clinically at-risk` = "cv",
-      `Prior COVID-19 vaccine count` = "vax_previous_group",
-      #`Prior SARS-CoV-2 infection status` = "prior_covid_infection"
+      `Prior COVID-19 vaccine count` = "prior_vax_count_group",
       NULL
     ),
     status = c(
@@ -179,12 +181,8 @@ recoder <-
       `Clinically at-risk` = "TRUE",
       `Not clinically at-risk` = "FALSE"
     ),
-    prior_covid_infection = c(
-      `No prior SARS-CoV-2 infection` = "FALSE",
-      `Prior SARS-CoV-2 infection` = "TRUE"
-    ),
-    vax_previous_group = c(
-      "0-1", "2-4", "5", "6+"
+    prior_vax_count_group = c(
+      "0", "1-2", "3-5", "6+"
     ) %>% {set_names(.,.)},
   )
 
@@ -269,7 +267,6 @@ local({
     #"region",
     #"imd_Q5",
     #"multimorb",
-    #"prior_covid_infection",
     NULL
   )
   caliper <- c(
@@ -288,10 +285,9 @@ local({
     "sex",
     "region",
     #"imd_Q5",
-    "vax_previous_group",
+    "prior_vax_count_group",
     "multimorb",
-    "prior_covid_infection",
-    "immunosuppressed",
+    #"immunosuppressed",
     NULL
   )
   caliper <- c(
@@ -314,19 +310,24 @@ local({
 local({
   
   # TODO: make sure these weighting formulae correspond to the protocol
+  # TODO: make sure subgroups are dealt with as desired, either: 
+  # - ignore, and assume appropriate calibration from global model
+  # - independent models in each subgroup (so refit weighting model(s) for each subgroup analysis)
+  # - completely stratified (subgroup1*subgroup2*subgroup3...)
+  # - something else
   
-  weighting_formulae = list()
-  weighting_variables = list()
+  weighting_formulae <- list()
+  weighting_variables <- list()
   
   # weighting specification A
 
-  weighting_formulae$A = "vax_day + age + cv + sex + region"
+  weighting_formulae$A <- "vax_day + age + cv + sex + region"
   
   weighting_variables$A <- all.vars(as.formula(paste("~", weighting_formulae$A)))
   
   # weighting specification B
   
-  weighting_formulae$B = "vax_day + age + cv + sex + region + multimorb"
+  weighting_formulae$B <- "vax_day + age + cv + sex + region + multimorb"
   
   weighting_variables$B <- all.vars(as.formula(paste("~", weighting_formulae$B)))
   
@@ -340,22 +341,28 @@ local({
 
 
 
-## metaparameter dataset ---
+## meta-parameter dataset ---
+## contains all combinations of design elements that should be run in the study
+## this is mainly used to construct the project.yaml file, via the create-project.R script
+## but also picked up in a few places elsewhere
 
 #TODO: check this is capturing everything
 
 metaparams <-
   expand_grid(
-    cohort = c("age75plus"),
-    method = c("match", "weight"),
-    spec = c("A", "B"),
-    outcome = factor(c("covid_emergency", "covid_admitted", "covid_critcare", "covid_death", "noncovid_death", "fracture", "pericarditis", "myocarditis")),
+    cohort = factor(c("age75plus")),
+    method = factor(c("match", "weight")),
+    spec = c("A", "B", "C"),
+    outcome = factor(c("covid_death", "covid_admitted")),#, "covid_critcare", "covid_death", "noncovid_death", "fracture", "pericarditis", "myocarditis")),
     subgroup = factor(recoder$subgroups),
-  ) %>%
+  ) |>
+  filter(
+    subgroup  %in% c("all", "ageband"),
+    !(spec=="C")
+  ) |>
   mutate(
-    #cohort_descr = fct_recoderelevel(cohort, recoder$cohort),
-    outcome_descr = fct_recoderelevel(outcome,  recoder$outcome),
-    subgroup_descr = fct_recoderelevel(subgroup,  recoder$subgroups),
+    cohort_descr = fct_recoderelevel(cohort, recoder$cohort),
+    outcome_descr = fct_recoderelevel(outcome, recoder$outcome),
+    subgroup_descr = fct_recoderelevel(subgroup, recoder$subgroups),
   )
-
 
