@@ -43,19 +43,19 @@ data_cohort <- read_feather(here("output", "2-prepare", cohort, "data_cohort.arr
 ## create dataset of metaparameters to import
 cohort0 <- cohort
 
-metaparams <- 
+metaparams_cohort_method_spec <- 
   metaparams |>
   select(cohort, method, spec) |>
   unique() |>
   filter(
     cohort == cohort0,
-    spec == "A"
   )
 
-## create dataset that contains only patient IDs and the weights from all different adjustment strategies ----
+## weights ----
+## create dataset that contains only patient IDs and the weights from all different adjustment strategies
 
 data_weights <- 
-  metaparams |>
+  metaparams_cohort_method_spec |>
   mutate(
     data = pmap(
       list(cohort, method, spec), 
@@ -69,7 +69,6 @@ data_weights <-
     )
   ) |>
   unnest(data) 
-
 
 data_weights_wider <-
   data_weights |>
@@ -94,7 +93,8 @@ data_all <-
 
 write_feather(data_all, fs::path(output_dir, "data_weights.arrow"))
 
-## create dataset of effective sample sizes for each adjustment strategy ----
+## ESS ----
+## create dataset of effective sample sizes for each adjustment strategy
 
 table_ess <-
   data_weights |>
@@ -110,4 +110,71 @@ table_ess <-
   )
    
 write_feather(table_ess, fs::path(output_dir, "table_ess.arrow"))
+
+
+## event counts ----
+## create dataset that reports event counts for each outcome of interest
+
+data_event_counts <-
+  bind_rows(
+    metaparams |> 
+      distinct(cohort, subgroup, outcome, .keep_all=TRUE) |>
+      mutate(
+        method="unadjusted",
+        spec=""
+      ),
+    metaparams
+  ) |>
+  group_by(cohort, method, spec, subgroup, outcome) |>
+  mutate(
+    data = pmap(
+      list(cohort, method, spec, subgroup, outcome), 
+      function(cohort, method, spec, subgroup, outcome) {
+        
+        data_all %>%
+          mutate(
+            
+            subgroup_level = .[[subgroup]],
+            
+            wt = ifelse(
+              method!="unadjusted",
+              .[[paste0("wt_", cohort, "_", method, "_", spec)]],
+              1
+            ),
+            treatment_date = vax_date-1L, 
+            
+            event_date = as.Date(.[[paste0(outcome, "_date")]]),
+            
+            # person-time is up to and including censor date
+            censor_date = pmin(
+              dereg_date,
+              death_date,
+              study_dates$followupend_date,
+              treatment_date + maxfup,
+              na.rm=TRUE
+            ),
+            
+            noncompetingcensor_date = pmin(
+              dereg_date,
+              study_dates$followupend_date,
+              treatment_date + maxfup,
+              na.rm=TRUE
+            ),
+            
+            event_time = tte(treatment_date, event_date, censor_date, na.censor=FALSE),
+            event_indicator = censor_indicator(event_date, censor_date),
+          ) |>
+          group_by(subgroup_level, treatment) |>
+          summarise(
+            n = roundmid_any(sum(wt), sdc.limit),
+            persontime = sum(wt*as.numeric(censor_date - (vax_date - 1))),
+            count = sum(wt*event_indicator)
+          )
+        }
+      )
+    ) |>
+  unnest(data)
+
+write_feather(data_event_counts, fs::path(output_dir, "table_event_counts.arrow"))
+
 
