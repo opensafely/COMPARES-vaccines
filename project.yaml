@@ -591,21 +591,37 @@ actions:
     run: r:v2 analysis/4-contrast/combine-contrasts.R age75plus
     needs:
     - plr_age75plus_match_A_all_covid_death
+    - km_age75plus_match_A_all_covid_death
     - plr_age75plus_match_A_ageband_covid_death
+    - km_age75plus_match_A_ageband_covid_death
     - plr_age75plus_match_A_all_covid_admitted
+    - km_age75plus_match_A_all_covid_admitted
     - plr_age75plus_match_A_ageband_covid_admitted
+    - km_age75plus_match_A_ageband_covid_admitted
     - plr_age75plus_match_B_all_covid_death
+    - km_age75plus_match_B_all_covid_death
     - plr_age75plus_match_B_ageband_covid_death
+    - km_age75plus_match_B_ageband_covid_death
     - plr_age75plus_match_B_all_covid_admitted
+    - km_age75plus_match_B_all_covid_admitted
     - plr_age75plus_match_B_ageband_covid_admitted
+    - km_age75plus_match_B_ageband_covid_admitted
     - plr_age75plus_weight_A_all_covid_death
+    - km_age75plus_weight_A_all_covid_death
     - plr_age75plus_weight_A_ageband_covid_death
+    - km_age75plus_weight_A_ageband_covid_death
     - plr_age75plus_weight_A_all_covid_admitted
+    - km_age75plus_weight_A_all_covid_admitted
     - plr_age75plus_weight_A_ageband_covid_admitted
+    - km_age75plus_weight_A_ageband_covid_admitted
     - plr_age75plus_weight_B_all_covid_death
+    - km_age75plus_weight_B_all_covid_death
     - plr_age75plus_weight_B_ageband_covid_death
+    - km_age75plus_weight_B_ageband_covid_death
     - plr_age75plus_weight_B_all_covid_admitted
+    - km_age75plus_weight_B_all_covid_admitted
     - plr_age75plus_weight_B_ageband_covid_admitted
+    - km_age75plus_weight_B_ageband_covid_admitted
     outputs:
       moderately_sensitive:
         csv: output/4-contrast/age75plus/contrasts/*.csv

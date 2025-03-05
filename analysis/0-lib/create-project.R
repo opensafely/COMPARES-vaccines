@@ -283,7 +283,7 @@ action_contrasts_combine <- function(
       .x = metaparams |> 
         select(spec, method, subgroup, outcome) |>
         unique() |> 
-        expand_grid(strategy=c("plr")), #TODO: add km actions here
+        expand_grid(strategy=c("plr", "km")),
       "{strategy}_{cohort}_{method}_{spec}_{subgroup}_{outcome}"
     ),
     moderately_sensitive = lst(
