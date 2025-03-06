@@ -5,13 +5,14 @@
 
 ## Import libraries ----
 library("optparse")
-library('tidyverse')
-library('here')
-library('glue')
+library("tidyverse")
+library("here")
+library("glue")
 library("arrow")
 library("WeightIt")
 library("survival")
-library('splines')
+library("splines")
+library("sandwich")
 #library("marginaleffects")
 
 ## Import custom user functions from lib
@@ -151,41 +152,45 @@ subgroup_models <-
   mutate(
     model = map(
       .x = data,
-      .f = function(.x){
-        glm(
+      .f = function(plrdata){
+        model <- glm(
           formula_time_treatment, 
           family = binomial(), 
           weight = weight,
-          data = .x,
-          model = FALSE,
+          data = plrdata,
+          model = TRUE, # this needs to be true for vcovCL to work as needed - shame because it takes up a lot of memory
           x = FALSE,
           y = FALSE
         )
       }
     ),
-    estimates = map(
-      .x = model,
-      .f = function(model){
+    estimates = map2(
+      .x = data,
+      .y = model,
+      .f = function(plrdata, model){
         
-        expand_grid(
-          treatment =  c(0L, 1L),
-          time = c(0, seq_len(maxfup))
-        ) %>%
+        # sandwich::vcovCL doesn't handle formulae properly! hence inclusion of "model=TRUE" above - be careful
+        vcov <- vcovCL(x = model, cluster = plrdata$patient_id, type = "HC0")
+
+        newdata <-
+          expand_grid(
+            treatment =  c(0L, 1L),
+            time = c(0, seq_len(maxfup))
+          ) %>%
         mutate(
           # this uses the ipw.model to get the estimated incidence at each time point for each treatment, assuming the entire population received treatment A
           # it works correctly for the ATE because of the weights (ie as if setting treatment=1 or treatment=0 for entire population)
-          inc = predict(model, newdata = ., type="response", se.fit=TRUE)$fit, 
+          inc = predict(model, newdata = ., type="response", se.fit=TRUE)$fit,
           inc.se = predict(model, newdata = ., type="response", se.fit=TRUE)$se.fit
         ) |>
-        group_by(treatment) |>
+        group_by(treatment) %>%
         mutate(
+          dummy_id_weight = 1L,
           surv = cumprod(1-inc),
-          # TODO: get standard errors for survival
-          ## probably need Fizz's magic delta method for this in the context of PLR!!
-          surv.se = inc.se, # TODO: this is COMPLETELY wrong, need to fix, but placeholder so there are _some_ confidence limits for now to check workflow
-          surv.low = surv + (qnorm(0.025) * inc.se),
-          surv.high = surv + (qnorm(0.975) * inc.se),
-          
+          surv.se = sqrt(cmlinc_variance(model = model, vcov = vcov, newdata = tibble(treatment=treatment, time=time), id = dummy_id_weight, time = time, weights = dummy_id_weight)),
+          surv.low = surv + (qnorm(0.025) * surv.se),
+          surv.high = surv + (qnorm(0.975) * surv.se),
+
           cmlinc = 1 - surv,
           cmlinc.se = surv.se,
           cmlinc.low = 1 - surv.high,
@@ -200,7 +205,6 @@ subgroup_models <-
   ) |>
   select(-data, -model) |>
   arrange(!!subgroup_sym)
-
 
 data_estimates <-
   subgroup_models |>
