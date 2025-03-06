@@ -145,6 +145,18 @@ data_persontime <-
 
 # estimate time-specific incidence from using pooled logistic regression ----
 
+
+predict.glm.custom.vcov <- function(x,vcov,newdata){
+  if(missing(newdata)){ newdata <- x$model }
+  tt <- terms(x)
+  Terms <- delete.response(tt)
+  m.mat <- model.matrix(Terms,data=newdata)
+  m.coef <- x$coef
+  fit <- as.vector(m.mat %*% x$coef)
+  se.fit <- sqrt(diag(m.mat%*%vcov%*%t(m.mat)))
+  return(list(fit=fit,se.fit=se.fit))
+}
+
 subgroup_models <-
   data_persontime |>
   group_by(!!subgroup_sym) |>
@@ -180,8 +192,11 @@ subgroup_models <-
         mutate(
           # this uses the ipw.model to get the estimated incidence at each time point for each treatment, assuming the entire population received treatment A
           # it works correctly for the ATE because of the weights (ie as if setting treatment=1 or treatment=0 for entire population)
-          inc = predict(model, newdata = ., type="response", se.fit=TRUE)$fit,
-          inc.se = predict(model, newdata = ., type="response", se.fit=TRUE)$se.fit
+          inc = predict(model, newdata = ., type="response"),
+          inc.se = predict(model, newdata = ., type="response", se.fit=TRUE)$se.fit, # this does not use vcov from vcovCL, so not cluster-robust
+          inc.logit.se = predict.glm.custom.vcov(model, vcov = vcov, newdata = .)$se.fit, # cluster robust, but on the linear scale, not response scale
+          inc.low = plogis(qlogis(inc) + (qnorm(0.025) * inc.logit.se)),
+          inc.high = plogis(qlogis(inc) + (qnorm(0.975) * inc.logit.se)),
         ) |>
         group_by(treatment) %>%
         mutate(
