@@ -114,7 +114,7 @@ action_match <- function(cohort, spec){
   splice2(
 
     action(
-      name = glue("match_{cohort}_{spec}"),
+      name = glue("adjust_{cohort}_match_{spec}"),
       run = "r:v2 analysis/3-adjust/match.R",
       arguments = c(cohort, spec),
       needs = list(glue("data_selection_{cohort}")),
@@ -124,10 +124,10 @@ action_match <- function(cohort, spec){
     ),
 
     action(
-      name = glue("match_report_{cohort}_{spec}"),
+      name = glue("adjust_{cohort}_match_{spec}_report"),
       run = "r:v2 analysis/3-adjust/report.R",
       arguments = c(cohort, "match", spec),
-      needs = list(glue("data_selection_{cohort}"),  glue("match_{cohort}_{spec}")),
+      needs = list(glue("data_selection_{cohort}"),  glue("adjust_{cohort}_match_{spec}")),
       # highly_sensitive = lst(
       #   arrow = glue("output/3-adjust/{cohort}/match-{spec}/report/*.arrow"),
       # ),
@@ -147,7 +147,7 @@ action_weight <- function(cohort, spec){
   
   splice2(
     action(
-      name = glue("weight_{cohort}_{spec}"),
+      name = glue("adjust_{cohort}_weight_{spec}"),
       run = "r:v2 analysis/3-adjust/weight.R",
       arguments = c(cohort, spec),
       needs = list(
@@ -159,12 +159,12 @@ action_weight <- function(cohort, spec){
     ),
     
     action(
-      name = glue("weight_report_{cohort}_{spec}"),
+      name = glue("adjust_{cohort}_weight_{spec}_report"),
       run = "r:v2 analysis/3-adjust/report.R",
       arguments = c(cohort, "weight", spec),
       needs = list(
         glue("data_selection_{cohort}"),  
-        glue("weight_{cohort}_{spec}")
+        glue("adjust_{cohort}_weight_{spec}")
       ),
       # highly_sensitive = lst(
       #   arrow = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.arrow"),
@@ -180,7 +180,7 @@ action_weight <- function(cohort, spec){
 action_combine_weights <- function(cohort){
   cohort0 <- cohort
   action(
-    name = glue("combine_weights_{cohort}"),
+    name = glue("adjust_combine_{cohort}"),
     run = glue("r:v2 analysis/3-adjust/combine-weights.R {cohort}"),
     needs = list(
       glue("data_selection_{cohort}"),
@@ -188,7 +188,7 @@ action_combine_weights <- function(cohort){
         .x=metaparams_cohort_method_spec |> 
           select(cohort, method, spec) |>
           filter(cohort == cohort0),
-        "{method}_{cohort}_{spec}"
+        "adjust_{cohort}_{method}_{spec}"
       )
     ) |> list_c(),
     
@@ -198,16 +198,15 @@ action_combine_weights <- function(cohort){
   )
 }
 
-## get km or ci actions function ----
-action_km_contrast <- function(
+## get AJ actions function ----
+action_aj_contrast <- function(
   cohort, method, spec, subgroup, outcome
 ){
-    dir_output <- glue("output/4-contrast/{cohort}/{method}-{spec}/{subgroup}/{outcome}/km/")
+    dir_output <- glue("output/4-contrast/{cohort}/{method}-{spec}/{subgroup}/{outcome}/aj/")
   
-    ## kaplan-meier action
     action(
-      name = glue("km_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
-      run = "kaplan-meier-function:v0.0.15",
+      name = glue("aj_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
+      run = "r:v2 analysis/4-contrast/aj.R",
       #arguments = c(cohort, method, spec, subgroup, outcome),
       arguments = c(
         "df_input" = glue("output/3-adjust/{cohort}/combine/data_weights.arrow"), 
@@ -216,7 +215,8 @@ action_km_contrast <- function(
         "subgroups" = glue("{subgroup}"),
         "origin_date" = "vax_date",
         "event_date" = glue("{outcome}_date"),
-        "censor_date" = "death_date",
+        "censoring_date" = "censor_date",
+        "competing_date" = "death_date",
         "weight" = glue("wt_{cohort}_{method}_{spec}"),
         "max_fup" = maxfup,
         "min_count" = sdc.limit,
@@ -226,7 +226,7 @@ action_km_contrast <- function(
       ),
       
       needs = list(
-        glue("combine_weights_{cohort}")
+        glue("adjust_combine_{cohort}")
       ),
       highly_sensitive = lst(
         arrow = fs::path(dir_output,"*.arrow"),
@@ -240,7 +240,7 @@ action_km_contrast <- function(
 
 
 
-## get km or ci actions function ----
+## get PLR actions function ----
 action_plr_contrast <- function(
     cohort, method, spec, subgroup, outcome
 ){
@@ -258,7 +258,7 @@ action_plr_contrast <- function(
     ),
     needs = list(
       #glue("data_selection_{cohort}"),
-      glue("combine_weights_{cohort}")
+      glue("adjust_combine_{cohort}")
     ),
     highly_sensitive = lst(
       arrow = fs::path(dir_output,"*.arrow"),
@@ -283,7 +283,7 @@ action_contrasts_combine <- function(
       .x = metaparams |> 
         select(spec, method, subgroup, outcome) |>
         unique() |> 
-        expand_grid(strategy=c("plr", "km")),
+        expand_grid(strategy=c("plr", "aj")),
       "{strategy}_{cohort}_{method}_{spec}_{subgroup}_{outcome}"
     ),
     moderately_sensitive = lst(
@@ -369,12 +369,12 @@ actions_list <- splice(
   
   comment("# # # # # # # # # # # # # # # # # # #", "Estimate cumulative incidence curves", "# # # # # # # # # # # # # # # # # # #"),
   
-  comment("### Kaplan-Meier estimates"),
+  comment("### Aalen-Johansen estimates"),
   pmap(
     metaparams |>
       filter(cohort == "age75plus"),
     function(cohort, method, spec, subgroup, outcome, ...){
-      action_km_contrast(cohort, method, spec, subgroup, outcome)
+      action_aj_contrast(cohort, method, spec, subgroup, outcome)
     }
   ) |> list_flatten(),
 

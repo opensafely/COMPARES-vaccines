@@ -76,15 +76,14 @@ The analysis scripts in the [`analysis/`](./analysis) directory are organised in
   It outputs a dataset containing the person-specific weights. 
   - [`report.R`](./analysis/3-adjust/report.R) (`cohort`, `method`, `spec`) describes baseline information for the matched or weighted method
   eg Table 1 type cohort characteristics, post-weighting balance checks.
-  - [`combine.R`](./analysis/3-adjust/combne.R) (`cohort`) combines weights across all weighted and matched analyses for the given cohort.
+  - [`combine-weights.R`](./analysis/3-adjust/combine-weights.R) (`cohort`) combines weights across all weighted and matched analyses for the given cohort.
   Also calculated the Effective sample size based on the weights. 
   - [`match-coverage.R`](./analysis/3-adjust/match-coverage.R) (`cohort`, `spec`) describes matching rates over calendar time.
 - [`4-constrast/`](./analysis/4-constrast/):
-  - [`km.R`] (`cohort`, `method`, `spec`, `subgroup`, `outcome`) derives Kaplan-Meier survival estimates for each product and calculates relative risk and risk differences. 
-  This is based on the OpenSAFELY reusable action and is not maintained within the repo.
-  - [`glm.R`](./analysis/4-constrasts/contrasts.R) (`cohort`, `method`, `spec`, `subgroup`, `outcome`) compares cumulative incidence curves between products using pooled logistic regression. 
-- [`5-combine/`](./analysis/5-combine/):
-  - [`combine.R`](./analysis/5-combine/combine.R) collects treatment contrasts from the [`cmlinc.R`](./analysis/cmlinc.R) script and other preliminary outputs (flowcharts, table1, matching coverage, etc) and combines into a single dataset for each output type.
+  - [`aj.R`](./analysis/4-constrast/aj.R) (`cohort`, `method`, `spec`, `subgroup`, `outcome`) derives Aalen-Johansen survival estimates for each product and calculates relative risk and risk differences. 
+  This is largely based on the OpenSAFELY Kaplan-Meier reusable action, with an extension to AJ estimates.
+  - [`plr.R`](./analysis/4-constrast/plr.R) (`cohort`, `method`, `spec`, `subgroup`, `outcome`) compares cumulative incidence curves between products using pooled logistic regression. 
+  - [`combine-contrasts.R`](./analysis/4-contrast/combine-contrasts.R) collects treatment contrasts from the [`aj.R`](./analysis/aj.R) and [`plr.R`](./analysis/plr.R) scripts.
 
 Scripts may take one or more arguments:
 

@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # #
-# Purpose: Combine km and plr estimates for all models within each cohort
+# Purpose: Combine AJ and PLR estimates for all models within each cohort
 # # # # # # # # # # # # # # # # # # # # #
 
 # TODO: this may need to be modified to interact nicely with Airlock
@@ -45,7 +45,7 @@ output_dir <- here("output", "4-contrast", cohort, "contrasts")
 
 dir_create(output_dir)
 
-## combine KM and PLR estimates ----
+## combine AJ and PLR estimates ----
 
 combine_model_outputs <- function(type, strategy, split){
   
@@ -77,8 +77,8 @@ combine_model_outputs <- function(type, strategy, split){
 
 estimates_plr <- combine_model_outputs("estimates", "plr")
 contrasts_plr <- combine_model_outputs("contrasts", "plr")
-estimates_km <- combine_model_outputs("estimates", "km")
-contrasts_km <- combine_model_outputs("contrasts", "km")
+estimates_aj <- combine_model_outputs("estimates", "aj")
+contrasts_aj <- combine_model_outputs("contrasts", "aj")
 
 
 ## write to csv ----
@@ -91,11 +91,11 @@ write_split_data <- function(.data, dir, fileprefix, ...){
 
 write_split_data(estimates_plr, output_dir, "estimates_plr_", outcome, subgroup)
 write_split_data(contrasts_plr, output_dir, "contrasts_plr_", outcome, subgroup)
-write_split_data(estimates_km, output_dir, "estimates_km_", outcome, subgroup)
-write_split_data(contrasts_km, output_dir, "contrasts_km_", outcome, subgroup)
+write_split_data(estimates_aj, output_dir, "estimates_aj_", outcome, subgroup)
+write_split_data(contrasts_aj, output_dir, "contrasts_aj_", outcome, subgroup)
 
 
-## move KM and PLR plots to single folder ----
+## move AJ and PLR plots to single folder ----
 
 output_dir_plots <- path(output_dir, "plots")
 dir_create(output_dir_plots)
@@ -109,8 +109,8 @@ metaparams |>
 
 metaparams |>
   mutate(
-    plotdir = here("output", "4-contrast", cohort, glue("{method}-{spec}"), subgroup, outcome, "km", "plot.png"),
-    plotnewdir = path(output_dir_plots, glue("km_{method}-{spec}_{subgroup}_{outcome}.png")),
+    plotdir = here("output", "4-contrast", cohort, glue("{method}-{spec}"), subgroup, outcome, "aj", "plot.png"),
+    plotnewdir = path(output_dir_plots, glue("aj_{method}-{spec}_{subgroup}_{outcome}.png")),
   ) %>%
   {walk2(.$plotdir, .$plotnewdir, ~file_copy(.x, .y, overwrite = TRUE))}
 
@@ -165,7 +165,7 @@ for (method in c("match", "weight")){
   for (spec in c("A", "B")){
     plot_contrasts(contrasts_plr, timeslice=90, method, spec, rd, rd.ll, rd.ul, "rd")
     plot_contrasts(contrasts_plr, timeslice=90, method, spec, rr, rr.ll, rr.ul, "rr")
-    plot_contrasts(contrasts_km, timeslice=90, method, spec, rd, rd.ll, rd.ul, "rd")
-    plot_contrasts(contrasts_km, timeslice=90, method, spec, rr, rr.ll, rr.ul, "rr")
+    plot_contrasts(contrasts_aj, timeslice=90, method, spec, rd, rd.ll, rd.ul, "rd")
+    plot_contrasts(contrasts_aj, timeslice=90, method, spec, rr, rr.ll, rr.ul, "rr")
   }
 }
