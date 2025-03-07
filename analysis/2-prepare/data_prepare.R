@@ -134,6 +134,8 @@ data_prepared <-
     
     
     ## process outcomes data
+    
+    censor_date = pmin(dereg_date, study_dates$followupend_date, na.rm=TRUE),
 
     # latest covid event before study start
     
