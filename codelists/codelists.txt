@@ -1,0 +1,117 @@
+#######################################################
+# COvid-19 identification
+#######################################################
+
+
+opensafely/covid-identification/2020-06-03
+opensafely/covid-identification-in-primary-care-probable-covid-positive-test/508192f8
+opensafely/covid-identification-in-primary-care-probable-covid-clinical-code/2020-07-16
+opensafely/covid-identification-in-primary-care-probable-covid-sequelae/2020-07-16
+opensafely/covid-identification-in-primary-care-suspected-covid-advice/2020-07-16
+opensafely/covid-identification-in-primary-care-suspected-covid-had-test/2020-07-16
+opensafely/covid-identification-in-primary-care-suspected-covid-isolation-code/2020-07-16
+opensafely/covid-identification-in-primary-care-suspected-covid-nonspecific-clinical-assessment/2020-07-16
+opensafely/covid-identification-in-primary-care-exposure-to-disease/2020-06-23
+
+
+opensafely/ethnicity/2020-04-27
+opensafely/covid-19-ae-diagnosis-codes/1df1c0b2
+
+#######################################################
+# Others to be sorted. TODO
+#######################################################
+
+nhsd-primary-care-domain-refsets/palcare_cod/5fce98cf
+
+nhsd/haematopoietic-stem-cell-transplant-snomed/3ec3ac16
+nhsd/haematological-malignancies-snomed/31a49191
+nhsd/sickle-spl-atriskv4-snomed-ct/7083ed37
+nhsd/hiv-aids-snomed/68ca529e
+
+opensafely/solid-organ-transplantation-snomed/2020-04-10
+opensafely/haematological-cancer-snomed/2020-04-15
+opensafely/cancer-excluding-lung-and-haematological-snomed/2020-04-15
+opensafely/chemotherapy-or-radiotherapy-snomed/2020-04-15
+opensafely/lung-cancer-snomed/2020-04-15
+
+opensafely/midazolam-end-of-life/4c1b3c89
+opensafely/housebound/5bc77310
+opensafely/no-longer-housebound/29a88ca6
+
+opensafely/fractures/086e92fc
+
+opensafely/ethnicity-snomed-0removed/22911876
+
+#######################################################
+# PRIMIS
+#######################################################
+
+# TODO: check why some codelists are not using "v2.5" 
+
+#Asthma
+primis-covid19-vacc-uptake/astadm/6dee7f06
+primis-covid19-vacc-uptake/ast/10a3993c
+primis-covid19-vacc-uptake/astrx/6f2f876e
+primis-covid19-vacc-uptake/astrxm1/3e825892
+primis-covid19-vacc-uptake/astrxm2/v2.5
+
+#Resp
+primis-covid19-vacc-uptake/resp_cov/44ae8c0d
+
+#Chronic heart disease
+primis-covid19-vacc-uptake/chd_cov/5791cbc7
+
+#Chronic kidney disease
+primis-covid19-vacc-uptake/ckd15/09b0b232
+primis-covid19-vacc-uptake/ckd35/7980326d
+primis-covid19-vacc-uptake/ckd_cov/0a7765c1
+
+#Chronic liver disease
+primis-covid19-vacc-uptake/cld/2386d8f6
+
+#DM + addison
+primis-covid19-vacc-uptake/diab/v2.5
+primis-covid19-vacc-uptake/dmres/v2.5
+primis-covid19-vacc-uptake/addis_cod/v2.5
+primis-covid19-vacc-uptake/gdiab_cod/v2.5
+
+#Pregnancy
+primis-covid19-vacc-uptake/preg/v2.5
+primis-covid19-vacc-uptake/pregdel/v2.5
+
+
+#Severe mental
+primis-covid19-vacc-uptake/smhres/v2.5
+primis-covid19-vacc-uptake/sev_mental/v2.5
+
+#Chronic neurological disease
+primis-covid19-vacc-uptake/cns_cov/v2.5
+
+#Immuno
+primis-covid19-vacc-uptake/immdx_cov/v2.5
+primis-covid19-vacc-uptake/immrx/v2.5
+primis-covid19-vacc-uptake/immunosuppression-admin-codes/v2.5/
+
+#Chemotherapy
+primis-covid19-vacc-uptake/dxt_chemo_cod/v2.5
+
+#Asplenia
+primis-covid19-vacc-uptake/spln_cov/v2.5
+
+#Severe obesity
+primis-covid19-vacc-uptake/bmi/v2.5
+primis-covid19-vacc-uptake/bmi_stage/v2.5
+primis-covid19-vacc-uptake/sev_obesity/v2.5
+
+#Learning disability
+primis-covid19-vacc-uptake/learndis/v2.5
+
+# Care setting / profession
+primis-covid19-vacc-uptake/carer/v2.5
+primis-covid19-vacc-uptake/notcarer/v2.5
+primis-covid19-vacc-uptake/carehome/v2.5
+primis-covid19-vacc-uptake/nursehome/v2.5
+primis-covid19-vacc-uptake/domcare/v2.5
+primis-covid19-vacc-uptake/longres/v2.5
+primis-covid19-vacc-uptake/hhld_imdef/v2.5
+

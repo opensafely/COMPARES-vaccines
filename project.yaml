@@ -1,8 +1,633 @@
-version: '4.0'
+version: '3.0'
+
+expectations:
+
+  population_size: 1000
 
 actions:
-  generate_dataset:
-    run: ehrql:v1 generate-dataset analysis/dataset_definition.py --output output/dataset.csv.gz
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## DO NOT EDIT project.yaml DIRECTLY 
+  ## This file is created by create-project.R 
+  ## Edit and run create-project.R to update the project.yaml 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Pre-server scripts 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Extract and tidy 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  extract:
+    run: ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py --output
+      output/1-extract/extract.arrow --dummy-data-file analysis/1-extract/dummy_extract.arrow
+    needs: []
     outputs:
       highly_sensitive:
-        dataset: output/dataset.csv.gz
+        arrow: output/1-extract/extract.arrow
+
+  prepare:
+    run: r:v2 analysis/2-prepare/data_prepare.R
+    needs:
+    - extract
+    outputs:
+      highly_sensitive:
+        arrow: output/2-prepare/*.arrow
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Cohort: age75plus 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  data_selection_age75plus:
+    run: r:v2 analysis/2-prepare/data_selection.R age75plus
+    needs:
+    - prepare
+    outputs:
+      highly_sensitive:
+        arrow: output/2-prepare/age75plus/*.arrow
+      moderately_sensitive:
+        csv: output/2-prepare/age75plus/*.csv
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Matching 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  adjust_age75plus_match_A:
+    run: r:v2 analysis/3-adjust/match.R age75plus A
+    needs:
+    - data_selection_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/3-adjust/age75plus/match-A/*.arrow
+
+  adjust_age75plus_match_A_report:
+    run: r:v2 analysis/3-adjust/report.R age75plus match A
+    needs:
+    - data_selection_age75plus
+    - adjust_age75plus_match_A
+    outputs:
+      moderately_sensitive:
+        csv: output/3-adjust/age75plus/match-A/report/*.csv
+        png: output/3-adjust/age75plus/match-A/report/*.png
+
+  adjust_age75plus_match_B:
+    run: r:v2 analysis/3-adjust/match.R age75plus B
+    needs:
+    - data_selection_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/3-adjust/age75plus/match-B/*.arrow
+
+  adjust_age75plus_match_B_report:
+    run: r:v2 analysis/3-adjust/report.R age75plus match B
+    needs:
+    - data_selection_age75plus
+    - adjust_age75plus_match_B
+    outputs:
+      moderately_sensitive:
+        csv: output/3-adjust/age75plus/match-B/report/*.csv
+        png: output/3-adjust/age75plus/match-B/report/*.png
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Weighting 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  adjust_age75plus_weight_A:
+    run: r:v2 analysis/3-adjust/weight.R age75plus A
+    needs:
+    - data_selection_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/3-adjust/age75plus/weight-A/*.arrow
+
+  adjust_age75plus_weight_A_report:
+    run: r:v2 analysis/3-adjust/report.R age75plus weight A
+    needs:
+    - data_selection_age75plus
+    - adjust_age75plus_weight_A
+    outputs:
+      moderately_sensitive:
+        csv: output/3-adjust/age75plus/weight-A/report/*.csv
+        png: output/3-adjust/age75plus/weight-A/report/*.png
+
+  adjust_age75plus_weight_B:
+    run: r:v2 analysis/3-adjust/weight.R age75plus B
+    needs:
+    - data_selection_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/3-adjust/age75plus/weight-B/*.arrow
+
+  adjust_age75plus_weight_B_report:
+    run: r:v2 analysis/3-adjust/report.R age75plus weight B
+    needs:
+    - data_selection_age75plus
+    - adjust_age75plus_weight_B
+    outputs:
+      moderately_sensitive:
+        csv: output/3-adjust/age75plus/weight-B/report/*.csv
+        png: output/3-adjust/age75plus/weight-B/report/*.png
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## combine weights from all adjustment strategies 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  adjust_combine_age75plus:
+    run: r:v2 analysis/3-adjust/combine-weights.R age75plus
+    needs:
+    - data_selection_age75plus
+    - adjust_age75plus_match_A
+    - adjust_age75plus_match_B
+    - adjust_age75plus_weight_A
+    - adjust_age75plus_weight_B
+    outputs:
+      highly_sensitive:
+        arrow: output/3-adjust/age75plus/combine/*.arrow
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Estimate cumulative incidence curves 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## ### Aalen-Johansen estimates 
+
+  aj_age75plus_match_A_all_covid_death:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/match-A/all/covid_death/aj/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_death_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_match_A --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-A/all/covid_death/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-A/all/covid_death/aj/*.csv
+        png: output/4-contrast/age75plus/match-A/all/covid_death/aj/*.png
+
+  aj_age75plus_match_A_ageband_covid_death:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/match-A/ageband/covid_death/aj/ --exposure=treatment
+      --subgroups=ageband --origin_date=vax_date --event_date=covid_death_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_match_A --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-A/ageband/covid_death/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-A/ageband/covid_death/aj/*.csv
+        png: output/4-contrast/age75plus/match-A/ageband/covid_death/aj/*.png
+
+  aj_age75plus_match_A_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/match-A/all/covid_admitted/aj/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_admitted_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_match_A --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-A/all/covid_admitted/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-A/all/covid_admitted/aj/*.csv
+        png: output/4-contrast/age75plus/match-A/all/covid_admitted/aj/*.png
+
+  aj_age75plus_match_A_ageband_covid_admitted:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/match-A/ageband/covid_admitted/aj/
+      --exposure=treatment --subgroups=ageband --origin_date=vax_date --event_date=covid_admitted_date
+      --censoring_date=censor_date --competing_date=death_date --weight=wt_age75plus_match_A
+      --max_fup=168 --min_count=6 --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-A/ageband/covid_admitted/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-A/ageband/covid_admitted/aj/*.csv
+        png: output/4-contrast/age75plus/match-A/ageband/covid_admitted/aj/*.png
+
+  aj_age75plus_match_B_all_covid_death:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/match-B/all/covid_death/aj/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_death_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_match_B --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-B/all/covid_death/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-B/all/covid_death/aj/*.csv
+        png: output/4-contrast/age75plus/match-B/all/covid_death/aj/*.png
+
+  aj_age75plus_match_B_ageband_covid_death:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/match-B/ageband/covid_death/aj/ --exposure=treatment
+      --subgroups=ageband --origin_date=vax_date --event_date=covid_death_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_match_B --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-B/ageband/covid_death/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-B/ageband/covid_death/aj/*.csv
+        png: output/4-contrast/age75plus/match-B/ageband/covid_death/aj/*.png
+
+  aj_age75plus_match_B_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/match-B/all/covid_admitted/aj/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_admitted_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_match_B --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-B/all/covid_admitted/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-B/all/covid_admitted/aj/*.csv
+        png: output/4-contrast/age75plus/match-B/all/covid_admitted/aj/*.png
+
+  aj_age75plus_match_B_ageband_covid_admitted:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/match-B/ageband/covid_admitted/aj/
+      --exposure=treatment --subgroups=ageband --origin_date=vax_date --event_date=covid_admitted_date
+      --censoring_date=censor_date --competing_date=death_date --weight=wt_age75plus_match_B
+      --max_fup=168 --min_count=6 --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-B/ageband/covid_admitted/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-B/ageband/covid_admitted/aj/*.csv
+        png: output/4-contrast/age75plus/match-B/ageband/covid_admitted/aj/*.png
+
+  aj_age75plus_weight_A_all_covid_death:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/weight-A/all/covid_death/aj/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_death_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_weight_A --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/all/covid_death/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/all/covid_death/aj/*.csv
+        png: output/4-contrast/age75plus/weight-A/all/covid_death/aj/*.png
+
+  aj_age75plus_weight_A_ageband_covid_death:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/weight-A/ageband/covid_death/aj/ --exposure=treatment
+      --subgroups=ageband --origin_date=vax_date --event_date=covid_death_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_weight_A --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/ageband/covid_death/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/ageband/covid_death/aj/*.csv
+        png: output/4-contrast/age75plus/weight-A/ageband/covid_death/aj/*.png
+
+  aj_age75plus_weight_A_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/weight-A/all/covid_admitted/aj/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_admitted_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_weight_A --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/all/covid_admitted/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/all/covid_admitted/aj/*.csv
+        png: output/4-contrast/age75plus/weight-A/all/covid_admitted/aj/*.png
+
+  aj_age75plus_weight_A_ageband_covid_admitted:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/weight-A/ageband/covid_admitted/aj/
+      --exposure=treatment --subgroups=ageband --origin_date=vax_date --event_date=covid_admitted_date
+      --censoring_date=censor_date --competing_date=death_date --weight=wt_age75plus_weight_A
+      --max_fup=168 --min_count=6 --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/ageband/covid_admitted/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/ageband/covid_admitted/aj/*.csv
+        png: output/4-contrast/age75plus/weight-A/ageband/covid_admitted/aj/*.png
+
+  aj_age75plus_weight_B_all_covid_death:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/weight-B/all/covid_death/aj/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_death_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_weight_B --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-B/all/covid_death/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-B/all/covid_death/aj/*.csv
+        png: output/4-contrast/age75plus/weight-B/all/covid_death/aj/*.png
+
+  aj_age75plus_weight_B_ageband_covid_death:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/weight-B/ageband/covid_death/aj/ --exposure=treatment
+      --subgroups=ageband --origin_date=vax_date --event_date=covid_death_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_weight_B --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-B/ageband/covid_death/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-B/ageband/covid_death/aj/*.csv
+        png: output/4-contrast/age75plus/weight-B/ageband/covid_death/aj/*.png
+
+  aj_age75plus_weight_B_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/weight-B/all/covid_admitted/aj/ --exposure=treatment
+      --subgroups=all --origin_date=vax_date --event_date=covid_admitted_date --censoring_date=censor_date
+      --competing_date=death_date --weight=wt_age75plus_weight_B --max_fup=168 --min_count=6
+      --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-B/all/covid_admitted/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-B/all/covid_admitted/aj/*.csv
+        png: output/4-contrast/age75plus/weight-B/all/covid_admitted/aj/*.png
+
+  aj_age75plus_weight_B_ageband_covid_admitted:
+    run: r:v2 analysis/4-contrast/aj.R --df_input=output/3-adjust/age75plus/combine/data_weights.arrow
+      --dir_output=output/4-contrast/age75plus/weight-B/ageband/covid_admitted/aj/
+      --exposure=treatment --subgroups=ageband --origin_date=vax_date --event_date=covid_admitted_date
+      --censoring_date=censor_date --competing_date=death_date --weight=wt_age75plus_weight_B
+      --max_fup=168 --min_count=6 --method=constant --contrast=TRUE --plot=TRUE
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-B/ageband/covid_admitted/aj/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-B/ageband/covid_admitted/aj/*.csv
+        png: output/4-contrast/age75plus/weight-B/ageband/covid_admitted/aj/*.png
+
+  ## ### Pooled logistic regression estimates 
+
+  plr_age75plus_match_A_all_covid_death:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=match --spec=A
+      --subgroup=all --outcome=covid_death
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-A/all/covid_death/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-A/all/covid_death/plr/*.csv
+        png: output/4-contrast/age75plus/match-A/all/covid_death/plr/*.png
+
+  plr_age75plus_match_A_ageband_covid_death:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=match --spec=A
+      --subgroup=ageband --outcome=covid_death
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-A/ageband/covid_death/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-A/ageband/covid_death/plr/*.csv
+        png: output/4-contrast/age75plus/match-A/ageband/covid_death/plr/*.png
+
+  plr_age75plus_match_A_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=match --spec=A
+      --subgroup=all --outcome=covid_admitted
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-A/all/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-A/all/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/match-A/all/covid_admitted/plr/*.png
+
+  plr_age75plus_match_A_ageband_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=match --spec=A
+      --subgroup=ageband --outcome=covid_admitted
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-A/ageband/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-A/ageband/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/match-A/ageband/covid_admitted/plr/*.png
+
+  plr_age75plus_match_B_all_covid_death:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=match --spec=B
+      --subgroup=all --outcome=covid_death
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-B/all/covid_death/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-B/all/covid_death/plr/*.csv
+        png: output/4-contrast/age75plus/match-B/all/covid_death/plr/*.png
+
+  plr_age75plus_match_B_ageband_covid_death:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=match --spec=B
+      --subgroup=ageband --outcome=covid_death
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-B/ageband/covid_death/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-B/ageband/covid_death/plr/*.csv
+        png: output/4-contrast/age75plus/match-B/ageband/covid_death/plr/*.png
+
+  plr_age75plus_match_B_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=match --spec=B
+      --subgroup=all --outcome=covid_admitted
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-B/all/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-B/all/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/match-B/all/covid_admitted/plr/*.png
+
+  plr_age75plus_match_B_ageband_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=match --spec=B
+      --subgroup=ageband --outcome=covid_admitted
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/match-B/ageband/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/match-B/ageband/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/match-B/ageband/covid_admitted/plr/*.png
+
+  plr_age75plus_weight_A_all_covid_death:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=A
+      --subgroup=all --outcome=covid_death
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/all/covid_death/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/all/covid_death/plr/*.csv
+        png: output/4-contrast/age75plus/weight-A/all/covid_death/plr/*.png
+
+  plr_age75plus_weight_A_ageband_covid_death:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=A
+      --subgroup=ageband --outcome=covid_death
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/ageband/covid_death/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/ageband/covid_death/plr/*.csv
+        png: output/4-contrast/age75plus/weight-A/ageband/covid_death/plr/*.png
+
+  plr_age75plus_weight_A_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=A
+      --subgroup=all --outcome=covid_admitted
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/all/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/all/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/weight-A/all/covid_admitted/plr/*.png
+
+  plr_age75plus_weight_A_ageband_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=A
+      --subgroup=ageband --outcome=covid_admitted
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-A/ageband/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-A/ageband/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/weight-A/ageband/covid_admitted/plr/*.png
+
+  plr_age75plus_weight_B_all_covid_death:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=B
+      --subgroup=all --outcome=covid_death
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-B/all/covid_death/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-B/all/covid_death/plr/*.csv
+        png: output/4-contrast/age75plus/weight-B/all/covid_death/plr/*.png
+
+  plr_age75plus_weight_B_ageband_covid_death:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=B
+      --subgroup=ageband --outcome=covid_death
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-B/ageband/covid_death/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-B/ageband/covid_death/plr/*.csv
+        png: output/4-contrast/age75plus/weight-B/ageband/covid_death/plr/*.png
+
+  plr_age75plus_weight_B_all_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=B
+      --subgroup=all --outcome=covid_admitted
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-B/all/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-B/all/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/weight-B/all/covid_admitted/plr/*.png
+
+  plr_age75plus_weight_B_ageband_covid_admitted:
+    run: r:v2 analysis/4-contrast/plr.R --cohort=age75plus --method=weight --spec=B
+      --subgroup=ageband --outcome=covid_admitted
+    needs:
+    - adjust_combine_age75plus
+    outputs:
+      highly_sensitive:
+        arrow: output/4-contrast/age75plus/weight-B/ageband/covid_admitted/plr/*.arrow
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/weight-B/ageband/covid_admitted/plr/*.csv
+        png: output/4-contrast/age75plus/weight-B/ageband/covid_admitted/plr/*.png
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Combine estimates across cohorts, specs, outcomes and subgroups 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  combine_age75plus_contrasts:
+    run: r:v2 analysis/4-contrast/combine-contrasts.R age75plus
+    needs:
+    - plr_age75plus_match_A_all_covid_death
+    - aj_age75plus_match_A_all_covid_death
+    - plr_age75plus_match_A_ageband_covid_death
+    - aj_age75plus_match_A_ageband_covid_death
+    - plr_age75plus_match_A_all_covid_admitted
+    - aj_age75plus_match_A_all_covid_admitted
+    - plr_age75plus_match_A_ageband_covid_admitted
+    - aj_age75plus_match_A_ageband_covid_admitted
+    - plr_age75plus_match_B_all_covid_death
+    - aj_age75plus_match_B_all_covid_death
+    - plr_age75plus_match_B_ageband_covid_death
+    - aj_age75plus_match_B_ageband_covid_death
+    - plr_age75plus_match_B_all_covid_admitted
+    - aj_age75plus_match_B_all_covid_admitted
+    - plr_age75plus_match_B_ageband_covid_admitted
+    - aj_age75plus_match_B_ageband_covid_admitted
+    - plr_age75plus_weight_A_all_covid_death
+    - aj_age75plus_weight_A_all_covid_death
+    - plr_age75plus_weight_A_ageband_covid_death
+    - aj_age75plus_weight_A_ageband_covid_death
+    - plr_age75plus_weight_A_all_covid_admitted
+    - aj_age75plus_weight_A_all_covid_admitted
+    - plr_age75plus_weight_A_ageband_covid_admitted
+    - aj_age75plus_weight_A_ageband_covid_admitted
+    - plr_age75plus_weight_B_all_covid_death
+    - aj_age75plus_weight_B_all_covid_death
+    - plr_age75plus_weight_B_ageband_covid_death
+    - aj_age75plus_weight_B_ageband_covid_death
+    - plr_age75plus_weight_B_all_covid_admitted
+    - aj_age75plus_weight_B_all_covid_admitted
+    - plr_age75plus_weight_B_ageband_covid_admitted
+    - aj_age75plus_weight_B_ageband_covid_admitted
+    outputs:
+      moderately_sensitive:
+        csv: output/4-contrast/age75plus/contrasts/*.csv
+        png: output/4-contrast/age75plus/contrasts/plots/*.png
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## End 
+  ## # # # # # # # # # # # # # # # # # # # 
+

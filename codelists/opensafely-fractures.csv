@@ -1,0 +1,113 @@
+code,term
+M843,"Stress fracture, not elsewhere classified"
+S02,Fracture of skull and facial bones
+S020,Fracture of vault of skull
+S021,Fracture of base of skull
+S022,Fracture of nasal bones
+S023,Fracture of orbital floor
+S024,Fracture of malar and maxillary bones
+S025,Fracture of tooth
+S026,Fracture of mandible
+S027,Multiple fractures involving skull and facial bones
+S028,Fractures of other skull and facial bones
+S029,"Fracture of skull and facial bones, part unspecified"
+S12,Fracture of neck
+S120,Fracture of first cervical vertebra
+S121,Fracture of second cervical vertebra
+S122,Fracture of other specified cervical vertebra
+S127,Multiple fractures of cervical spine
+S128,Fracture of other parts of neck
+S129,"Fracture of neck, part unspecified"
+S22,"Fracture of rib(s), sternum and thoracic spine"
+S220,Fracture of thoracic vertebra
+S221,Multiple fractures of thoracic spine
+S222,Fracture of sternum
+S223,Fracture of rib
+S224,Multiple fractures of ribs
+S225,Flail chest
+S228,Fracture of other parts of bony thorax
+S229,"Fracture of bony thorax, part unspecified"
+S32,Fracture of lumbar spine and pelvis
+S320,Fracture of lumbar vertebra
+S321,Fracture of sacrum
+S322,Fracture of coccyx
+S323,Fracture of ilium
+S324,Fracture of acetabulum
+S325,Fracture of pubis
+S327,Multiple fractures of lumbar spine and pelvis
+S328,Fracture of other and unspecified parts of lumbar spine and pelvis
+S42,Fracture of shoulder and upper arm
+S420,Fracture of clavicle
+S421,Fracture of scapula
+S422,Fracture of upper end of humerus
+S423,Fracture of shaft of humerus
+S424,Fracture of lower end of humerus
+S427,"Multiple fractures of clavicle, scapula and humerus"
+S428,Fracture of other parts of shoulder and upper arm
+S429,"Fracture of shoulder girdle, part unspecified"
+S52,Fracture of forearm
+S520,Fracture of upper end of ulna
+S521,Fracture of upper end of radius
+S522,Fracture of shaft of ulna
+S523,Fracture of shaft of radius
+S524,Fracture of shafts of both ulna and radius
+S525,Fracture of lower end of radius
+S526,Fracture of lower end of both ulna and radius
+S527,Multiple fractures of forearm
+S528,Fracture of other parts of forearm
+S529,"Fracture of forearm, part unspecified"
+S62,Fracture at wrist and hand level
+S620,Fracture of navicular [scaphoid] bone of hand
+S621,Fracture of other carpal bone(s)
+S622,Fracture of first metacarpal bone
+S623,Fracture of other metacarpal bone
+S624,Multiple fractures of metacarpal bones
+S625,Fracture of thumb
+S626,Fracture of other finger
+S627,Multiple fractures of fingers
+S628,Fracture of other and unspecified parts of wrist and hand
+S72,Fracture of femur
+S720,Fracture of neck of femur
+S721,Pertrochanteric fracture
+S722,Subtrochanteric fracture
+S723,Fracture of shaft of femur
+S724,Fracture of lower end of femur
+S727,Multiple fractures of femur
+S728,Fractures of other parts of femur
+S729,"Fracture of femur, part unspecified"
+S82,"Fracture of lower leg, including ankle"
+S820,Fracture of patella
+S821,Fracture of upper end of tibia
+S822,Fracture of shaft of tibia
+S823,Fracture of lower end of tibia
+S824,Fracture of fibula alone
+S825,Fracture of medial malleolus
+S826,Fracture of lateral malleolus
+S827,Multiple fractures of lower leg
+S828,Fractures of other parts of lower leg
+S829,"Fracture of lower leg, part unspecified"
+S92,"Fracture of foot, except ankle"
+S920,Fracture of calcaneus
+S921,Fracture of talus
+S922,Fracture of other tarsal bone(s)
+S923,Fracture of metatarsal bone
+S924,Fracture of great toe
+S925,Fracture of other toe
+S927,Multiple fractures of foot
+S929,"Fracture of foot, unspecified"
+T02,Fractures involving multiple body regions
+T020,Fractures involving head with neck
+T021,Fractures involving thorax with lower back and pelvis
+T022,Fractures involving multiple regions of one upper limb
+T023,Fractures involving multiple regions of one lower limb
+T024,Fractures involving multiple regions of both upper limbs
+T025,Fractures involving multiple regions of both lower limbs
+T026,Fractures involving multiple regions of upper limb(s) with lower limb(s)
+T027,Fractures involving thorax with lower back and pelvis with limb(s)
+T028,Fractures involving other combinations of body regions
+T029,"Multiple fractures, unspecified"
+T08,"Fracture of spine, level unspecified"
+T10,"Fracture of upper limb, level unspecified"
+T12,"Fracture of lower limb, level unspecified"
+T142,Fracture of unspecified body region
+X590,Exposure to unspecified factor causing fracture
