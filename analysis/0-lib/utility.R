@@ -16,6 +16,10 @@ ceiling_any <- function(x, to = 1) {
   ceiling(plyr::round_any(x / to, 1 / 100000000)) * to
 }
 
+floor_any <- function(x, to=1){
+  x - x%%to
+}
+
 # get nth largest value from list
 nthmax <- function(x, n = 1) {
   dplyr::nth(sort(x, decreasing = TRUE), n)
@@ -62,7 +66,6 @@ censor_indicator <- function(event_date, censor_date){
    stopifnot("all censoring dates must be non-missing" =  all(!is.na(censor_date)))
   !((event_date>censor_date) | is.na(event_date))
 }
-
 
 # function to convert ethnicity 16 group into 5 group
 ethnicity_16_to_5 <- function(x) {
