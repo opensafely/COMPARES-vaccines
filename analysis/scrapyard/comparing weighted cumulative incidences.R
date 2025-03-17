@@ -67,7 +67,7 @@ output_dir <- here_glue("output", "3-adjust", cohort, "{method}-{spec}", "report
 fs::dir_create(output_dir)
 
 ## import unadjusted cohort data ----
-data_cohort <- read_feather(here("output", "2-prepare", cohort, "data_cohort.arrow"))
+data_cohort <- read_feather(here("output", "2-select", cohort, "data_cohort.arrow"))
 
 if(subgroup=="all") data_cohort$all <- 1L
 
