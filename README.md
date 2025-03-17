@@ -44,7 +44,7 @@ This repo should be forked (maybe?!) when starting an analysis for the next camp
 - The [`codelists/`](./codelists/) directory contains all the codelists used to define variables in analysis. 
 - The [`analysis/`](./analysis) directory contains the executable scripts used to conduct the analysis. 
 - The [`project.yaml`](./project.yaml) defines run-order and dependencies for all the analysis scripts.
-**This file should *not* be edited directly**. To make changes to the yaml, edit and run the [`create-project.R`](./create-project.R) script instead.
+**This file should *not* be edited directly**. To make changes to the yaml, edit and run the [`analysis/lib-0/create-project.R`](./analysis/lib-0/create-project.R) script instead.
 - Non-disclosive model outputs, including tables, figures, etc, are available via the OpenSAFELY job server.
 
 ## Analysis scripts
@@ -52,23 +52,23 @@ This repo should be forked (maybe?!) when starting an analysis for the next camp
 The analysis scripts in the [`analysis/`](./analysis) directory are organised into sub-directories as follows:
 
 - [`0-lib/`](./analysis/0-lib/):
-  - [`study-dates.R`](./analysis/0-lib/study-dates.R) defines the key study dates (start date, end date, vaccine roll-out dates, etc) that are used throughout the study. 
-  It create a json file that is used by R scripts and the study definition.
-  - [`design.R`](./analysis/0-lib/design.R) defines the campaign-specific design elements used throughout the study (start and end dates, eligibility, products, etc). 
+  - [`design.R`](./analysis/0-lib/design.R) defines the campaign-specific design elements (or parameters) used throughout the study (start and end dates, eligibility, products, etc).
   It also defines matching and weighting specification, look-up dictionaries, and other useful objects. 
-  This script is run at the start of all subsequent R scripts.
+  This script is run at the start of all subsequent R scripts, 
+  including the [`create-project.R`](./analysis/lib-0/create-project.R)script to ensure study-wide parameters are passed to the dataset definition via the project.yaml.
+  - [`create-project.R`](./analysis/lib-0/create-project.R) creates the [`project.yaml`](./project.yaml) file defining action outputs and dependencies.
   - [`utility.R`](./analysis/0-lib/utility.R) defines functions used throughout the codebase. This script is run at the start of all subsequent R scripts.
 - [`1-extract/`](./analysis/1-extract/):
-  - [`dataset_definition.py`](./analysis/1-extract/dataset_definition.py) is the script defining the dataset to extract from the database, using ehrQL.
-  - [`dummy_datasett_definition.R`](./analysis/1-extract/dummy_dataset_definition.R) defines a custom dummy dataset.  
+  - [`dataset_definition.py`](./analysis/1-extract/dataset_definition.py) is the script defining the dataset to extract from the database, using ehrQL. 
+  - [`dummy_dataset_definition.R`](./analysis/1-extract/dummy_dataset_definition.R) defines a custom dummy dataset.  
   This can be used instead of the dummy data created by ehrQL when it is necessarily to have more control over the structure in the data, 
   such as more realistic vaccination dates or event rates.
   If the dataset definition is updated, this script must also be updated to ensure variable names and types match.
   - [`variables.py`](./analysis/1-extract/variables.py) contains some function and variable definitions to be read in by the dataset definition.
   - [`codelist.py`](./analysis/1-extract/codelists.py) pulls the codelists from the [`codelists/`](./codelists/) directory to be usable in the dataset definition. 
-- [`2-prepare/`](./analysis/2-prepare/):
-  - [`data_prepare.R`](./analysis/2-prepare/data_prepare.R) imports the extracted database data (or dummy data), standardises some variables and derives some new ones.
-  - [`data_selection.R`](./analysis/data_selection.R) applies the inclusion criteria to the extracted data and creates a small table used for the inclusion/exclusion flowchart.
+- [`2-select/`](./analysis/2-select/):
+  - [`prepare.R`](./analysis/2-select/prepare.R) imports the extracted database data (or dummy data), standardises some variables and derives some new ones.
+  - [`select.R`](./analysis/select.R) applies the inclusion criteria to the extracted data and creates a small table used for the inclusion/exclusion flowchart.
 - [`3-adjust/`](./analysis/3-adjust/):
   - [`match.R`](./analysis/3-adjust/match.R) (`cohort`, `spec`) runs the matching algorithm to pair recipients of product A with product B, with matching criteria determined by `spec`. 
   It outputs a dataset containing the matching "weights" (`0`/`1`), and a matching ID. 
@@ -77,7 +77,7 @@ The analysis scripts in the [`analysis/`](./analysis) directory are organised in
   - [`report.R`](./analysis/3-adjust/report.R) (`cohort`, `method`, `spec`) describes baseline information for the matched or weighted method
   eg Table 1 type cohort characteristics, post-weighting balance checks.
   - [`combine-weights.R`](./analysis/3-adjust/combine-weights.R) (`cohort`) combines weights across all weighted and matched analyses for the given cohort.
-  Also calculated the Effective sample size based on the weights. 
+  Also calculates the Effective sample size based on the weights. 
   - [`match-coverage.R`](./analysis/3-adjust/match-coverage.R) (`cohort`, `spec`) describes matching rates over calendar time.
 - [`4-constrast/`](./analysis/4-constrast/):
   - [`aj.R`](./analysis/4-constrast/aj.R) (`cohort`, `method`, `spec`, `subgroup`, `outcome`) derives Aalen-Johansen survival estimates for each product and calculates relative risk and risk differences. 
@@ -95,6 +95,10 @@ For matching, `spec` is the set of variables to match on. For weighting, `spec` 
 Choose _all_ for no subgroups (i.e., the main analysis). Choose _<variable>_ to select a specific variable to stratify on.
 This variable must be exactly matched in the matching run if using `approach="matching"`, and must be used as a stratification variable if using `approach="weighting"` (this requirement is under review!)
 - `outcome`, the outcome of interest, for example _covidadmitted_ or _coviddeath_.
+
+## Protocol
+
+TODO
 
 ## Workspace
 
