@@ -91,19 +91,19 @@ action <- function(
 }
 
 
-## selection action function ----
+## select action function ----
 
-action_selection <- function(cohort){
+action_select <- function(cohort){
   action(
-    name = glue("data_selection_{cohort}"),
-    run = "r:v2 analysis/2-prepare/data_selection.R",
+    name = glue("select_{cohort}"),
+    run = "r:v2 analysis/2-select/select.R",
     arguments = c(cohort),
     needs = list("prepare"),
     highly_sensitive = lst(
-      arrow = glue("output/2-prepare/{cohort}/*.arrow"),
+      arrow = glue("output/2-select/{cohort}/*.arrow"),
     ),
     moderately_sensitive = lst(
-      csv = glue("output/2-prepare/{cohort}/*.csv"),
+      csv = glue("output/2-select/{cohort}/*.csv"),
     )
   )
 }
@@ -117,7 +117,7 @@ action_match <- function(cohort, spec){
       name = glue("adjust_{cohort}_match_{spec}"),
       run = "r:v2 analysis/3-adjust/match.R",
       arguments = c(cohort, spec),
-      needs = list(glue("data_selection_{cohort}")),
+      needs = list(glue("select_{cohort}")),
       highly_sensitive = lst(
         arrow = glue("output/3-adjust/{cohort}/match-{spec}/*.arrow")
       )
@@ -127,7 +127,7 @@ action_match <- function(cohort, spec){
       name = glue("adjust_{cohort}_match_{spec}_report"),
       run = "r:v2 analysis/3-adjust/report.R",
       arguments = c(cohort, "match", spec),
-      needs = list(glue("data_selection_{cohort}"),  glue("adjust_{cohort}_match_{spec}")),
+      needs = list(glue("select_{cohort}"),  glue("adjust_{cohort}_match_{spec}")),
       # highly_sensitive = lst(
       #   arrow = glue("output/3-adjust/{cohort}/match-{spec}/report/*.arrow"),
       # ),
@@ -151,7 +151,7 @@ action_weight <- function(cohort, spec){
       run = "r:v2 analysis/3-adjust/weight.R",
       arguments = c(cohort, spec),
       needs = list(
-        glue("data_selection_{cohort}")
+        glue("select_{cohort}")
       ),
       highly_sensitive = lst(
         arrow = glue("output/3-adjust/{cohort}/weight-{spec}/*.arrow")
@@ -163,7 +163,7 @@ action_weight <- function(cohort, spec){
       run = "r:v2 analysis/3-adjust/report.R",
       arguments = c(cohort, "weight", spec),
       needs = list(
-        glue("data_selection_{cohort}"),  
+        glue("select_{cohort}"),  
         glue("adjust_{cohort}_weight_{spec}")
       ),
       # highly_sensitive = lst(
@@ -183,7 +183,7 @@ action_combine_weights <- function(cohort){
     name = glue("adjust_combine_{cohort}"),
     run = glue("r:v2 analysis/3-adjust/combine-weights.R {cohort}"),
     needs = list(
-      glue("data_selection_{cohort}"),
+      glue("select_{cohort}"),
       glue_data(
         .x=metaparams_cohort_method_spec |> 
           select(cohort, method, spec) |>
@@ -257,7 +257,7 @@ action_plr_contrast <- function(
       "outcome" = glue("{outcome}")
     ),
     needs = list(
-      #glue("data_selection_{cohort}"),
+      #glue("select_{cohort}"),
       glue("adjust_combine_{cohort}")
     ),
     highly_sensitive = lst(
@@ -344,17 +344,17 @@ actions_list <- splice(
 
   action(
     name = "prepare",
-    run = "r:v2 analysis/2-prepare/data_prepare.R",
+    run = "r:v2 analysis/2-select/prepare.R",
     needs = list("extract"),
     highly_sensitive = lst(
-      arrow = "output/2-prepare/*.arrow",
+      arrow = "output/2-select/*.arrow",
     )
   ),
 
 
   comment("# # # # # # # # # # # # # # # # # # #", "Cohort: age75plus", "# # # # # # # # # # # # # # # # # # #"),
 
-  action_selection("age75plus"),
+  action_select("age75plus"),
 
   comment("# # # # # # # # # # # # # # # # # # #", "Matching", "# # # # # # # # # # # # # # # # # # #"),
 

@@ -1,6 +1,5 @@
 # # # # # # # # # # # # # # # # # # # # #
-# Purpose: estimate treatment effect using pooled logistic regression with IPW
-# can be used for either IPW or matching adjustment, since matching produces 0/1 weights
+# Purpose: collate all scripts to create testing environment for M-estimation
 # # # # # # # # # # # # # # # # # # # # #
 
 ## Import libraries ----
@@ -69,7 +68,7 @@ fs::dir_create(output_dir)
 
 ## import unadjusted cohort data ----
 # only needed if rerunning weighting model
-# data_cohort <- read_feather(here("output", "2-prepare", cohort, "data_cohort.arrow"))
+# data_cohort <- read_feather(here("output", "2-select", cohort, "data_cohort.arrow"))
 
 ## import weights from matching or weighting method ----
 data_weights <- read_feather(here_glue("output", "3-adjust", cohort, "combine", "data_weights.arrow"))

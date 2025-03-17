@@ -48,7 +48,7 @@ fs::dir_create(output_dir)
 # Import and prepare data ----
 
 ## one pow per patient ----
-data_cohort <- read_feather(here("output", "2-prepare", cohort, "data_cohort.arrow"))
+data_cohort <- read_feather(here("output", "2-select", cohort, "data_cohort.arrow"))
 
 print_data_size(data_cohort)
 
