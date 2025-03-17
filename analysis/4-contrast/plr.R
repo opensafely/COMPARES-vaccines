@@ -130,31 +130,19 @@ formula_time_treatment <- event_indicator ~ treatment + ns(time, 4) + treatment:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # standard errors calculated using pooled logistic regression,
 # but this does not account for uncertainty in the weights
-# TODO: incorporate competing risks with death as a competing risk
-# TODO: incorporate proper standard errors
+# TODO: incorporate competing risks with death as a competing risk - see https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8471
+# TODO: incorporate proper standard errors - now done except for weighting uncertainty
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 data_persontime <- 
   data_all  |>
-  uncount(event_time, .remove=FALSE) %>%
+  uncount(event_time, .remove=FALSE) %>% # may change this from event_time to final censoring time in case we want keep dead people under follow up
   mutate(
     time = sequence(rle(patient_id)$lengths), # equivalent-ish to group_by(patient_id) |> mutate(row_number())
     event_indicator = (time==event_time) & (event_indicator==TRUE)
   )
 
 # estimate time-specific incidence from using pooled logistic regression ----
-
-
-predict.glm.custom.vcov <- function(x,vcov,newdata){
-  if(missing(newdata)){ newdata <- x$model }
-  tt <- terms(x)
-  Terms <- delete.response(tt)
-  m.mat <- model.matrix(Terms,data=newdata)
-  m.coef <- x$coef
-  fit <- as.vector(m.mat %*% x$coef)
-  se.fit <- sqrt(diag(m.mat%*%vcov%*%t(m.mat)))
-  return(list(fit=fit,se.fit=se.fit))
-}
 
 subgroup_models <-
   data_persontime |>
