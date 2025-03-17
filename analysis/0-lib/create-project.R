@@ -330,7 +330,10 @@ actions_list <- splice(
     run = paste(
       "ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py", 
       "--output output/1-extract/extract.arrow",
-      "--dummy-data-file analysis/1-extract/dummy_extract.arrow"
+      "--dummy-data-file analysis/1-extract/dummy_extract.arrow",
+      "--",
+      glue("--studystart_date={studystart_date}"), 
+      glue("--studyend_date={studyend_date}")
     ),
     needs = list(),
     highly_sensitive = lst(
