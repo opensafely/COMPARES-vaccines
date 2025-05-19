@@ -397,21 +397,24 @@ actions_list <- splice(
 #   #   "age75plus",
 #   #   "B",
 #   #   subgroups = c("all", "ageband", "cv", "vax_previous_group"),
-#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis")
+#   # #SAFETY
+#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis", "ATE")
 #   # ),
 #   #
 #   # action_contrasts_combine(
 #   #   "cv",
 #   #   "A",
 #   #   subgroups = c("all", "ageband", "vax_previous_group"),
-#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis")
+#   # #SAFETY
+#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis", "ATE")
 #   # ),
 #   #
 #   # action_contrasts_combine(
 #   #   "cv",
 #   #   "B",
 #   #   subgroups = c("all", "ageband", "vax_previous_group"),
-#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis")
+#   # #SAFETY
+#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis", "ATE")
 #   # ),
 #
 #   action_combine("age75plus"),

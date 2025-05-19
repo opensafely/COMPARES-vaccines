@@ -248,30 +248,33 @@ dataset.covid_admitted_0_date = prior_hospital_admission(vax_date, codelists.cov
 #######################################################################################
 # Post-baseline variables: outcomes, competing outcomes, and censoring
 #######################################################################################
+# Functions
 
+# A & E: first event after baseline (ECDS)
+def next_emergency_attendance(on_or_after = None, diagnoses_contains_any_of = None, where = None):
+    return (
+       ecds
+       .where(ecds.arrival_date.is_on_or_after(on_or_after))
+       .where(ecds.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
+       .where(where)
+       .sort_by(ecds.arrival_date)
+       .first_for_patient()
+       .arrival_date
+     )
 
-### Effectiveness outcomes 
+# GP: first GP attendance after baseline (SNOMED)
+def next_gp_attendance(codelist, vax_date, where=True):
+    post_events = clinical_events.where(clinical_events.date.is_on_or_after(vax_date))
+    return (
+        post_events
+        .where(post_events.snomedct_code.is_in(codelist))
+        .where(where)
+        .sort_by(clinical_events.date)
+        .first_for_patient()
+        .date
+    )
 
-
-# TODO: awaiting `all_diagnoses.contains_any_of` functionality
-# def next_emergency_attendance(on_or_after = None, diagnoses_contains_any_of = None, where = None):
-#    return (
-#       emergency
-#       .where(ecds.arrival_date.is_on_or_after(on_or_after))
-#       .where(ecds.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
-#       .where(where)
-#       .sort_by(ecds.arrival_date)
-#       .first_for_patient()
-#       .arrival_date
-#     )
-
-# Covid-related emergency attendance
-#dataset.covidemergency_date = next_emergency_attendance(vax_date, codelists.covid_emergency)
-
-# Any emergency attendance
-#dataset.emergency_date = next_emergency_attendance(vax_date)
-
-
+# HES: first HES attendance after baseline (ICD-10)
 def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None, where = None):
     return (
         apcs
@@ -283,6 +286,25 @@ def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None
         .first_for_patient()
         .admission_date
     )
+
+# Death: death after baseline (SNOMED)
+def death_after(codelist, vax_date, where=True):
+    return (
+        ons_deaths
+        .where(ons_deaths.cause_of_death_is_in(codelist))
+        .where(ons_deaths.date.is_on_or_after(vax_date))
+#        .where(where)
+#        .sort_by(clinical_events.date)
+#        .first_for_patient()
+        .date
+    )
+### Effectiveness outcomes 
+
+# Covid-related emergency attendance
+#dataset.covidemergency_date = next_emergency_attendance(vax_date, codelists.covid_emergency)
+
+# Any emergency attendance
+#dataset.emergency_date = next_emergency_attendance(vax_date)
   
 
 # covid-related admission 
@@ -303,13 +325,73 @@ dataset.death_cause_covid = ons_deaths.cause_of_death_is_in(codelists.covid_icd1
 # TODO: add all effectiveness outcomes here
 
 
-### Safety outcomes
+### Safety outcomes ---------------------------------------------------------------------------
 
 #dataset.pericarditis_emergency_date = next_emergency_attendance(vax_date, codelists.pericarditis_snomedECDS)
 #dataset.pericarditis_admitted_date = next_hospital_admission(vax_date, codelists.pericarditis_icd10)
 #dataset.pericarditis_death_date = ons_deaths.cause_of_death_is_in(codelists.pericarditis_icd10).date
 
 # TODO: add all safety outcomes here
+# Neurological -----------------------------------------------------------------
+
+# GUILLAIN BARRE
+# BELL'S PALSY
+
+
+# THROMBO ----------------------------------------------------------------------
+
+# THROMBOCITOPENIA
+
+# ARTERIAL THROMBOTIC
+### Acute myocardial infarction 
+safety_first_ami_gp = next_gp_attendance(codelists.ami_snomed, vax_date, where=True)
+safety_first_ami_hosp = next_hospital_admission(vax_date, codelists.ami_icd10, where = apcs.days_in_critical_care>0)
+safety_first_ami_death = death_after(codelists.ami_icd10, vax_date)
+
+dataset.safety_first_ami = minimum_of(
+    safety_first_ami_gp,
+    safety_first_ami_hosp,
+    safety_first_ami_death
+)
+
+### Ischaemic stroke 
+safety_first_stroke_isch_gp = next_gp_attendance(codelists.stroke_isch_snomed, vax_date, where=True)
+safety_first_stroke_isch_hosp = next_hospital_admission(vax_date, codelists.stroke_isch_icd10, where = apcs.days_in_critical_care>0)
+safety_first_stroke_isch_death = death_after(codelists.stroke_isch_icd10, vax_date)
+
+safety_first_ami = minimum_of(
+    safety_first_stroke_isch_gp,
+    safety_first_stroke_isch_hosp,
+    safety_first_stroke_isch_death
+)
+
+
+## Composite arterial thrombotic event (ATE)
+safety_first_ate_gp = next_gp_attendance(codelists.ate_snomed, vax_date, where=True)
+safety_first_ate_hosp = next_hospital_admission(vax_date, codelists.ate_icd10, where = apcs.days_in_critical_care>0)
+safety_first_ate_death = death_after(codelists.ate_icd10, vax_date)
+
+dataset.safety_first_ami = minimum_of(
+    safety_first_ate_gp,
+    safety_first_ate_hosp,
+    safety_first_ate_death
+)
+
+# VENOUS THROMBOTIC
+
+
+# CARDIO ------------------------------------------------------------------------
+
+# PERICARDITIS
+# MYOCARDITIS
+
+
+# OTHER --------------------------------------------------------------------------
+
+
+# HEAVY MENTRUAL BLEEDING
+# ERYTHEMA MULTIFORME
+# ANAPHYLAXIS
 
 ### Negative control outcomes 
 

@@ -168,8 +168,10 @@ recoder <-
     #   "Non-COVID-19 death" = "noncoviddeath",
     #   "All-cause death" = "death",
     #   "Fracture" = "fracture",
+    # # SAFETY
     #   "Pericarditis" = "pericarditis",
     #   "Myocarditis" = "myocarditis",
+    #   "Arterial Thrombotic Event" = "ATE",
     #   NULL
     # ),
     outcome = set_names(events_lookup$event, events_lookup$event_descr),
@@ -353,6 +355,7 @@ metaparams <-
     cohort = factor(c("age75plus")),
     method = factor(c("match", "weight")),
     spec = c("A", "B", "C"),
+    # ADD SAFETY
     outcome = factor(c("covid_death", "covid_admitted")),#, "covid_critcare", "covid_death", "noncovid_death", "fracture", "pericarditis", "myocarditis")),
     subgroup = factor(recoder$subgroups),
   ) |>

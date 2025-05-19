@@ -283,6 +283,12 @@ sim_list = lst(
   #   missing_rate = ~0.97
   # ),
   # 
+  # fracturedeath_day = bn_node(
+  #   ~death_day,
+  #   missing_rate = ~0.95,
+  #   needs = "death_day"
+  # ),
+  # SAFETY EVENTS
   # pericarditis_emergency_day = bn_node(
   #   ~as.integer(runif(n=..n, boost_day, boost_day+100)),
   #   missing_rate = ~0.99
@@ -302,14 +308,6 @@ sim_list = lst(
   #   ~as.integer(runif(n=..n, boost_day, boost_day+100)),
   #   missing_rate = ~0.99
   # ),
-
-
-  # fracturedeath_day = bn_node(
-  #   ~death_day,
-  #   missing_rate = ~0.95,
-  #   needs = "death_day"
-  # ),
-
 )
 bn <- bn_create(sim_list, known_variables = known_variables)
 

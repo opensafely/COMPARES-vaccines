@@ -399,6 +399,9 @@ fractures_snomedECDS = [
     "481870042","4948002","367527001", "74395007", "95851007"
   ]
 
+######################################
+# SAFETY
+######################################
 
 pericarditis_icd10 = [
   "I30"
@@ -416,3 +419,43 @@ myocarditis_icd10 = [
 myocarditis_snomedECDS = [
   "50920009",	#Myocarditis
 ]
+
+## ARTERIAL THROMBOTIC
+# from: https://github.com/opensafely/post-covid-cvd
+### Acute myocardial infarction 
+ami_snomed = codelist_from_csv(
+    "codelists/user-elsie_horne-ami_snomed.csv",
+    column="code",
+)
+ami_icd10 = codelist_from_csv(
+    "codelists/user-RochelleKnight-ami_icd10.csv",
+    column="code",
+)
+ami_prior_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-ami_prior_icd10.csv",
+    column="code"
+)
+
+### Ischaemic stroke 
+stroke_isch_snomed = codelist_from_csv(
+    "codelists/user-elsie_horne-stroke_isch_snomed.csv",
+    column="code",
+)
+stroke_isch_icd10 = codelist_from_csv(
+    "codelists/user-RochelleKnight-stroke_isch_icd10.csv",  
+    column="code",
+)
+
+# Other arterial embolism (AE) [contributes to composite ATE only]
+other_ae_snomed = codelist_from_csv(
+    "codelists/user-tomsrenin-other_art_embol.csv",
+    column="code",
+)
+other_ae_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-other_arterial_embolism_icd10.csv",
+    column="code",
+)
+
+## Composite arterial thrombotic event (ATE)
+ate_snomed = ami_snomed + other_ae_snomed + stroke_isch_snomed
+ate_icd10 = ami_icd10 + other_ae_icd10 + stroke_isch_icd10

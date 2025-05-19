@@ -155,7 +155,7 @@ data_prepared <-
       !death_cause_covid ~ "not covid-related",
       TRUE ~ NA_character_
     ),
-
+    # safety events
     # pericarditis_death_date = if_else(death_cause_pericarditis, death_date, NA_Date_),
     # pericarditis_date = pmin(pericarditis_emergency_date, pericarditis_admitted_date, pericarditis_death_date, na.rm=TRUE),
     # 
