@@ -42,7 +42,7 @@ if(length(args)==0){
 cohort_sym <- sym(cohort)
 
 ## create output directories for data ----
-output_dir <- here("output", "2-prepare", cohort)
+output_dir <- here("output", "2-select", cohort)
 fs::dir_create(output_dir)
 
 
@@ -50,7 +50,7 @@ fs::dir_create(output_dir)
 
 ## Import processed data ----
 
-data_prepared <- read_feather(here("output", "2-prepare", "data_prepared.arrow"))
+data_prepared <- read_feather(here("output", "2-select", "data_prepared.arrow"))
 
 
 # Report total number of people vaccinated in time period, by vaccine type ----

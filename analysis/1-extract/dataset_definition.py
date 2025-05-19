@@ -1,4 +1,4 @@
-import json
+
 from pathlib import Path
 
 from ehrql import Dataset, case, days, years, when, minimum_of
@@ -20,20 +20,31 @@ import codelists
 
 import variables
 
+
+
 #######################################################################################
-# Import study dates defined in "./0-lib/study-dates.R" script and then exported
-# to JSON
+# Import action parameters
 #######################################################################################
-study_dates = json.loads(
-    Path("analysis/0-lib/study-dates.json").read_text(),
+
+import argparse
+import sys
+import logging
+
+logging.info(f"command line args are: {sys.argv}")
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--studystart_date",
+    type=str,
 )
+parser.add_argument(
+    "--studyend_date",
+    type=str,
+)
+args = parser.parse_args()
 
-# Change these in ./0-lib/study-dates.R if necessary
-studystart_date = study_dates["studystart_date"]
-studyend_date = study_dates["studyend_date"]
-followupend_date = study_dates["followupend_date"]
-firstpossiblevax_date = study_dates["firstpossiblevax_date"]
-
+studystart_date = args.studystart_date
+studyend_date = args.studyend_date
 
 #######################################################################################
 # Initialise dataset

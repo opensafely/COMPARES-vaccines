@@ -24,7 +24,7 @@ source(here("analysis", "0-lib", "utility.R"))
 source(here("analysis", "0-lib", "design.R"))
 
 # create output directory
-output_dir <- here("output", "2-prepare")
+output_dir <- here("output", "2-select")
 fs::dir_create(output_dir)
 
 # Import and process data ----

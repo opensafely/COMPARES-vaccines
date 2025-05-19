@@ -38,7 +38,7 @@ output_dir <- here_glue("output", "3-adjust", cohort, "combine")
 fs::dir_create(output_dir)
 
 ## import unadjusted cohort data ----
-data_cohort <- read_feather(here("output", "2-prepare", cohort, "data_cohort.arrow"))
+data_cohort <- read_feather(here("output", "2-select", cohort, "data_cohort.arrow"))
 
 ## create dataset of metaparameters to import
 cohort0 <- cohort

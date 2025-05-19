@@ -549,6 +549,18 @@ cmlinc_variance <- function(model, vcov, newdata, id, time, weights){
   variance
 }
 
+# providing SEs for response when vcov is different to model object - is this functionality provided by marginaleffects?
+predict.glm.custom.vcov <- function(x, vcov, newdata){
+  if(missing(newdata)){ newdata <- x$model }
+  tt <- terms(x)
+  Terms <- delete.response(tt)
+  m.mat <- model.matrix(Terms,data=newdata)
+  m.coef <- x$coef
+  fit <- as.vector(m.mat %*% x$coef)
+  se.fit <- sqrt(diag(m.mat%*%vcov%*%t(m.mat)))
+  return(list(fit=fit,se.fit=se.fit))
+}
+
 
 ## Print the number of rows and the size on disk of a R object ----
 
