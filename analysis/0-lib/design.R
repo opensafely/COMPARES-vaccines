@@ -50,31 +50,38 @@ list2env(study_dates, globalenv())
 
 maxfup <- 7L*24L
 
+
+# Look-up table for all potential outcomes of interest
+# this look-up table is used by `create-project.R` to select outcomes that are used in comparisons between products
+# comment-out outcomes that are not yet defined in the dataset definition or are otherwise not needed
+# - `event` is the variable name prefix used in the dataset, eg for the  `covid_admission_date` variable, the prefix is `covid_admission`
+# - `event_var` is the full variable name
+# - `event_descr` is the verbose variable name used in summary table/figure outputs
 events_lookup <- tribble(
   ~event, ~event_var, ~event_descr,
 
   # other
-  "test", "covid_test_date", "SARS-CoV-2 test", 
+  # "test", "covid_test_date", "SARS-CoV-2 test", 
 
   # effectiveness
-  "covid_emergency", "covid_emergency_date", "COVID-19 A&E attendance", 
+  #"covid_emergency", "covid_emergency_date", "COVID-19 A&E attendance", 
   "covid_admitted", "covid_admitted_date", "COVID-19 hospitalisation", 
-  "covid_critcare", "covid_critcare_date", "COVID-19 critical care", 
+  #"covid_critcare", "covid_critcare_date", "COVID-19 critical care", 
   "covid_death", "covid_death_date", "COVID-19 death", 
-  "death", "death_date", "Any death", 
+  #"death", "death_date", "Any death", 
 
   # safety
-  "admitted", "admitted_date", "Unplanned hospitalisation", 
-  "emergency", "emergency_date", "A&E attendance", 
-  "pericarditis", "pericarditis_date", "Pericarditis", 
-  "myocarditis", "myocarditis_date", "Myocarditis",
+  #"admitted", "admitted_date", "Unplanned hospitalisation", 
+  #"emergency", "emergency_date", "A&E attendance", 
+  #"pericarditis", "pericarditis_date", "Pericarditis", 
+  #"myocarditis", "myocarditis_date", "Myocarditis",
   "ate", "ate_date", "Arterial thrombosis",
-  "ami", "ami_date", "Acute myocardial infarction",
-  "stroke_isch", "stroke_isch_date", "Ischemic stroke",
+  #"ami", "ami_date", "Acute myocardial infarction",
+  #"stroke_isch", "stroke_isch_date", "Ischemic stroke",
 
   # negative control
-  "noncovid_death", "noncovid_death_date", "Non-COVID-19 death", 
-  "fracture", "fracture_date", "Fracture", 
+  #"noncovid_death", "noncovid_death_date", "Non-COVID-19 death", 
+  #"fracture", "fracture_date", "Fracture", 
 )
 
 
@@ -90,7 +97,7 @@ productA <- "pfizer"
 productB <- "moderna"
 #productC <- "vidprevtyn"
 
-# lookup to rename TPP product names to coding-friendly porduct names
+# lookup to rename TPP product names to coding-friendly product names
 vax_product_lookup <- c(
   "pfizer" = "COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
   "az" = "COVID-19 Vaccine Vaxzevria 0.5ml inj multidose vials (AstraZeneca)",
@@ -107,7 +114,7 @@ vax_product_lookup <- c(
 )
 
 
-# lookup to rename coding-friendly product names to publication-friendly product names
+# look-up to rename coding-friendly product names to publication-friendly product names
 vax_shortname_lookup <- c(
   "BNT162b2" = "pfizer",
   "ChAdOx1" = "az",
@@ -343,8 +350,7 @@ metaparams <-
     cohort = factor(c("age75plus")),
     method = factor(c("match", "weight")),
     spec = c("A", "B", "C"),
-    # ADD SAFETY
-    outcome = factor(c("covid_death", "covid_admitted")),#, "covid_critcare", "covid_death", "noncovid_death", "fracture", "pericarditis", "myocarditis")),
+    outcome = factor(recoder$outcome),
     subgroup = factor(recoder$subgroups),
   ) |>
   filter(
