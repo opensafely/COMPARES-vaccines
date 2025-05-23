@@ -67,7 +67,8 @@ events_lookup <- tribble(
   "admitted", "admitted_date", "Unplanned hospitalisation", 
   "emergency", "emergency_date", "A&E attendance", 
   "pericarditis", "pericarditis_date", "Pericarditis", 
-  "myocarditis", "myocarditis_date", "Myocarditis", 
+  "myocarditis", "myocarditis_date", "Myocarditis",
+  "ATE", "ate_date", "Arterial thrombotic event",
 
   # negative control
   "noncovid_death", "noncovid_death_date", "Non-COVID-19 death", 
@@ -159,21 +160,6 @@ recoder <-
       `pfizer/BA.4-5` = "0",
       `Sanofi` = "1"
     ),
-    # outcome = c(
-    #   "Positive SARS-CoV-2 test"= "postest",
-    #   "COVID-19 A&E attendance" = "covidemergency",
-    #   "COVID-19 hospitalisation" = "covidadmitted",
-    #   "COVID-19 critical care" = "covidcritcare",
-    #   "COVID-19 death" = "coviddeath",
-    #   "Non-COVID-19 death" = "noncoviddeath",
-    #   "All-cause death" = "death",
-    #   "Fracture" = "fracture",
-    # # SAFETY
-    #   "Pericarditis" = "pericarditis",
-    #   "Myocarditis" = "myocarditis",
-    #   "Arterial Thrombotic Event" = "ATE",
-    #   NULL
-    # ),
     outcome = set_names(events_lookup$event, events_lookup$event_descr),
     all = c(` ` = "all"),
     ageband = c(

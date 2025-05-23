@@ -262,7 +262,7 @@ dataset.covid_admitted_0_date = prior_hospital_admission(vax_date, codelists.cov
 # Functions
 
 # A & E: first event after baseline (ECDS)
-def next_emergency_attendance(on_or_after = None, diagnoses_contains_any_of = None, where = None):
+def next_emergency_attendance(on_or_after = None, diagnoses_contains_any_of = None, where = True):
     return (
        ecds
        .where(ecds.arrival_date.is_on_or_after(on_or_after))
@@ -273,9 +273,9 @@ def next_emergency_attendance(on_or_after = None, diagnoses_contains_any_of = No
        .arrival_date
      )
 
-# GP: first GP attendance after baseline (SNOMED)
-def next_gp_attendance(codelist, vax_date, where=True):
-    post_events = clinical_events.where(clinical_events.date.is_on_or_after(vax_date))
+# GP: first GP coded-event after baseline (SNOMED)
+def next_gp_event(on_or_after = None, codelist = None, where = True):
+    post_events = clinical_events.where(clinical_events.date.is_on_or_after(on_or_after))
     return (
         post_events
         .where(post_events.snomedct_code.is_in(codelist))
@@ -286,7 +286,7 @@ def next_gp_attendance(codelist, vax_date, where=True):
     )
 
 # HES: first HES attendance after baseline (ICD-10)
-def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None, where = None):
+def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None, where = True):
     return (
         apcs
         .where(apcs.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
@@ -355,7 +355,7 @@ dataset.death_cause_covid = ons_deaths.cause_of_death_is_in(codelists.covid_icd1
 
 # ARTERIAL THROMBOTIC
 ### Acute myocardial infarction 
-safety_first_ami_gp = next_gp_attendance(codelists.ami_snomed, vax_date, where=True)
+safety_first_ami_gp = next_gp_attendance(vax_date, codelists.ami_snomed, where=True)
 safety_first_ami_hosp = next_hospital_admission(vax_date, codelists.ami_icd10, where = apcs.days_in_critical_care>0)
 safety_first_ami_death = death_after(codelists.ami_icd10, vax_date)
 
@@ -366,7 +366,7 @@ dataset.safety_first_ami = minimum_of(
 )
 
 ### Ischaemic stroke 
-safety_first_stroke_isch_gp = next_gp_attendance(codelists.stroke_isch_snomed, vax_date, where=True)
+safety_first_stroke_isch_gp = next_gp_attendancevax_date, (codelists.stroke_isch_snomed, where=True)
 safety_first_stroke_isch_hosp = next_hospital_admission(vax_date, codelists.stroke_isch_icd10, where = apcs.days_in_critical_care>0)
 safety_first_stroke_isch_death = death_after(codelists.stroke_isch_icd10, vax_date)
 
@@ -378,7 +378,7 @@ safety_first_ami = minimum_of(
 
 
 ## Composite arterial thrombotic event (ATE)
-safety_first_ate_gp = next_gp_attendance(codelists.ate_snomed, vax_date, where=True)
+safety_first_ate_gp = next_gp_attendance(vax_date, codelists.ate_snomed, where=True)
 safety_first_ate_hosp = next_hospital_admission(vax_date, codelists.ate_icd10, where = apcs.days_in_critical_care>0)
 safety_first_ate_death = death_after(codelists.ate_icd10, vax_date)
 
