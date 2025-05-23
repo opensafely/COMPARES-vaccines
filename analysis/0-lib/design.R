@@ -68,7 +68,9 @@ events_lookup <- tribble(
   "emergency", "emergency_date", "A&E attendance", 
   "pericarditis", "pericarditis_date", "Pericarditis", 
   "myocarditis", "myocarditis_date", "Myocarditis",
-  "ATE", "ate_date", "Arterial thrombotic event",
+  "ate", "ate_date", "Arterial thrombosis",
+  "ami", "ami_date", "Acute myocardial infarction",
+  "stroke_isch", "stroke_isch_date", "Ischemic stroke",
 
   # negative control
   "noncovid_death", "noncovid_death_date", "Non-COVID-19 death", 
