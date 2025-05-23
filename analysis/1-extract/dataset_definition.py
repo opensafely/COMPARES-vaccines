@@ -299,15 +299,9 @@ def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None
     )
 
 # Death: death after baseline (SNOMED)
-def death_after(codelist, vax_date, where=True):
+def cause_specific_death(codelist):
     return (
-        ons_deaths
-        .where(ons_deaths.cause_of_death_is_in(codelist))
-        .where(ons_deaths.date.is_on_or_after(vax_date))
-#        .where(where)
-#        .sort_by(clinical_events.date)
-#        .first_for_patient()
-        .date
+        ons_deaths.cause_of_death_is_in(codelist).date
     )
 ### Effectiveness outcomes 
 
@@ -324,13 +318,11 @@ dataset.covid_admitted_date = next_hospital_admission(vax_date, codelists.covid_
 # covid-related admission to critical care
 dataset.covid_critcare_date = next_hospital_admission(vax_date, codelists.covid_icd10, where = apcs.days_in_critical_care>0)
 
+# covid-related death
+dataset.covid_death_date = cause_specific_death(codelists.covid_icd10)
 
 # all-cause death
 dataset.death_date = ons_deaths.date
-
-
-# covid-related death (stated anywhere on death certificate)
-dataset.death_cause_covid = ons_deaths.cause_of_death_is_in(codelists.covid_icd10)
 
 
 # TODO: add all effectiveness outcomes here
@@ -355,37 +347,37 @@ dataset.death_cause_covid = ons_deaths.cause_of_death_is_in(codelists.covid_icd1
 
 # ARTERIAL THROMBOTIC
 ### Acute myocardial infarction 
-safety_first_ami_gp = next_gp_attendance(vax_date, codelists.ami_snomed, where=True)
-safety_first_ami_hosp = next_hospital_admission(vax_date, codelists.ami_icd10, where = apcs.days_in_critical_care>0)
-safety_first_ami_death = death_after(codelists.ami_icd10, vax_date)
+dataset.ami_gp_date = next_gp_attendance(vax_date, codelists.ami_snomed)
+dataset.ami_hosp_date = next_hospital_admission(vax_date, codelists.ami_icd10)
+dataset.ami_death_date = cause_specific_death(codelists.ami_icd10)
 
-dataset.safety_first_ami = minimum_of(
-    safety_first_ami_gp,
-    safety_first_ami_hosp,
-    safety_first_ami_death
+dataset.ami_date = minimum_of(
+    dataset.ami_gp_date,
+    dataset.ami_hosp_date,
+    dataset.ami_death_date
 )
 
 ### Ischaemic stroke 
-safety_first_stroke_isch_gp = next_gp_attendancevax_date, (codelists.stroke_isch_snomed, where=True)
-safety_first_stroke_isch_hosp = next_hospital_admission(vax_date, codelists.stroke_isch_icd10, where = apcs.days_in_critical_care>0)
-safety_first_stroke_isch_death = death_after(codelists.stroke_isch_icd10, vax_date)
+dataset.stroke_isch_gp_date = next_gp_attendancevax_date, (codelists.stroke_isch_snomed)
+dataset.stroke_isch_hosp_date = next_hospital_admission(vax_date, codelists.stroke_isch_icd10)
+dataset.stroke_isch_death_date = cause_specific_death(codelists.stroke_isch_icd10)
 
-safety_first_ami = minimum_of(
-    safety_first_stroke_isch_gp,
-    safety_first_stroke_isch_hosp,
-    safety_first_stroke_isch_death
+dataset.stroke_isch_date = minimum_of(
+    dataset.stroke_isch_gp_date,
+    dataset.stroke_isch_hosp_date,
+    dataset.stroke_isch_death_date
 )
 
 
 ## Composite arterial thrombotic event (ATE)
-safety_first_ate_gp = next_gp_attendance(vax_date, codelists.ate_snomed, where=True)
-safety_first_ate_hosp = next_hospital_admission(vax_date, codelists.ate_icd10, where = apcs.days_in_critical_care>0)
-safety_first_ate_death = death_after(codelists.ate_icd10, vax_date)
+dataset.ate_gp_date = next_gp_attendance(vax_date, codelists.ate_snomed)
+dataset.ate_hosp_date = next_hospital_admission(vax_date, codelists.ate_icd10)
+dataset.ate_death_date = cause_specific_death(codelists.ate_icd10)
 
-dataset.safety_first_ami = minimum_of(
-    safety_first_ate_gp,
-    safety_first_ate_hosp,
-    safety_first_ate_death
+dataset.ate_date = minimum_of(
+    dataset.ate_gp_date,
+    dataset.ate_hosp_date,
+    dataset.ate_death_date
 )
 
 # VENOUS THROMBOTIC

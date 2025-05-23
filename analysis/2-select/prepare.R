@@ -137,9 +137,6 @@ data_prepared <-
     
     censor_date = pmin(dereg_date, study_dates$followupend_date, na.rm=TRUE),
 
-    # latest covid event before study start
-    
-    covid_death_date = if_else(death_cause_covid, death_date, NA_Date_),
     noncovid_death_date = if_else(!is.na(death_date) & is.na(covid_death_date), death_date, as.Date(NA_character_)),
 
     # replace events dates with more severe dates if they precede less severe dates
@@ -150,11 +147,6 @@ data_prepared <-
     # earliest covid event after study start
     #any_covid_date = pmin(covidemergency_date, covidadmitted_date, coviddeath_date, na.rm=TRUE),
 
-    cause_of_death = fct_case_when(
-      death_cause_covid ~ "covid-related",
-      !death_cause_covid ~ "not covid-related",
-      TRUE ~ NA_character_
-    ),
     # safety events
     # pericarditis_death_date = if_else(death_cause_pericarditis, death_date, NA_Date_),
     # pericarditis_date = pmin(pericarditis_emergency_date, pericarditis_admitted_date, pericarditis_death_date, na.rm=TRUE),
