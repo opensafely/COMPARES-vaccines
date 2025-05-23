@@ -259,9 +259,10 @@ dataset.covid_admitted_0_date = prior_hospital_admission(vax_date, codelists.cov
 #######################################################################################
 # Post-baseline variables: outcomes, competing outcomes, and censoring
 #######################################################################################
-# Functions
 
-# A & E: first event after baseline (ECDS)
+## Functions
+
+### A & E: first event after baseline (ECDS)
 def next_emergency_attendance(on_or_after = None, diagnoses_contains_any_of = None, where = True):
     return (
        ecds
@@ -273,7 +274,7 @@ def next_emergency_attendance(on_or_after = None, diagnoses_contains_any_of = No
        .arrival_date
      )
 
-# GP: first GP coded-event after baseline (SNOMED)
+### GP: first GP coded-event after baseline (SNOMED)
 def next_gp_event(on_or_after = None, codelist = None, where = True):
     post_events = clinical_events.where(clinical_events.date.is_on_or_after(on_or_after))
     return (
@@ -285,7 +286,7 @@ def next_gp_event(on_or_after = None, codelist = None, where = True):
         .date
     )
 
-# HES: first HES attendance after baseline (ICD-10)
+### HES: first HES attendance after baseline (ICD-10)
 def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None, where = True):
     return (
         apcs
@@ -298,43 +299,38 @@ def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None
         .admission_date
     )
 
-# Death: death after baseline (SNOMED)
+### Death: death after baseline (SNOMED)
 def cause_specific_death(codelist):
     return (
         ons_deaths.cause_of_death_is_in(codelist).date
     )
-### Effectiveness outcomes 
 
-# Covid-related emergency attendance
-#dataset.covidemergency_date = next_emergency_attendance(vax_date, codelists.covid_emergency)
+## All-cause outcomes ----------------------------------------------------------
 
 # Any emergency attendance
-#dataset.emergency_date = next_emergency_attendance(vax_date)
-  
-
-# covid-related admission 
-dataset.covid_admitted_date = next_hospital_admission(vax_date, codelists.covid_icd10)
-
-# covid-related admission to critical care
-dataset.covid_critcare_date = next_hospital_admission(vax_date, codelists.covid_icd10, where = apcs.days_in_critical_care>0)
-
-# covid-related death
-dataset.covid_death_date = cause_specific_death(codelists.covid_icd10)
-
+dataset.emergency_date = next_emergency_attendance(vax_date)
+# Any admission 
+dataset.admitted_date = next_hospital_admission(vax_date)
 # all-cause death
 dataset.death_date = ons_deaths.date
 
 
-# TODO: add all effectiveness outcomes here
 
+## Effectiveness outcomes ------------------------------------------------------
 
-### Safety outcomes ---------------------------------------------------------------------------
+### Covid-related emergency attendance
+dataset.covidemergency_date = next_emergency_attendance(vax_date, codelists.covid_emergency)
+# covid-related admission 
+dataset.covid_admitted_date = next_hospital_admission(vax_date, codelists.covid_icd10)
+# covid-related admission to critical care
+dataset.covid_critcare_date = next_hospital_admission(vax_date, codelists.covid_icd10, where = apcs.days_in_critical_care>0)
+# covid-related death
+dataset.covid_death_date = cause_specific_death(codelists.covid_icd10)
 
-#dataset.pericarditis_emergency_date = next_emergency_attendance(vax_date, codelists.pericarditis_snomedECDS)
-#dataset.pericarditis_admitted_date = next_hospital_admission(vax_date, codelists.pericarditis_icd10)
-#dataset.pericarditis_death_date = ons_deaths.cause_of_death_is_in(codelists.pericarditis_icd10).date
+## Safety outcomes ------------------------------------------------------------
 
 # TODO: add all safety outcomes here
+
 # Neurological -----------------------------------------------------------------
 
 # GUILLAIN BARRE
@@ -346,6 +342,7 @@ dataset.death_date = ons_deaths.date
 # THROMBOCITOPENIA
 
 # ARTERIAL THROMBOTIC
+
 ### Acute myocardial infarction 
 dataset.ami_gp_date = next_gp_attendance(vax_date, codelists.ami_snomed)
 dataset.ami_hosp_date = next_hospital_admission(vax_date, codelists.ami_icd10)
@@ -368,7 +365,6 @@ dataset.stroke_isch_date = minimum_of(
     dataset.stroke_isch_death_date
 )
 
-
 ## Composite arterial thrombotic event (ATE)
 dataset.ate_gp_date = next_gp_attendance(vax_date, codelists.ate_snomed)
 dataset.ate_hosp_date = next_hospital_admission(vax_date, codelists.ate_icd10)
@@ -386,6 +382,11 @@ dataset.ate_date = minimum_of(
 # CARDIO ------------------------------------------------------------------------
 
 # PERICARDITIS
+
+#dataset.pericarditis_emergency_date = next_emergency_attendance(vax_date, codelists.pericarditis_snomedECDS)
+#dataset.pericarditis_admitted_date = next_hospital_admission(vax_date, codelists.pericarditis_icd10)
+#dataset.pericarditis_death_date = cause_specific_death(codelists.pericarditis_icd10)
+
 # MYOCARDITIS
 
 
