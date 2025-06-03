@@ -259,98 +259,308 @@ sim_list = lst(
     missing_rate = ~0.7
   ),
 
-  covid_death_day = bn_node(
-    ~death_day,
-    missing_rate = ~0.7,
-    needs = "death_day"
-  ),
-
+  covid_death_day = bn_node(~ death_day,
+                            missing_rate = ~ 0.7,
+                            needs = "death_day"),
   
   
   ### safety outcomes
+  # NEUROLOGICAL
+  #### SGB
   
+  sgb_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+                       missing_rate = ~ 0.8),
   
-  #### AMI
+  sgb_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                  100)),
+                             missing_rate = ~ 0.7),
   
-  ami_gp_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.8
+  sgb_death_day = bn_node(~ death_day,
+                          missing_rate = ~ 0.7,
+                          needs = "death_day"),
+  
+  sgb_day = bn_node(~ pmin(sgb_gp_day, sgb_admitted_day, sgb_death_day),),
+  
+  #### BELLS_PALSY
+  
+  bells_palsy_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                    100)),
+                               missing_rate = ~ 0.8),
+  
+  bells_palsy_emergency_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                           100)),
+                                      missing_rate = ~ 0.8),
+  
+  bells_palsy_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                          100)),
+                                     missing_rate = ~ 0.7),
+  
+  bells_palsy_death_day = bn_node(~ death_day,
+                                  missing_rate = ~ 0.7,
+                                  needs = "death_day"),
+  
+  bells_palsy_day = bn_node(
+    ~ pmin(
+      bells_palsy_gp_day,
+      bells_palsy_emergency_day,
+      bells_palsy_admitted_day,
+      bells_palsy_death_day
+    ),
   ),
   
-  ami_emergency_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.8
-  ),
+  # THROMBO
+  #### TTP
   
-  ami_admitted_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.7
-  ),
+  ttp_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+                       missing_rate = ~ 0.8),
   
-  ami_death_day = bn_node(
-    ~death_day,
-    missing_rate = ~0.7,
-    needs = "death_day"
-  ),
+  ttp_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                  100)),
+                             missing_rate = ~ 0.7),
   
-  ami_day = bn_node(
-    ~ pmin(ami_gp_day, ami_emergency_day, ami_admitted_day, ami_death_day),
-  ),
+  ttp_death_day = bn_node(~ death_day,
+                          missing_rate = ~ 0.7,
+                          needs = "death_day"),
   
+  ttp_day = bn_node(~ pmin(ttp_gp_day, ttp_admitted_day, ttp_death_day),),
+  # ARTERIAL THROMBOTIC
+  #### Acute myocardial infarction (ami)
+  
+  ami_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+                       missing_rate = ~ 0.8),
+  
+  ami_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                  100)),
+                             missing_rate = ~ 0.7),
+  
+  ami_death_day = bn_node(~ death_day,
+                          missing_rate = ~ 0.7,
+                          needs = "death_day"),
+  
+  ami_day = bn_node(~ pmin(ami_gp_day, ami_admitted_day, ami_death_day),),
   
   #### Ischaemic stroke
   
-  stroke_isch_gp_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.8
+  stroke_isch_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                    100)),
+                               missing_rate = ~ 0.8),
+  
+  stroke_isch_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                          100)),
+                                     missing_rate = ~ 0.7),
+  
+  stroke_isch_death_day = bn_node(~ death_day,
+                                  missing_rate = ~ 0.7,
+                                  needs = "death_day"),
+  
+  stroke_isch_day = bn_node(~ pmin(
+    stroke_isch_gp_day,
+    stroke_isch_admitted_day,
+    stroke_isch_death_day
+  ),),
+  
+  #### Composite arterial thrombotic event (ATE)
+  
+  ate_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+                       missing_rate = ~ 0.8),
+  
+  ate_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                  100)),
+                             missing_rate = ~ 0.7),
+  
+  ate_death_day = bn_node(~ death_day,
+                          missing_rate = ~ 0.7,
+                          needs = "death_day"),
+  
+  ate_day = bn_node(~ pmin(ate_gp_day, ate_admitted_day, ate_death_day),),
+  # VENOUS THROMBOTIC
+  #### Deep vein thrombosis (DVT)
+  
+  dvt_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+                       missing_rate = ~ 0.8),
+  
+  dvt_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                  100)),
+                             missing_rate = ~ 0.7),
+  
+  dvt_death_day = bn_node(~ death_day,
+                          missing_rate = ~ 0.7,
+                          needs = "death_day"),
+  
+  dvt_day = bn_node(~ pmin(dvt_gp_day, dvt_admitted_day, dvt_death_day),),
+  
+  #### Intracranial venous thrombosis (ICVT)
+  
+  icvt_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+                        missing_rate = ~ 0.8),
+  
+  icvt_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                   100)),
+                              missing_rate = ~ 0.7),
+  
+  icvt_death_day = bn_node(~ death_day,
+                           missing_rate = ~ 0.7,
+                           needs = "death_day"),
+  
+  icvt_day = bn_node(~ pmin(icvt_gp_day, icvt_admitted_day, icvt_death_day),),
+  
+  #### Pulmonary embolism (PE)
+  
+  pe_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+                      missing_rate = ~ 0.8),
+  
+  pe_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                 100)),
+                            missing_rate = ~ 0.7),
+  
+  pe_death_day = bn_node(~ death_day,
+                         missing_rate = ~ 0.7,
+                         needs = "death_day"),
+  
+  pe_day = bn_node(~ pmin(pe_gp_day, pe_admitted_day, pe_death_day),),
+  
+  #### Composite venous thrombotic event (VTE)
+  
+  vte_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+                       missing_rate = ~ 0.8),
+  
+  vte_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                  100)),
+                             missing_rate = ~ 0.7),
+  
+  vte_death_day = bn_node(~ death_day,
+                          missing_rate = ~ 0.7,
+                          needs = "death_day"),
+  
+  vte_day = bn_node(~ pmin(vte_gp_day, vte_admitted_day, vte_death_day),),
+  
+  # CARDIO
+  #### PERICARDITIS
+  
+  pericarditis_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                     100)),
+                                missing_rate = ~ 0.8),
+  
+  pericarditis_emergency_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                            100)),
+                                       missing_rate = ~ 0.8),
+  
+  pericarditis_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                           100)),
+                                      missing_rate = ~ 0.7),
+  
+  pericarditis_death_day = bn_node(~ death_day,
+                                   missing_rate = ~ 0.7,
+                                   needs = "death_day"),
+  
+  pericarditis_day = bn_node(
+    ~ pmin(
+      pericarditis_gp_day,
+      pericarditis_emergency_day,
+      pericarditis_admitted_day,
+      pericarditis_death_day
+    ),
   ),
   
-  stroke_isch_emergency_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.8
+  #### MYOCARDITIS
+  
+  myocarditis_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                    100)),
+                               missing_rate = ~ 0.8),
+  
+  myocarditis_emergency_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                           100)),
+                                      missing_rate = ~ 0.8),
+  
+  myocarditis_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                          100)),
+                                     missing_rate = ~ 0.7),
+  
+  myocarditis_death_day = bn_node(~ death_day,
+                                  missing_rate = ~ 0.7,
+                                  needs = "death_day"),
+  
+  myocarditis_day = bn_node(
+    ~ pmin(
+      myocarditis_gp_day,
+      myocarditis_emergency_day,
+      myocarditis_admitted_day,
+      myocarditis_death_day
+    ),
   ),
   
-  stroke_isch_admitted_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.7
+  #### MENORRHAGIA
+  
+  menorrhagia_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                    100)),
+                               missing_rate = ~ 0.8),
+  
+  menorrhagia_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                          100)),
+                                     missing_rate = ~ 0.7),
+  
+  menorrhagia_death_day = bn_node(~ death_day,
+                                  missing_rate = ~ 0.7,
+                                  needs = "death_day"),
+  
+  menorrhagia_day = bn_node(~ pmin(
+    menorrhagia_gp_day,
+    menorrhagia_admitted_day,
+    menorrhagia_death_day
+  ),),
+  
+  #### ERY_MULTI
+  
+  ery_multi_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                  100)),
+                             missing_rate = ~ 0.8),
+  
+  ery_multi_emergency_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                         100)),
+                                    missing_rate = ~ 0.8),
+  
+  ery_multi_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                        100)),
+                                   missing_rate = ~ 0.7),
+  
+  ery_multi_death_day = bn_node(~ death_day,
+                                missing_rate = ~ 0.7,
+                                needs = "death_day"),
+  
+  ery_multi_day = bn_node(
+    ~ pmin(
+      ery_multi_gp_day,
+      ery_multi_emergency_day,
+      ery_multi_admitted_day,
+      ery_multi_death_day
+    ),
   ),
   
-  stroke_isch_death_day = bn_node(
-    ~death_day,
-    missing_rate = ~0.7,
-    needs = "death_day"
-  ),
+  #### ANAPHYLAXIS
   
-  stroke_isch_day = bn_node(
-    ~ pmin(stroke_isch_gp_day, stroke_isch_emergency_day, stroke_isch_admitted_day, stroke_isch_death_day),
-  ),
+  anaphylaxis_gp_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                    100)),
+                               missing_rate = ~ 0.8),
   
+  anaphylaxis_emergency_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                           100)),
+                                      missing_rate = ~ 0.8),
   
-  #### ATE
+  anaphylaxis_admitted_day = bn_node(~ as.integer(runif(n = ..n, vax_day, vax_day +
+                                                          100)),
+                                     missing_rate = ~ 0.7),
   
-  ate_gp_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.8
-  ),
+  anaphylaxis_death_day = bn_node(~ death_day,
+                                  missing_rate = ~ 0.7,
+                                  needs = "death_day"),
   
-  ate_emergency_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.8
-  ),
-  
-  ate_admitted_day = bn_node(
-    ~as.integer(runif(n=..n, vax_day, vax_day+100)),
-    missing_rate = ~0.7
-  ),
-  
-  ate_death_day = bn_node(
-    ~death_day,
-    missing_rate = ~0.7,
-    needs = "death_day"
-  ),
-  
-  ate_day = bn_node(
-    ~ pmin(ate_gp_day, ate_emergency_day, ate_admitted_day, ate_death_day),
+  anaphylaxis_day = bn_node(
+    ~ pmin(
+      anaphylaxis_gp_day,
+      anaphylaxis_emergency_day,
+      anaphylaxis_admitted_day,
+      anaphylaxis_death_day
+    ),
   ),
   
 )

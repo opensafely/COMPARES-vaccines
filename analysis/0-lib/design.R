@@ -71,6 +71,7 @@ events_lookup <- tribble(
   #"death", "death_date", "Any death", 
 
   # safety
+  # TODO:
   #"admitted", "admitted_date", "Unplanned hospitalisation", 
   #"emergency", "emergency_date", "A&E attendance", 
   #"pericarditis", "pericarditis_date", "Pericarditis", 
