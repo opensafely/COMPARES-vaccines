@@ -579,8 +579,7 @@ dummydata_processed <- dummydata %>%
   rename_with(~str_replace(., "_day", "_date"), ends_with("_day"))
 
 
-fs::dir_create(here("output", "1-extract"))
-write_feather(dummydata_processed, sink = here("output", "1-extract", "dummy_extract.arrow"))
+write_feather(dummydata_processed, sink = here("analysis", "1-extract", "dummy_extract.arrow"))
 
 
 
