@@ -375,7 +375,7 @@ dataset.sgb_date = minimum_of(
 
 # BELL'S PALSY
 dataset.bells_palsy_gp_date = next_gp_event(vax_date, codelists.bells_palsy_snomed)
-dataset.bells_palsy_emergency_date = next_hospital_admission(vax_date, codelists.bells_palsy_ecds)
+dataset.bells_palsy_emergency_date = next_emergency_attendance(vax_date, codelists.bells_palsy_ecds)
 dataset.bells_palsy_hosp_date = next_hospital_admission(vax_date, codelists.bells_palsy_icd10)
 dataset.bells_palsy_death_date = cause_specific_death_date(codelists.bells_palsy_icd10)
 
@@ -483,7 +483,7 @@ dataset.vte_date = minimum_of(
 
 # PERICARDITIS
 dataset.pericarditis_gp_date = next_gp_event(vax_date, codelists.pericarditis_snomed)
-dataset.pericarditis_emergency_date = next_hospital_admission(vax_date, codelists.pericarditis_ecds)
+dataset.pericarditis_emergency_date = next_emergency_attendance(vax_date, codelists.pericarditis_ecds)
 dataset.pericarditis_hosp_date = next_hospital_admission(vax_date, codelists.pericarditis_icd10)
 dataset.pericarditis_death_date = cause_specific_death_date(codelists.pericarditis_icd10)
 
@@ -497,7 +497,7 @@ dataset.pericarditis_date = minimum_of(
 
 # MYOCARDITIS
 dataset.myocarditis_gp_date = next_gp_event(vax_date, codelists.myocarditis_snomed)
-dataset.myocarditis_emergency_date = next_hospital_admission(vax_date, codelists.myocarditis_ecds)
+dataset.myocarditis_emergency_date = next_emergency_attendance(vax_date, codelists.myocarditis_ecds)
 dataset.myocarditis_hosp_date = next_hospital_admission(vax_date, codelists.myocarditis_icd10)
 dataset.myocarditis_death_date = cause_specific_death_date(codelists.myocarditis_icd10)
 
@@ -522,7 +522,7 @@ dataset.menorrhagia_date = minimum_of(
 
 # ERYTHEMA MULTIFORME
 dataset.ery_multi_gp_date = next_gp_event(vax_date, codelists.ery_multi_snomed)
-dataset.ery_multi_emergency_date = next_hospital_admission(vax_date, codelists.ery_multi_ecds)
+dataset.ery_multi_emergency_date = next_emergency_attendance(vax_date, codelists.ery_multi_ecds)
 dataset.ery_multi_hosp_date = next_hospital_admission(vax_date, codelists.ery_multi_icd10)
 dataset.ery_multi_death_date = cause_specific_death_date(codelists.ery_multi_icd10)
 
@@ -535,7 +535,7 @@ dataset.ery_multi_date = minimum_of(
 
 # ANAPHYLAXIS
 dataset.anaphylaxis_gp_date = next_gp_event(vax_date, codelists.anaphylaxis_snomed)
-dataset.anaphylaxis_emergency_date = next_hospital_admission(vax_date, codelists.anaphylaxis_ecds)
+dataset.anaphylaxis_emergency_date = next_emergency_attendance(vax_date, codelists.anaphylaxis_ecds)
 dataset.anaphylaxis_hosp_date = next_hospital_admission(vax_date, codelists.anaphylaxis_icd10)
 dataset.anaphylaxis_death_date = cause_specific_death_date(codelists.anaphylaxis_icd10)
 
