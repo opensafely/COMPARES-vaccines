@@ -20,7 +20,11 @@ import codelists
 
 import variables
 
-
+# these are needed for emergency diagnoses workaround
+import operator
+from functools import reduce
+def any_of(conditions):
+    return reduce(operator.or_, conditions)
 
 #######################################################################################
 # Import action parameters
@@ -264,10 +268,22 @@ dataset.covid_admitted_0_date = prior_hospital_admission(vax_date, codelists.cov
 
 ### A & E: first event after baseline (ECDS)
 def next_emergency_attendance(on_or_after = None, diagnoses_contains_any_of = None, where = True):
+  
+    # use this until "contains_any_of" methods works for ecds table
+    
+    if diagnoses_contains_any_of:
+        conditions = [
+            getattr(ecds, column_name).is_in(diagnoses_contains_any_of)
+            for column_name in [f"diagnosis_{i:02d}" for i in range(1, 25)]
+        ]
+        ecds_filtered = ecds.where(any_of(conditions))
+    else:
+        ecds_filtered = ecds
+    
     return (
-       ecds
+       ecds_filtered
        .where(ecds.arrival_date.is_on_or_after(on_or_after))
-       .where(ecds.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
+#       .where(ecds.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
        .where(where)
        .sort_by(ecds.arrival_date)
        .first_for_patient()
