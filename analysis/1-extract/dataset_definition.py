@@ -307,7 +307,7 @@ def next_gp_event(on_or_after = None, codelist = None, where = True):
         .date
     )
 
-### HES: first HES attendance after baseline (ICD-10)
+### SUS: first hospital attendance after baseline (ICD-10)
 def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None, where = True):
   
     if diagnoses_contains_any_of:
