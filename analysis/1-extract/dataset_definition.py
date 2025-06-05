@@ -242,9 +242,14 @@ variables.primis_variables(dataset, vax_date, var_name_suffix="")
 
 
 def prior_hospital_admission(before = None, diagnoses_contains_any_of = None, where = None):
+    
+    if diagnoses_contains_any_of:
+        apcs_filtered = apcs.where(apcs.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
+    else:
+        apcs_filtered = apcs
+    
     return (
-        apcs
-        .where(apcs.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
+        apcs_filtered
         .where(apcs.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]))
         .where(apcs.patient_classification == "1")  # Ordinary admissions only
         .where(apcs.admission_date.is_before(vax_date))
@@ -304,9 +309,15 @@ def next_gp_event(on_or_after = None, codelist = None, where = True):
 
 ### HES: first HES attendance after baseline (ICD-10)
 def next_hospital_admission(on_or_after = None, diagnoses_contains_any_of = None, where = True):
+  
+    if diagnoses_contains_any_of:
+        apcs_filtered = apcs.where(apcs.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
+    else:
+        apcs_filtered = apcs
+    
     return (
-        apcs
-        .where(apcs.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
+        apcs_filtered
+        #.where(apcs.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
         .where(apcs.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]))
         .where(apcs.patient_classification == "1")  # Ordinary admissions only
         .where(apcs.admission_date.is_on_or_after(vax_date))
