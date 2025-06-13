@@ -134,36 +134,20 @@ data_prepared <-
     
     
     ## process outcomes data
-    
     censor_date = pmin(dereg_date, study_dates$followupend_date, na.rm=TRUE),
-
-    # latest covid event before study start
-    
-    covid_death_date = if_else(death_cause_covid, death_date, NA_Date_),
     noncovid_death_date = if_else(!is.na(death_date) & is.na(covid_death_date), death_date, as.Date(NA_character_)),
 
-    # replace events dates with more severe dates if they precede less severe dates
+    # earliest covid event after study start
+    any_covid_date = pmin(covid_emergency_date, covid_admitted_date, covid_death_date, na.rm=TRUE),
+    
+    # KEEP THIS as a reminder to replace event dates with more severe dates if they precede less severe dates
+    # for use if we decide to include source specific endpoints
     #covid_emergency_date = pmin(covid_emergency_date, covid_admitted_date, covid_critcare_date, covid_death_date, na.rm=TRUE),
     #covid_admitted_date = pmin(covid_admitted_date, covid_critcare_date, covid_death_date, na.rm=TRUE),
     #covid_critcare_date = pmin(covid_critcare_date, covid_death_date, na.rm=TRUE),
-
-    # earliest covid event after study start
-    #any_covid_date = pmin(covidemergency_date, covidadmitted_date, coviddeath_date, na.rm=TRUE),
-
-    cause_of_death = fct_case_when(
-      death_cause_covid ~ "covid-related",
-      !death_cause_covid ~ "not covid-related",
-      TRUE ~ NA_character_
-    ),
-
-    # pericarditis_death_date = if_else(death_cause_pericarditis, death_date, NA_Date_),
-    # pericarditis_date = pmin(pericarditis_emergency_date, pericarditis_admitted_date, pericarditis_death_date, na.rm=TRUE),
-    # 
-    # myocarditis_death_date = if_else(death_cause_myocarditis, death_date, NA_Date_),
-    # myocarditis_date = pmin(myocarditis_emergency_date, myocarditis_admitted_date, myocarditis_death_date, na.rm=TRUE),
+    
 
     # define cohorts
-
     age75plus = age_eligible >= 75,
     #cv = cv,
     is_eligible = age_eligible | cv,

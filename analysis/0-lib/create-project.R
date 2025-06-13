@@ -395,31 +395,7 @@ actions_list <- splice(
   action_contrasts_combine(
     "age75plus"
   ),
-#   #
-#   # action_contrasts_combine(
-#   #   "age75plus",
-#   #   "B",
-#   #   subgroups = c("all", "ageband", "cv", "vax_previous_group"),
-#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis")
-#   # ),
-#   #
-#   # action_contrasts_combine(
-#   #   "cv",
-#   #   "A",
-#   #   subgroups = c("all", "ageband", "vax_previous_group"),
-#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis")
-#   # ),
-#   #
-#   # action_contrasts_combine(
-#   #   "cv",
-#   #   "B",
-#   #   subgroups = c("all", "ageband", "vax_previous_group"),
-#   #   outcomes = c("covidemergency", "covidadmitted", "covidcritcare", "coviddeath", "noncoviddeath", "fracture", "pericarditis", "myocarditis")
-#   # ),
-#
-#   action_combine("age75plus"),
-#   action_combine("cv"),
-#
+
 #   comment("# # # # # # # # # # # # # # # # # # #", "Files for release", "# # # # # # # # # # # # # # # # # # #"),
 #
 #   action(

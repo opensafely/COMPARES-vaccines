@@ -399,20 +399,223 @@ fractures_snomedECDS = [
     "481870042","4948002","367527001", "74395007", "95851007"
   ]
 
+######################################
+# SAFETY
+######################################
 
-pericarditis_icd10 = [
-  "I30"
-]
+# Neurological -----------------------------------------------------------------
 
-pericarditis_snomedECDS = [
-  "3238004", #Pericarditis
-  "373945007",	#Pericardial effusion
-]
+# GUILLAIN BARRE
+sgb_snomed = codelist_from_csv(
+    "codelists/opensafely-guillain-barre-snomed.csv",
+    column="code",
+)
+sgb_icd10 = codelist_from_csv(
+    "codelists/opensafely-guillain-barre-syndrome-icd10.csv",
+    column="code",
+)
 
-myocarditis_icd10 = [
- "I514", "I41", "I40"
-]
+# BELL'S PALSY
+bells_palsy_snomed = codelist_from_csv(
+    "codelists/opensafely-bells-palsy-snomed.csv",
+    column="code",
+)
+bells_palsy_icd10 = codelist_from_csv(
+    "codelists/opensafely-bells-palsy-icd-10.csv",
+    column="code",
+)
+bells_palsy_ecds = codelist_from_csv(
+    "codelists/opensafely-bells-palsy-ecds-restricted-reference-set.csv",
+    column="code",
+)
+# THROMBO ----------------------------------------------------------------------
 
-myocarditis_snomedECDS = [
-  "50920009",	#Myocarditis
-]
+# THROMBOTIC THROMBOCYTOPENIA (TTP)
+ttp_snomed = codelist_from_csv(
+    "codelists/opensafely-thrombotic-thrombocytopenia-snomed.csv",
+    column="code",
+)
+ttp_icd10 = codelist_from_csv(
+    "codelists/opensafely-thrombocytopenia-icd-10.csv",
+    column="code",
+)
+
+# ARTERIAL THROMBOTIC
+# from: https://github.com/opensafely/post-covid-cvd
+## Acute myocardial infarction 
+ami_snomed = codelist_from_csv(
+    "codelists/user-elsie_horne-ami_snomed.csv",
+    column="code",
+)
+ami_icd10 = codelist_from_csv(
+    "codelists/user-RochelleKnight-ami_icd10.csv",
+    column="code",
+)
+ami_prior_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-ami_prior_icd10.csv",
+    column="code"
+)
+
+## Ischaemic stroke 
+stroke_isch_snomed = codelist_from_csv(
+    "codelists/user-elsie_horne-stroke_isch_snomed.csv",
+    column="code",
+)
+stroke_isch_icd10 = codelist_from_csv(
+    "codelists/user-RochelleKnight-stroke_isch_icd10.csv",  
+    column="code",
+)
+
+## Other arterial embolism (AE) [contributes to composite ATE only]
+other_ae_snomed = codelist_from_csv(
+    "codelists/user-tomsrenin-other_art_embol.csv",
+    column="code",
+)
+other_ae_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-other_arterial_embolism_icd10.csv",
+    column="code",
+)
+
+## Composite arterial thrombotic event (ATE)
+ate_snomed = ami_snomed + other_ae_snomed + stroke_isch_snomed
+ate_icd10 = ami_icd10 + other_ae_icd10 + stroke_isch_icd10
+
+# VENOUS THROMBOTIC
+# from: https://github.com/opensafely/post-covid-cvd
+## Deep vein thrombosis (DVT) [includes during pregnancy]
+dvt_nonpreg_snomed = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt_main.csv",    
+    column="code",
+)
+dvt_preg_snomed = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt-preg.csv",   
+    column="code",
+)
+dvt_snomed = dvt_nonpreg_snomed + dvt_preg_snomed
+
+dvt_nonpreg_icd10 = codelist_from_csv(
+    "codelists/user-RochelleKnight-dvt_dvt_icd10.csv",   
+    column="code",
+)
+dvt_preg_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-dvt_pregnancy_icd10.csv",   
+    column="code",
+)
+dvt_icd10 = dvt_nonpreg_icd10 + dvt_preg_icd10
+
+## Intracranial venous thrombosis (ICVT) [includes during pregnancy; contributes to composite VTE only]
+icvt_snomed = codelist_from_csv(
+    "codelists/user-elsie_horne-dvt_icvt_snomed.csv",    
+    column="code",
+)
+icvt_nonpreg_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-dvt_icvt_icd10.csv",   
+    column="code",
+)
+icvt_preg_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-icvt_pregnancy_icd10.csv",  
+    column="code",
+)
+icvt_icd10 = icvt_nonpreg_icd10 + icvt_preg_icd10
+
+## Other deep vein thrombosis [contributes to composite VTE only]
+other_dvt_snomed = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt-other.csv",   
+    column="code",
+)
+other_dvt_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-other_dvt_icd10.csv",    
+    column="code",
+)
+
+## Pulmonary embolism (PE)
+pe_snomed = codelist_from_csv(
+    "codelists/user-elsie_horne-pe_snomed.csv",    
+    column="code",
+)
+pe_icd10 = codelist_from_csv(
+    "codelists/user-RochelleKnight-pe_icd10.csv",    
+    column="code",
+)
+
+## Portal vein thrombosis (PVT) [contributes to composite VTE only]
+pvt_snomed = codelist_from_csv(
+    "codelists/user-tomsrenin-pvt.csv",   
+    column="code",
+)
+pvt_icd10 = codelist_from_csv(
+    "codelists/user-elsie_horne-portal_vein_thrombosis_icd10.csv",  
+    column="code",
+)
+
+## Composite venous thrombotic event (VTE)
+vte_snomed = dvt_snomed + icvt_snomed + other_dvt_snomed + pe_snomed + pvt_snomed
+vte_icd10 = dvt_icd10 + icvt_icd10 + other_dvt_icd10 + pe_icd10 + pvt_icd10
+
+# CARDIO ------------------------------------------------------------------------
+
+# PERICARDITIS
+pericarditis_snomed = codelist_from_csv(
+    "codelists/opensafely-pericarditis-snomed.csv",
+    column="code",
+)
+pericarditis_icd10 = codelist_from_csv(
+    "codelists/opensafely-pericarditis-icd-10.csv",
+    column="code",
+)
+pericarditis_ecds = codelist_from_csv(
+    "codelists/opensafely-pericarditis-ecds.csv",
+    column="code",
+)
+# MYOCARDITIS
+myocarditis_snomed = codelist_from_csv(
+    "codelists/opensafely-myocarditis.csv",
+    column="code",
+)
+myocarditis_icd10 = codelist_from_csv(
+    "codelists/opensafely-myocarditis-icd-10.csv",
+    column="code",
+)
+myocarditis_ecds = codelist_from_csv(
+    "codelists/opensafely-myocarditis-ecds.csv",
+    column="code",
+)
+
+# OTHER --------------------------------------------------------------------------
+
+# HEAVY MENSTRUAL BLEEDING
+menorrhagia_snomed = codelist_from_csv(
+    "codelists/opensafely-heavy-menstrual-bleeding-snomed.csv",
+    column="code",
+)
+menorrhagia_icd10 = codelist_from_csv(
+    "codelists/opensafely-heavy-menstrual-bleeding-icd-10.csv",
+    column="code",
+)
+# ERYTHEMA MULTIFORME
+ery_multi_snomed = codelist_from_csv(
+    "codelists/opensafely-erythema-multiforme-snomed.csv",
+    column="code",
+)
+ery_multi_icd10 = codelist_from_csv(
+    "codelists/opensafely-erythema-multiforme-icd-10.csv",
+    column="code",
+)
+ery_multi_ecds = codelist_from_csv(
+    "codelists/opensafely-erythema-multiforme-ecds.csv",
+    column="code",
+)
+
+# ANAPHYLAXIS
+anaphylaxis_snomed = codelist_from_csv(
+    "codelists/opensafely-anaphylaxis-snomed.csv",
+    column="code",
+)
+anaphylaxis_icd10 = codelist_from_csv(
+    "codelists/opensafely-anaphylaxis-icd-10.csv",
+    column="code",
+)
+anaphylaxis_ecds = codelist_from_csv(
+    "codelists/opensafely-anaphylaxis-ecds.csv",
+    column="code",
+)
