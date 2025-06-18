@@ -305,12 +305,12 @@ sim_list = lst(
 
   ## post-baseline events (outcomes)
   ### all-cause outcomes
-  emergency_day = bn_node(
+  next_emergency_day = bn_node(
     ~as.integer(runif(n=..n, vax_day, vax_day+100)),
     missing_rate = ~0.8
   ),
   
-  admitted_day = bn_node(
+  next_admitted_day = bn_node(
     ~as.integer(runif(n=..n, vax_day, vax_day+100)),
     missing_rate = ~0.7
   ),
@@ -333,7 +333,7 @@ sim_list = lst(
     missing_rate = ~0.7
   ),
 
-  covid_critcare_day = bn_node(
+  covid_next_critcare_day = bn_node(
     ~covid_next_admitted_day,
     needs = "covid_next_admitted_day",
     missing_rate = ~0.7
@@ -379,7 +379,7 @@ sim_list = lst(
                                   missing_rate = ~ 0.7,
                                   needs = "death_day"),
   
-  bells_next_palsy_day = bn_node(
+  bells_palsy_next_day = bn_node(
     ~ pmin(
       bells_palsy_next_gp_day,
       bells_palsy_next_emergency_day,
