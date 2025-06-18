@@ -258,7 +258,7 @@ def prior_emergency_attendance(before = None, diagnoses_contains_any_of = None, 
        ecds_filtered
        .where(ecds.arrival_date.is_before(before))
        .where(ecds.arrival_date.is_on_or_after(before - years(1)))
-       .where(ecds.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
+#       .where(ecds.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
        .where(where)
        .sort_by(ecds.arrival_date)
        .last_for_patient()
