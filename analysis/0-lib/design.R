@@ -64,30 +64,30 @@ events_lookup <- tribble(
   # "test", "covid_test_date", "SARS-CoV-2 test", 
 
   # effectiveness
-  #"covid_emergency", "covid_emergency_date", "COVID-19 A&E attendance", 
-  "covid_admitted", "covid_admitted_date", "COVID-19 hospitalisation", 
-  #"covid_critcare", "covid_critcare_date", "COVID-19 critical care", 
+  #"covid_emergency", "covid_next_emergency_date", "COVID-19 A&E attendance", 
+  "covid_admitted", "covid_next_admitted_date", "COVID-19 hospitalisation", 
+  #"covid_critcare", "covid_next_critcare_date", "COVID-19 critical care", 
   "covid_death", "covid_death_date", "COVID-19 death", 
   "death", "death_date", "Any death", 
 
   # safety
   #"admitted", "admitted_date", "Unplanned hospitalisation", 
   #"emergency", "emergency_date", "A&E attendance", 
-  #"sgb", "sgb_date", "Guillain-Barré syndrome",
-  "bells_palsy", "bells_palsy_date", "Bell's palsy",
-  "ttp", "ttp_date", "Thrombocytopenia",
-  #"ami", "ami_date", "Acute myocardial infarction",
-  #"stroke_isch", "stroke_isch_date", "Ischaemic stroke",
-  #"ate", "ate_date", "Composite arterial thrombotic event (ATE)",
-  #"dvt", "dvt_date", "Deep vein thrombosis (DVT)",
-  #"icvt", "icvt_date", "Intracranial venous thrombosis (ICVT)",
-  #"pe", "pe_date", "Pulmonary embolism (PE)",
-  #"vte", "vte_date", "Composite venous thrombotic event (VTE)",
-  #"pericarditis", "pericarditis_date", "Pericarditis",
-  #"myocarditis", "myocarditis_date", "Myocarditis",
-  #"menorrhagia", "menorrhagia_date", "Heavy menstrual bleeding",
-  #"ery_multi", "ery_multi_date", "Erythema multiforme",
-  #"anaphylaxis", "anaphylaxis_date", "Anaphylaxis",
+  #"sgb", "sgb_next_date", "Guillain-Barré syndrome",
+  "bells_palsy", "bells_palsy_next_date", "Bell's palsy",
+  "ttp", "ttp_next_date", "Thrombocytopenia",
+  #"ami", "ami_next_date", "Acute myocardial infarction",
+  #"stroke_isch", "stroke_isch_next_date", "Ischaemic stroke",
+  #"ate", "ate_next_date", "Composite arterial thrombotic event (ATE)",
+  #"dvt", "dvt_next_date", "Deep vein thrombosis (DVT)",
+  #"icvt", "icvt_next_date", "Intracranial venous thrombosis (ICVT)",
+  #"pe", "pe_next_date", "Pulmonary embolism (PE)",
+  #"vte", "vte_next_date", "Composite venous thrombotic event (VTE)",
+  #"pericarditis", "pericarditis_next_date", "Pericarditis",
+  #"myocarditis", "myocarditis_next_date", "Myocarditis",
+  #"menorrhagia", "menorrhagia_next_date", "Heavy menstrual bleeding",
+  #"ery_multi", "ery_multi_next_date", "Erythema multiforme",
+  #"anaphylaxis", "anaphylaxis_next_date", "Anaphylaxis",
 
   # negative control
   #"noncovid_death", "noncovid_death_date", "Non-COVID-19 death", 
@@ -240,8 +240,32 @@ variable_labels <-
     learndis = "Learning disabilities",
     smi = "Serious mental illness"#,
     
+    # prior events
+    # effectiveness
+    #covid_prior_emergency = "COVID-19 A&E attendance in year before vaccination",   
+    covid_prior_admitted = "COVID-19 hospitalisation in year before vaccination",   
+    #covid_prior_critcare = "COVID-19 critical care in year before vaccination",
+
+    # safety
+    #admitted = "Unplanned hospitalisation in year before vaccination",  
+    #emergency = "A&E attendance in year before vaccination", 
+    #sgb_prior = "Guillain-Barré syndrome in year before vaccination",
+    bells_palsy_prior = "Bell's palsy in year before vaccination",
+    ttp_prior = "Thrombocytopenia in year before vaccination",
+    #ami_prior = "Acute myocardial infarction in year before vaccination",
+    #stroke_isch_prior = "Ischaemic stroke in year before vaccination",
+    #ate_prior = "Composite arterial thrombotic event (ATE) in year before vaccination",
+    #dvt_prior = "Deep vein thrombosis (DVT) in year before vaccination",
+    #icvt_prior = "Intracranial venous thrombosis (ICVT) in year before vaccination",
+    #pe_prior = "Pulmonary embolism (PE) in year before vaccination",
+    #vte_prior = "Composite venous thrombotic event (VTE) in year before vaccination",
+    #pericarditis_prior = "Pericarditis in year before vaccination",
+    #myocarditis_prior = "Myocarditis in year before vaccination",
+    #menorrhagia_prior = "Heavy menstrual bleeding in year before vaccination",
+    #ery_multi_prior = "Erythema multiforme in year before vaccination",
+    #anaphylaxis_prior = "Anaphylaxis in year before vaccination",
+
     # prior_tests_cat = "Number of SARS-CoV-2 tests",
-    # 
     # prior_covid_infection = "Prior documented SARS-CoV-2 infection",
     # 
     # vaxhist_pfizer  = "Previously received Pfizer (original)",

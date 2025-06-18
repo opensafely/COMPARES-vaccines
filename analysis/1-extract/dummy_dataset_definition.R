@@ -214,7 +214,8 @@ sim_list = lst(
 
   inhospital = bn_node( ~rbernoulli(n=..n, p = 0.01)),
 
-## pre-baseline events where event date is relevant
+## pre-baseline events
+
   # ANY EMERGENCY ATTENDANCE  
   prior_emergency = bn_node(~rbernoulli(n=..n, p=0.05)),  
   # ANY ADMISSION  
@@ -231,7 +232,7 @@ sim_list = lst(
   sgb_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)), 
   sgb_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
   sgb_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
-  #Bell's Palsy
+  # Bell's Palsy
   bells_palsy_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
   bells_palsy_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
   bells_palsy_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
@@ -253,61 +254,56 @@ sim_list = lst(
   ate_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
   ate_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# DEEP VEIN THROMBOSIS (DVT)  
-dvt_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-dvt_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-dvt_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  # DEEP VEIN THROMBOSIS (DVT)  
+  dvt_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  dvt_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  dvt_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# INTRACRANIAL VENOUS THROMBOSIS (ICVT)  
-icvt_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-icvt_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-icvt_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  # INTRACRANIAL VENOUS THROMBOSIS (ICVT)  
+  icvt_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  icvt_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  icvt_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# PULMONARY EMBOLISM (PE)  
-pe_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-pe_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-pe_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  # PULMONARY EMBOLISM (PE)  
+  pe_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  pe_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  pe_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# VENOUS THROMBOEMBOLISM (VTE)  
-vte_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-vte_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-vte_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  # VENOUS THROMBOEMBOLISM (VTE)  
+  vte_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  vte_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  vte_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# PERICARDITIS  
-pericarditis_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-pericarditis_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
-pericarditis_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-pericarditis_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  # PERICARDITIS  
+  pericarditis_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  pericarditis_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  pericarditis_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  pericarditis_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# MYOCARDITIS  
-myocarditis_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-myocarditis_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
-myocarditis_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-myocarditis_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  # MYOCARDITIS  
+  myocarditis_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  myocarditis_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  myocarditis_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  myocarditis_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# MENORRHAGIA  
-menorrhagia_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-menorrhagia_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-menorrhagia_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  # MENORRHAGIA  
+  menorrhagia_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  menorrhagia_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  menorrhagia_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# ERYTHEMA MULTIFORME  
-ery_multi_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-ery_multi_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
-ery_multi_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-ery_multi_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  # ERYTHEMA MULTIFORME  
+  ery_multi_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  ery_multi_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  ery_multi_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  ery_multi_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
-# ANAPHYLAXIS  
-anaphylaxis_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
-anaphylaxis_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
-anaphylaxis_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
-anaphylaxis_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
-
-
-
+  # ANAPHYLAXIS  
+  anaphylaxis_prior_gp = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  anaphylaxis_prior_emergency = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  anaphylaxis_prior_admitted = bn_node(~rbernoulli(n=..n, p=0.01)),  
+  anaphylaxis_prior = bn_node(~rbernoulli(n=..n, p=0.01)),  
 
   ## post-baseline events (outcomes)
-
-  
   ### all-cause outcomes
   emergency_day = bn_node(
     ~as.integer(runif(n=..n, vax_day, vax_day+100)),
