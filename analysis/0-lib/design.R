@@ -238,10 +238,16 @@ variable_labels <-
     multimorb = "Morbidity count",
     
     learndis = "Learning disabilities",
-    smi = "Serious mental illness"#,
+    smi = "Serious mental illness",
     
     # prior events
-    # effectiveness
+    # General
+    # ANY EMERGENCY ATTENDANCE  
+    prior_emergency = "A&E attendance in year before vaccination", 
+    # ANY ADMISSION  
+    prior_admitted = "hospitalisation in year before vaccination",
+    
+    #COVID-related
     #covid_prior_emergency = "COVID-19 A&E attendance in year before vaccination",   
     covid_prior_admitted = "COVID-19 hospitalisation in year before vaccination",   
     #covid_prior_critcare = "COVID-19 critical care in year before vaccination",
@@ -251,7 +257,7 @@ variable_labels <-
     #prior_emergency = "A&E attendance in year before vaccination", 
     #sgb_prior = "Guillain-Barré syndrome in year before vaccination",
     bells_palsy_prior = "Bell's palsy in year before vaccination",
-    ttp_prior = "Thrombocytopenia in year before vaccination",
+    ttp_prior = "Thrombocytopenia in year before vaccination"#,
     #ami_prior = "Acute myocardial infarction in year before vaccination",
     #stroke_isch_prior = "Ischaemic stroke in year before vaccination",
     #ate_prior = "Composite arterial thrombotic event (ATE) in year before vaccination",
