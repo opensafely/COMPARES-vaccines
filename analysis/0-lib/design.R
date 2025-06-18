@@ -247,8 +247,8 @@ variable_labels <-
     #covid_prior_critcare = "COVID-19 critical care in year before vaccination",
 
     # safety
-    #admitted = "Unplanned hospitalisation in year before vaccination",  
-    #emergency = "A&E attendance in year before vaccination", 
+    #prior_admitted = "Unplanned hospitalisation in year before vaccination",  
+    #prior_emergency = "A&E attendance in year before vaccination", 
     #sgb_prior = "Guillain-Barré syndrome in year before vaccination",
     bells_palsy_prior = "Bell's palsy in year before vaccination",
     ttp_prior = "Thrombocytopenia in year before vaccination",
