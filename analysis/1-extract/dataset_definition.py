@@ -109,7 +109,7 @@ dataset.dereg_date = registration.end_date
 
 #Pseudo practice ID
 #dataset.practice_id = registration.practice_pseudo_id
-# patient has continuous practice registration at least 6 weeks next to vaccination date
+# patient has continuous practice registration at least 6 weeks prior to vaccination date
 dataset.registered_previous_6weeks = (
     registration
     .start_date.is_on_or_before(vax_date - days(6 * 7))
@@ -176,18 +176,18 @@ variables.add_n_vaccines(
     dataset = dataset, 
     index_date = vax_date, 
     target_disease = "SARS-2 Coronavirus", 
-    name = "vax_covid_next", 
+    name = "vax_covid_prior", 
     direction = "before",
     number_of_vaccines = 3
 )
 
-dataset.vax_covid_next_count = (
+dataset.vax_covid_prior_count = (
   covid_vaccinations
   .where(vaccinations.date.is_before(vax_date))
   .count_for_patient()
 )
 
-# TODO: add variables to see if either of Product A or product B have been received next to curent vax date
+# TODO: add variables to see if either of Product A or product B have been received prior to curent vax date
 # TODO: add variables to see if _any_ vaccine of interest has previously been received
 
 #######################################################################################
@@ -201,7 +201,7 @@ dataset.hscworker = occupation_on_covid_vaccine_record.where(occupation_on_covid
 dataset.care_home_tpp = address.care_home_is_potential_match.when_null_then(False)
 
 # Patients in long-stay nursing and residential care
-dataset.care_home_code = variables.has_next_event(codelists.carehome, vax_date)
+dataset.care_home_code = variables.has_prior_event(codelists.carehome, vax_date)
 
 #######################################################################################
 # Other vulnerabilities / predictors of vaccination or vaccination setting (and therefore product)
