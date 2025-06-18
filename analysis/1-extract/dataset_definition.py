@@ -109,7 +109,7 @@ dataset.dereg_date = registration.end_date
 
 #Pseudo practice ID
 #dataset.practice_id = registration.practice_pseudo_id
-# patient has continuous practice registration at least 6 weeks prior to vaccination date
+# patient has continuous practice registration at least 6 weeks next to vaccination date
 dataset.registered_previous_6weeks = (
     registration
     .start_date.is_on_or_before(vax_date - days(6 * 7))
@@ -168,7 +168,7 @@ variables.add_n_vaccines(
     index_date = vax_date, 
     target_disease = "SARS-2 Coronavirus", 
     name = "vax_covid", 
-    direction = "on_or_after",
+    direction = "before",
     number_of_vaccines = 3
 )
 
@@ -176,18 +176,18 @@ variables.add_n_vaccines(
     dataset = dataset, 
     index_date = vax_date, 
     target_disease = "SARS-2 Coronavirus", 
-    name = "vax_covid_prior", 
+    name = "vax_covid_next", 
     direction = "before",
     number_of_vaccines = 3
 )
 
-dataset.vax_covid_prior_count = (
+dataset.vax_covid_next_count = (
   covid_vaccinations
   .where(vaccinations.date.is_before(vax_date))
   .count_for_patient()
 )
 
-# TODO: add variables to see if either of Product A or product B have been received prior to curent vax date
+# TODO: add variables to see if either of Product A or product B have been received next to curent vax date
 # TODO: add variables to see if _any_ vaccine of interest has previously been received
 
 #######################################################################################
@@ -201,7 +201,7 @@ dataset.hscworker = occupation_on_covid_vaccine_record.where(occupation_on_covid
 dataset.care_home_tpp = address.care_home_is_potential_match.when_null_then(False)
 
 # Patients in long-stay nursing and residential care
-dataset.care_home_code = variables.has_prior_event(codelists.carehome, vax_date)
+dataset.care_home_code = variables.has_next_event(codelists.carehome, vax_date)
 
 #######################################################################################
 # Other vulnerabilities / predictors of vaccination or vaccination setting (and therefore product)
@@ -211,7 +211,7 @@ dataset.care_home_code = variables.has_prior_event(codelists.carehome, vax_date)
 dataset.inhospital = (
     apcs
     .where(apcs.admission_date.is_on_or_before(vax_date))
-    .where(apcs.discharge_date.is_on_or_after(vax_date))
+    .where(apcs.discharge_date.is_before(vax_date))
     .where(apcs.admission_method.is_in(
             ["11", "12", "13", "21", "2A", "22", "23", "24", "25", "2D", "28", "2B", "81"]
         )
@@ -240,7 +240,44 @@ variables.primis_variables(dataset, vax_date, var_name_suffix="")
 # Pre-baseline variables where event date is of interest
 #######################################################################################
 
+### A & E: last event before baseline (ECDS)
+def prior_emergency_attendance(before = None, diagnoses_contains_any_of = None, where = True):
+  
+    # use this until "contains_any_of" methods works for ecds table
+    
+    if diagnoses_contains_any_of:
+        conditions = [
+            getattr(ecds, column_name).is_in(diagnoses_contains_any_of)
+            for column_name in [f"diagnosis_{i:02d}" for i in range(1, 25)]
+        ]
+        ecds_filtered = ecds.where(any_of(conditions))
+    else:
+        ecds_filtered = ecds
+    
+    return (
+       ecds_filtered
+       .where(ecds.arrival_date.is_before(before))
+       .where(ecds.arrival_date.is_on_or_after(before - years(1)))
+       .where(ecds.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
+       .where(where)
+       .sort_by(ecds.arrival_date)
+       .last_for_patient()
+#       .arrival_date
+     )
 
+### GP: last GP coded-event before baseline (SNOMED)
+def prior_gp_event(before = None, codelist = None, where = True):
+    post_events = clinical_events.where(clinical_events.date.is_before(before)).where(clinical_events.date.is_on_or_after(before - years(1)))
+    return (
+        post_events
+        .where(post_events.snomedct_code.is_in(codelist))
+        .where(where)
+        .sort_by(clinical_events.date)
+        .last_for_patient()
+#        .date
+    )
+
+### SUS: last hospital attendance before baseline (ICD-10)
 def prior_hospital_admission(before = None, diagnoses_contains_any_of = None, where = None):
     
     if diagnoses_contains_any_of:
@@ -255,15 +292,188 @@ def prior_hospital_admission(before = None, diagnoses_contains_any_of = None, wh
         .where(apcs.admission_date.is_before(vax_date))
         .sort_by(apcs.admission_date)
         .last_for_patient()
-        .admission_date
+#        .admission_date
     )
-    
-dataset.covid_admitted_0_date = prior_hospital_admission(vax_date, codelists.covid_icd10)
+# dataset.covid_admitted_0_date = prior_hospital_admission(vax_date, codelists.covid_icd10)
 
 
 # TODO: add all relevant variables
 # eg additional prior covid related events, possibibly tests
+## All-cause outcomes ----------------------------------------------------------
 
+# Any emergency attendance
+dataset.prior_emergency = prior_emergency_attendance(vax_date)
+# Any admission 
+dataset.prior_admitted = prior_hospital_admission(vax_date)
+
+## Effectiveness outcomes ------------------------------------------------------
+
+### Covid-related emergency attendance
+dataset.covid_prior_emergency = prior_emergency_attendance(vax_date, codelists.covid_emergency)
+# covid-related admission 
+dataset.covid_prior_admitted = prior_hospital_admission(vax_date, codelists.covid_icd10)
+# covid-related admission to critical care
+dataset.covid_critcare = prior_hospital_admission(vax_date, codelists.covid_icd10, where = apcs.days_in_critical_care>0)
+
+
+## Safety outcomes ------------------------------------------------------------
+
+# Neurological -----------------------------------------------------------------
+
+# GUILLAIN BARRE
+dataset.sgb_prior_gp = prior_gp_event(vax_date, codelists.sgb_snomed)
+dataset.sgb_prior_admitted = prior_hospital_admission(vax_date, codelists.sgb_icd10)
+
+dataset.sgb_prior = minimum_of(
+    dataset.sgb_prior_gp,
+    dataset.sgb_prior_admitted
+)
+
+# BELL'S PALSY
+dataset.bells_palsy_prior_gp = prior_gp_event(vax_date, codelists.bells_palsy_snomed)
+dataset.bells_palsy_prior_emergency = prior_emergency_attendance(vax_date, codelists.bells_palsy_ecds)
+dataset.bells_palsy_prior_admitted = prior_hospital_admission(vax_date, codelists.bells_palsy_icd10)
+
+dataset.bells_palsy_prior = minimum_of(
+    dataset.bells_palsy_prior_gp,
+    dataset.bells_palsy_prior_emergency,
+    dataset.bells_palsy_prior_admitted,
+)
+
+# THROMBO ----------------------------------------------------------------------
+
+# THROMBOCITOPENIA
+dataset.ttp_prior_gp = prior_gp_event(vax_date, codelists.ttp_snomed)
+dataset.ttp_prior_admitted = prior_hospital_admission(vax_date, codelists.ttp_icd10)
+
+dataset.ttp_prior = minimum_of(
+    dataset.ttp_prior_gp,
+    dataset.ttp_prior_admitted
+)
+# ARTERIAL THROMBOTIC
+
+### Acute myocardial infarction (ami)
+dataset.ami_prior_gp = prior_gp_event(vax_date, codelists.ami_snomed)
+dataset.ami_prior_admitted = prior_hospital_admission(vax_date, codelists.ami_icd10)
+
+
+dataset.ami_prior = minimum_of(
+    dataset.ami_prior_gp,
+    dataset.ami_prior_admitted
+)
+
+### Ischaemic stroke
+dataset.stroke_isch_prior_gp = prior_gp_event(vax_date, (codelists.stroke_isch_snomed))
+dataset.stroke_isch_prior_admitted = prior_hospital_admission(vax_date, codelists.stroke_isch_icd10)
+
+dataset.stroke_isch_prior = minimum_of(
+    dataset.stroke_isch_prior_gp,
+    dataset.stroke_isch_prior_admitted
+)
+
+## Composite arterial thrombotic event (ATE)
+dataset.ate_prior_gp = prior_gp_event(vax_date, codelists.ate_snomed)
+dataset.ate_prior_admitted = prior_hospital_admission(vax_date, codelists.ate_icd10)
+
+dataset.ate_prior = minimum_of(
+    dataset.ate_prior_gp,
+    dataset.ate_prior_admitted
+)
+
+# VENOUS THROMBOTIC
+## Deep vein thrombosis (DVT) [includes during pregnancy]
+dataset.dvt_prior_gp = prior_gp_event(vax_date, codelists.dvt_snomed)
+dataset.dvt_prior_admitted = prior_hospital_admission(vax_date, codelists.dvt_icd10)
+
+dataset.dvt_prior = minimum_of(
+    dataset.dvt_prior_gp,
+    dataset.dvt_prior_admitted
+)
+
+## Intracranial venous thrombosis (ICVT) [includes during pregnancy; contributes to composite VTE only]
+dataset.icvt_prior_gp = prior_gp_event(vax_date, codelists.icvt_snomed)
+dataset.icvt_prior_admitted = prior_hospital_admission(vax_date, codelists.icvt_icd10)
+
+dataset.icvt_prior = minimum_of(
+    dataset.icvt_prior_gp,
+    dataset.icvt_prior_admitted
+)
+
+## Pulmonary embolism (PE)
+dataset.pe_prior_gp = prior_gp_event(vax_date, codelists.pe_snomed)
+dataset.pe_prior_admitted = prior_hospital_admission(vax_date, codelists.pe_icd10)
+
+dataset.pe_prior = minimum_of(
+    dataset.pe_prior_gp,
+    dataset.pe_prior_admitted
+)
+
+
+## Composite venous thrombotic event (VTE)
+dataset.vte_prior_gp = prior_gp_event(vax_date, codelists.vte_snomed)
+dataset.vte_prior_admitted = prior_hospital_admission(vax_date, codelists.vte_icd10)
+
+dataset.vte_prior = minimum_of(
+    dataset.vte_prior_gp,
+    dataset.vte_prior_admitted
+)
+
+# CARDIO ------------------------------------------------------------------------
+
+# PERICARDITIS
+dataset.pericarditis_prior_gp = prior_gp_event(vax_date, codelists.pericarditis_snomed)
+dataset.pericarditis_prior_emergency = prior_emergency_attendance(vax_date, codelists.pericarditis_ecds)
+dataset.pericarditis_prior_admitted = prior_hospital_admission(vax_date, codelists.pericarditis_icd10)
+
+dataset.pericarditis_prior = minimum_of(
+    dataset.pericarditis_prior_gp,
+    dataset.pericarditis_prior_emergency,
+    dataset.pericarditis_prior_admitted
+)
+
+
+# MYOCARDITIS
+dataset.myocarditis_prior_gp = prior_gp_event(vax_date, codelists.myocarditis_snomed)
+dataset.myocarditis_prior_emergency = prior_emergency_attendance(vax_date, codelists.myocarditis_ecds)
+dataset.myocarditis_prior_admitted = prior_hospital_admission(vax_date, codelists.myocarditis_icd10)
+
+dataset.myocarditis_prior = minimum_of(
+    dataset.myocarditis_prior_gp,
+    dataset.myocarditis_prior_emergency,
+    dataset.myocarditis_prior_admitted
+)
+
+# OTHER --------------------------------------------------------------------------
+# HEAVY MENTRUAL BLEEDING
+dataset.menorrhagia_prior_gp = prior_gp_event(vax_date, codelists.menorrhagia_snomed)
+dataset.menorrhagia_prior_admitted = prior_hospital_admission(vax_date, codelists.menorrhagia_icd10)
+
+dataset.menorrhagia_prior = minimum_of(
+    dataset.menorrhagia_prior_gp,
+    dataset.menorrhagia_prior_admitted
+)
+
+# ERYTHEMA MULTIFORME
+dataset.ery_multi_prior_gp = prior_gp_event(vax_date, codelists.ery_multi_snomed)
+dataset.ery_multi_prior_emergency = prior_emergency_attendance(vax_date, codelists.ery_multi_ecds)
+dataset.ery_multi_prior_admitted = prior_hospital_admission(vax_date, codelists.ery_multi_icd10)
+
+dataset.ery_multi_prior = minimum_of(
+    dataset.ery_multi_prior_gp,
+    dataset.ery_multi_prior_emergency,
+    dataset.ery_multi_prior_admitted
+)
+
+# ANAPHYLAXIS
+dataset.anaphylaxis_prior_gp = prior_gp_event(vax_date, codelists.anaphylaxis_snomed)
+dataset.anaphylaxis_prior_emergency = prior_emergency_attendance(vax_date, codelists.anaphylaxis_ecds)
+dataset.anaphylaxis_prior_admitted = prior_hospital_admission(vax_date, codelists.anaphylaxis_icd10)
+
+dataset.anaphylaxis_prior = minimum_of(
+    dataset.anaphylaxis_prior_gp,
+    dataset.anaphylaxis_prior_emergency,
+    dataset.anaphylaxis_prior_admitted
+)
 
 #######################################################################################
 # Post-baseline variables: outcomes, competing outcomes, and censoring
@@ -339,9 +549,9 @@ def cause_specific_death_date(codelist):
 ## All-cause outcomes ----------------------------------------------------------
 
 # Any emergency attendance
-dataset.emergency_date = next_emergency_attendance(vax_date)
+dataset.next_emergency_date = next_emergency_attendance(vax_date)
 # Any admission 
-dataset.admitted_date = next_hospital_admission(vax_date)
+dataset.next_admitted_date = next_hospital_admission(vax_date)
 # all-cause death
 dataset.death_date = ons_deaths.date
 
@@ -350,11 +560,11 @@ dataset.death_date = ons_deaths.date
 ## Effectiveness outcomes ------------------------------------------------------
 
 ### Covid-related emergency attendance
-dataset.covid_emergency_date = next_emergency_attendance(vax_date, codelists.covid_emergency)
+dataset.covid_next_emergency_date = next_emergency_attendance(vax_date, codelists.covid_emergency)
 # covid-related admission 
-dataset.covid_admitted_date = next_hospital_admission(vax_date, codelists.covid_icd10)
+dataset.covid_next_admitted_date = next_hospital_admission(vax_date, codelists.covid_icd10)
 # covid-related admission to critical care
-dataset.covid_critcare_date = next_hospital_admission(vax_date, codelists.covid_icd10, where = apcs.days_in_critical_care>0)
+dataset.covid_next_critcare_date = next_hospital_admission(vax_date, codelists.covid_icd10, where = apcs.days_in_critical_care>0)
 # covid-related death
 dataset.covid_death_date = cause_specific_death_date(codelists.covid_icd10)
 
@@ -363,193 +573,193 @@ dataset.covid_death_date = cause_specific_death_date(codelists.covid_icd10)
 # Neurological -----------------------------------------------------------------
 
 # GUILLAIN BARRE
-dataset.sgb_gp_date = next_gp_event(vax_date, codelists.sgb_snomed)
-dataset.sgb_admitted_date = next_hospital_admission(vax_date, codelists.sgb_icd10)
+dataset.sgb_next_gp_date = next_gp_event(vax_date, codelists.sgb_snomed)
+dataset.sgb_next_admitted_date = next_hospital_admission(vax_date, codelists.sgb_icd10)
 dataset.sgb_death_date = cause_specific_death_date(codelists.sgb_icd10)
 
-dataset.sgb_date = minimum_of(
-    dataset.sgb_gp_date,
-    dataset.sgb_admitted_date,
+dataset.sgb_next_date = minimum_of(
+    dataset.sgb_next_gp_date,
+    dataset.sgb_next_admitted_date,
     dataset.sgb_death_date
 )
 
 # BELL'S PALSY
-dataset.bells_palsy_gp_date = next_gp_event(vax_date, codelists.bells_palsy_snomed)
-dataset.bells_palsy_emergency_date = next_emergency_attendance(vax_date, codelists.bells_palsy_ecds)
-dataset.bells_palsy_admitted_date = next_hospital_admission(vax_date, codelists.bells_palsy_icd10)
+dataset.bells_palsy_next_gp_date = next_gp_event(vax_date, codelists.bells_palsy_snomed)
+dataset.bells_palsy_next_emergency_date = next_emergency_attendance(vax_date, codelists.bells_palsy_ecds)
+dataset.bells_palsy_next_admitted_date = next_hospital_admission(vax_date, codelists.bells_palsy_icd10)
 dataset.bells_palsy_death_date = cause_specific_death_date(codelists.bells_palsy_icd10)
 
-dataset.bells_palsy_date = minimum_of(
-    dataset.bells_palsy_gp_date,
-    dataset.bells_palsy_emergency_date,
-    dataset.bells_palsy_admitted_date,
+dataset.bells_palsy_next_date = minimum_of(
+    dataset.bells_palsy_next_gp_date,
+    dataset.bells_palsy_next_emergency_date,
+    dataset.bells_palsy_next_admitted_date,
     dataset.bells_palsy_death_date
 )
 
 # THROMBO ----------------------------------------------------------------------
 
 # THROMBOCITOPENIA
-dataset.ttp_gp_date = next_gp_event(vax_date, codelists.ttp_snomed)
-dataset.ttp_admitted_date = next_hospital_admission(vax_date, codelists.ttp_icd10)
+dataset.ttp_next_gp_date = next_gp_event(vax_date, codelists.ttp_snomed)
+dataset.ttp_next_admitted_date = next_hospital_admission(vax_date, codelists.ttp_icd10)
 dataset.ttp_death_date = cause_specific_death_date(codelists.ttp_icd10)
 
-dataset.ttp_date = minimum_of(
-    dataset.ttp_gp_date,
-    dataset.ttp_admitted_date,
+dataset.ttp_next_date = minimum_of(
+    dataset.ttp_next_gp_date,
+    dataset.ttp_next_admitted_date,
     dataset.ttp_death_date
 )
 # ARTERIAL THROMBOTIC
 
 ### Acute myocardial infarction (ami)
-dataset.ami_gp_date = next_gp_event(vax_date, codelists.ami_snomed)
-dataset.ami_admitted_date = next_hospital_admission(vax_date, codelists.ami_icd10)
+dataset.ami_next_gp_date = next_gp_event(vax_date, codelists.ami_snomed)
+dataset.ami_next_admitted_date = next_hospital_admission(vax_date, codelists.ami_icd10)
 dataset.ami_death_date = cause_specific_death_date(codelists.ami_icd10)
 
-dataset.ami_date = minimum_of(
-    dataset.ami_gp_date,
-    dataset.ami_admitted_date,
+dataset.ami_next_date = minimum_of(
+    dataset.ami_next_gp_date,
+    dataset.ami_next_admitted_date,
     dataset.ami_death_date
 )
 
 ### Ischaemic stroke
-dataset.stroke_isch_gp_date = next_gp_event(vax_date, (codelists.stroke_isch_snomed))
-dataset.stroke_isch_admitted_date = next_hospital_admission(vax_date, codelists.stroke_isch_icd10)
+dataset.stroke_isch_next_gp_date = next_gp_event(vax_date, (codelists.stroke_isch_snomed))
+dataset.stroke_isch_next_admitted_date = next_hospital_admission(vax_date, codelists.stroke_isch_icd10)
 dataset.stroke_isch_death_date = cause_specific_death_date(codelists.stroke_isch_icd10)
 
-dataset.stroke_isch_date = minimum_of(
-    dataset.stroke_isch_gp_date,
-    dataset.stroke_isch_admitted_date,
+dataset.stroke_isch_next_date = minimum_of(
+    dataset.stroke_isch_next_gp_date,
+    dataset.stroke_isch_next_admitted_date,
     dataset.stroke_isch_death_date
 )
 
 ## Composite arterial thrombotic event (ATE)
-dataset.ate_gp_date = next_gp_event(vax_date, codelists.ate_snomed)
-dataset.ate_admitted_date = next_hospital_admission(vax_date, codelists.ate_icd10)
+dataset.ate_next_gp_date = next_gp_event(vax_date, codelists.ate_snomed)
+dataset.ate_next_admitted_date = next_hospital_admission(vax_date, codelists.ate_icd10)
 dataset.ate_death_date = cause_specific_death_date(codelists.ate_icd10)
 
-dataset.ate_date = minimum_of(
-    dataset.ate_gp_date,
-    dataset.ate_admitted_date,
+dataset.ate_next_date = minimum_of(
+    dataset.ate_next_gp_date,
+    dataset.ate_next_admitted_date,
     dataset.ate_death_date
 )
 
 # VENOUS THROMBOTIC
 ## Deep vein thrombosis (DVT) [includes during pregnancy]
-dataset.dvt_gp_date = next_gp_event(vax_date, codelists.dvt_snomed)
-dataset.dvt_admitted_date = next_hospital_admission(vax_date, codelists.dvt_icd10)
+dataset.dvt_next_gp_date = next_gp_event(vax_date, codelists.dvt_snomed)
+dataset.dvt_next_admitted_date = next_hospital_admission(vax_date, codelists.dvt_icd10)
 dataset.dvt_death_date = cause_specific_death_date(codelists.dvt_icd10)
 
-dataset.dvt_date = minimum_of(
-    dataset.dvt_gp_date,
-    dataset.dvt_admitted_date,
+dataset.dvt_next_date = minimum_of(
+    dataset.dvt_next_gp_date,
+    dataset.dvt_next_admitted_date,
     dataset.dvt_death_date
 )
 
 ## Intracranial venous thrombosis (ICVT) [includes during pregnancy; contributes to composite VTE only]
-dataset.icvt_gp_date = next_gp_event(vax_date, codelists.icvt_snomed)
-dataset.icvt_admitted_date = next_hospital_admission(vax_date, codelists.icvt_icd10)
+dataset.icvt_next_gp_date = next_gp_event(vax_date, codelists.icvt_snomed)
+dataset.icvt_next_admitted_date = next_hospital_admission(vax_date, codelists.icvt_icd10)
 dataset.icvt_death_date = cause_specific_death_date(codelists.icvt_icd10)
 
-dataset.icvt_date = minimum_of(
-    dataset.icvt_gp_date,
-    dataset.icvt_admitted_date,
+dataset.icvt_next_date = minimum_of(
+    dataset.icvt_next_gp_date,
+    dataset.icvt_next_admitted_date,
     dataset.icvt_death_date
 )
 
 ## Pulmonary embolism (PE)
-dataset.pe_gp_date = next_gp_event(vax_date, codelists.pe_snomed)
-dataset.pe_admitted_date = next_hospital_admission(vax_date, codelists.pe_icd10)
+dataset.pe_next_gp_date = next_gp_event(vax_date, codelists.pe_snomed)
+dataset.pe_next_admitted_date = next_hospital_admission(vax_date, codelists.pe_icd10)
 dataset.pe_death_date = cause_specific_death_date(codelists.pe_icd10)
 
-dataset.pe_date = minimum_of(
-    dataset.pe_gp_date,
-    dataset.pe_admitted_date,
+dataset.pe_next_date = minimum_of(
+    dataset.pe_next_gp_date,
+    dataset.pe_next_admitted_date,
     dataset.pe_death_date
 )
 
 
 ## Composite venous thrombotic event (VTE)
-dataset.vte_gp_date = next_gp_event(vax_date, codelists.vte_snomed)
-dataset.vte_admitted_date = next_hospital_admission(vax_date, codelists.vte_icd10)
+dataset.vte_next_gp_date = next_gp_event(vax_date, codelists.vte_snomed)
+dataset.vte_next_admitted_date = next_hospital_admission(vax_date, codelists.vte_icd10)
 dataset.vte_death_date = cause_specific_death_date(codelists.vte_icd10)
 
-dataset.vte_date = minimum_of(
-    dataset.vte_gp_date,
-    dataset.vte_admitted_date,
+dataset.vte_next_date = minimum_of(
+    dataset.vte_next_gp_date,
+    dataset.vte_next_admitted_date,
     dataset.vte_death_date
 )
 
 # CARDIO ------------------------------------------------------------------------
 
 # PERICARDITIS
-dataset.pericarditis_gp_date = next_gp_event(vax_date, codelists.pericarditis_snomed)
-dataset.pericarditis_emergency_date = next_emergency_attendance(vax_date, codelists.pericarditis_ecds)
-dataset.pericarditis_admitted_date = next_hospital_admission(vax_date, codelists.pericarditis_icd10)
+dataset.pericarditis_next_gp_date = next_gp_event(vax_date, codelists.pericarditis_snomed)
+dataset.pericarditis_next_emergency_date = next_emergency_attendance(vax_date, codelists.pericarditis_ecds)
+dataset.pericarditis_next_admitted_date = next_hospital_admission(vax_date, codelists.pericarditis_icd10)
 dataset.pericarditis_death_date = cause_specific_death_date(codelists.pericarditis_icd10)
 
-dataset.pericarditis_date = minimum_of(
-    dataset.pericarditis_gp_date,
-    dataset.pericarditis_emergency_date,
-    dataset.pericarditis_admitted_date,
+dataset.pericarditis_next_date = minimum_of(
+    dataset.pericarditis_next_gp_date,
+    dataset.pericarditis_next_emergency_date,
+    dataset.pericarditis_next_admitted_date,
     dataset.pericarditis_death_date
 )
 
 
 # MYOCARDITIS
-dataset.myocarditis_gp_date = next_gp_event(vax_date, codelists.myocarditis_snomed)
-dataset.myocarditis_emergency_date = next_emergency_attendance(vax_date, codelists.myocarditis_ecds)
-dataset.myocarditis_admitted_date = next_hospital_admission(vax_date, codelists.myocarditis_icd10)
+dataset.myocarditis_next_gp_date = next_gp_event(vax_date, codelists.myocarditis_snomed)
+dataset.myocarditis_next_emergency_date = next_emergency_attendance(vax_date, codelists.myocarditis_ecds)
+dataset.myocarditis_next_admitted_date = next_hospital_admission(vax_date, codelists.myocarditis_icd10)
 dataset.myocarditis_death_date = cause_specific_death_date(codelists.myocarditis_icd10)
 
-dataset.myocarditis_date = minimum_of(
-    dataset.myocarditis_gp_date,
-    dataset.myocarditis_emergency_date,
-    dataset.myocarditis_admitted_date,
+dataset.myocarditis_next_date = minimum_of(
+    dataset.myocarditis_next_gp_date,
+    dataset.myocarditis_next_emergency_date,
+    dataset.myocarditis_next_admitted_date,
     dataset.myocarditis_death_date
 )
 
 # OTHER --------------------------------------------------------------------------
 # HEAVY MENTRUAL BLEEDING
-dataset.menorrhagia_gp_date = next_gp_event(vax_date, codelists.menorrhagia_snomed)
-dataset.menorrhagia_admitted_date = next_hospital_admission(vax_date, codelists.menorrhagia_icd10)
+dataset.menorrhagia_next_gp_date = next_gp_event(vax_date, codelists.menorrhagia_snomed)
+dataset.menorrhagia_next_admitted_date = next_hospital_admission(vax_date, codelists.menorrhagia_icd10)
 dataset.menorrhagia_death_date = cause_specific_death_date(codelists.menorrhagia_icd10)
 
-dataset.menorrhagia_date = minimum_of(
-    dataset.menorrhagia_gp_date,
-    dataset.menorrhagia_admitted_date,
+dataset.menorrhagia_next_date = minimum_of(
+    dataset.menorrhagia_next_gp_date,
+    dataset.menorrhagia_next_admitted_date,
     dataset.menorrhagia_death_date
 )
 
 # ERYTHEMA MULTIFORME
-dataset.ery_multi_gp_date = next_gp_event(vax_date, codelists.ery_multi_snomed)
-dataset.ery_multi_emergency_date = next_emergency_attendance(vax_date, codelists.ery_multi_ecds)
-dataset.ery_multi_admitted_date = next_hospital_admission(vax_date, codelists.ery_multi_icd10)
+dataset.ery_multi_next_gp_date = next_gp_event(vax_date, codelists.ery_multi_snomed)
+dataset.ery_multi_next_emergency_date = next_emergency_attendance(vax_date, codelists.ery_multi_ecds)
+dataset.ery_multi_next_admitted_date = next_hospital_admission(vax_date, codelists.ery_multi_icd10)
 dataset.ery_multi_death_date = cause_specific_death_date(codelists.ery_multi_icd10)
 
-dataset.ery_multi_date = minimum_of(
-    dataset.ery_multi_gp_date,
-    dataset.ery_multi_emergency_date,
-    dataset.ery_multi_admitted_date,
+dataset.ery_multi_next_date = minimum_of(
+    dataset.ery_multi_next_gp_date,
+    dataset.ery_multi_next_emergency_date,
+    dataset.ery_multi_next_admitted_date,
     dataset.ery_multi_death_date
 )
 
 # ANAPHYLAXIS
-dataset.anaphylaxis_gp_date = next_gp_event(vax_date, codelists.anaphylaxis_snomed)
-dataset.anaphylaxis_emergency_date = next_emergency_attendance(vax_date, codelists.anaphylaxis_ecds)
-dataset.anaphylaxis_admitted_date = next_hospital_admission(vax_date, codelists.anaphylaxis_icd10)
+dataset.anaphylaxis_next_gp_date = next_gp_event(vax_date, codelists.anaphylaxis_snomed)
+dataset.anaphylaxis_next_emergency_date = next_emergency_attendance(vax_date, codelists.anaphylaxis_ecds)
+dataset.anaphylaxis_next_admitted_date = next_hospital_admission(vax_date, codelists.anaphylaxis_icd10)
 dataset.anaphylaxis_death_date = cause_specific_death_date(codelists.anaphylaxis_icd10)
 
-dataset.anaphylaxis_date = minimum_of(
-    dataset.anaphylaxis_gp_date,
-    dataset.anaphylaxis_emergency_date,
-    dataset.anaphylaxis_admitted_date,
+dataset.anaphylaxis_next_date = minimum_of(
+    dataset.anaphylaxis_next_gp_date,
+    dataset.anaphylaxis_next_emergency_date,
+    dataset.anaphylaxis_next_admitted_date,
     dataset.anaphylaxis_death_date
 )
 
 ### Negative control outcomes 
 
-#dataset.fracture_emergency_date = next_emergency_attendance(vax_date, codelists.fractures_snomedECDS)
-#dataset.fractureadmitted_date = next_hospital_admission(vax_date, codelists.fractures_icd10)
+#dataset.fracture_next_emergency_date = next_emergency_attendance(vax_date, codelists.fractures_snomedECDS)
+#dataset.fracture_next_admitted_date = next_hospital_admission(vax_date, codelists.fractures_icd10)
 #dataset.fracturedeath_date = ons_deaths.cause_of_death_is_in(codelists.fractures_icd10).date
 
 # TODO: add all negative control outcomes here
