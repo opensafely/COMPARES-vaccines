@@ -138,13 +138,13 @@ data_prepared <-
     noncovid_death_date = if_else(!is.na(death_date) & is.na(covid_death_date), death_date, as.Date(NA_character_)),
 
     # earliest covid event after study start
-    any_covid_date = pmin(covid_next_emergency_date, covid_next_admitted_date, covid_death_date, na.rm=TRUE),
+    any_covid_date = pmin(covid_emergency_date, covid_admitted_date, covid_death_date, na.rm=TRUE),
     
     # KEEP THIS as a reminder to replace event dates with more severe dates if they precede less severe dates
     # for use if we decide to include source specific endpoints
-    #covid_next_emergency_date = pmin(covid_next_emergency_date, covid_next_admitted_date, covid_next_critcare_date, covid_death_date, na.rm=TRUE),
-    #covid_admitted_date = pmin(covid_next_admitted_date, covid_next_critcare_date, covid_death_date, na.rm=TRUE),
-    #covid_next_critcare_date = pmin(covid_next_critcare_date, covid_next_death_date, na.rm=TRUE),
+    #covid_emergency_date = pmin(covid_emergency_date, covid_admitted_date, covid_critcare_date, covid_death_date, na.rm=TRUE),
+    #covid_admitted_date = pmin(covid_admitted_date, covid_critcare_date, covid_death_date, na.rm=TRUE),
+    #covid_critcare_date = pmin(covid_critcare_date, covid_death_date, na.rm=TRUE),
     
 
     # define cohorts
