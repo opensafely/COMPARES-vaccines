@@ -168,7 +168,7 @@ variables.add_n_vaccines(
     index_date = vax_date, 
     target_disease = "SARS-2 Coronavirus", 
     name = "vax_covid", 
-    direction = "before",
+    direction = "on_or_after",
     number_of_vaccines = 3
 )
 
@@ -211,7 +211,7 @@ dataset.care_home_code = variables.has_prior_event(codelists.carehome, vax_date)
 dataset.inhospital = (
     apcs
     .where(apcs.admission_date.is_on_or_before(vax_date))
-    .where(apcs.discharge_date.is_before(vax_date))
+    .where(apcs.discharge_date.is_on_or_after(vax_date))
     .where(apcs.admission_method.is_in(
             ["11", "12", "13", "21", "2A", "22", "23", "24", "25", "2D", "28", "2B", "81"]
         )
