@@ -195,7 +195,7 @@ recoder <-
 ## variable labels in tables and plots ----
 
 variable_labels <- 
-  list(
+  lst(
     N  = "Total N",
     treatment_descr = "Vaccine product",
     #vax_date = "Vaccination date",
