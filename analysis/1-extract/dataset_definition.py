@@ -256,7 +256,7 @@ def prior_emergency_attendance(before, years_prior, diagnoses_contains_any_of = 
     
     return (
        ecds_filtered
-       .where(ecds.arrival_date.is_between(before - years(years_prior), before - days(1)))
+       .where(ecds.arrival_date.is_on_or_between(before - years(years_prior), before - days(1)))
 #       .where(ecds.all_diagnoses.contains_any_of(diagnoses_contains_any_of))
        .where(where)
        .exists_for_patient()
@@ -267,7 +267,7 @@ def prior_gp_event(before, years_prior, codelist = None, where = True):
     return (
         clinical_events
         .where(prior_events.snomedct_code.is_in(codelist))
-        .where(clinical_events.date.is_between(before - years(years_prior), before - days(1)))
+        .where(clinical_events.date.is_on_or_between(before - years(years_prior), before - days(1)))
         .where(where)
         .exists_for_patient()
     )
@@ -284,7 +284,7 @@ def prior_hospital_admission(before, years_prior, diagnoses_contains_any_of = No
         apcs_filtered
         .where(apcs.admission_method.is_in(["21", "22", "23", "24", "25", "2A", "2B", "2C", "2D", "28"]))
         .where(apcs.patient_classification == "1")  # Ordinary admissions only
-        .where(apcs.admission_date.is_between(before - years(years_prior), before - days(1)))
+        .where(apcs.admission_date.is_on_or_between(before - years(years_prior), before - days(1)))
         .exists_for_patient()
     )
 
