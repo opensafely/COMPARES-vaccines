@@ -266,7 +266,7 @@ def prior_emergency_attendance(before, years_prior, diagnoses_contains_any_of = 
 def prior_gp_event(before, years_prior, codelist = None, where = True):
     return (
         clinical_events
-        .where(prior_events.snomedct_code.is_in(codelist))
+        .where(clinical_events.snomedct_code.is_in(codelist))
         .where(clinical_events.date.is_on_or_between(before - years(years_prior), before - days(1)))
         .where(where)
         .exists_for_patient()
