@@ -60,19 +60,18 @@ maxfup <- 7L*24L
 events_lookup <- tribble(
   ~event, ~event_var, ~event_descr,
 
-  # other
-  # "test", "covid_test_date", "SARS-CoV-2 test", 
 
-  # effectiveness
+  # Effectiveness
   #"covid_emergency", "covid_emergency_date", "COVID-19 A&E attendance", 
   "covid_admitted", "covid_admitted_date", "COVID-19 hospitalisation", 
   #"covid_critcare", "covid_critcare_date", "COVID-19 critical care", 
   "covid_death", "covid_death_date", "COVID-19 death", 
-  "death", "death_date", "Any death", 
+  
 
   # safety
   #"admitted", "admitted_date", "Unplanned hospitalisation", 
   #"emergency", "emergency_date", "A&E attendance", 
+  "death", "death_date", "Any death", 
   #"sgb", "sgb_date", "Guillain-Barré syndrome",
   "bells_palsy", "bells_palsy_date", "Bell's palsy",
   "ttp", "ttp_date", "Thrombocytopenia",
@@ -196,7 +195,7 @@ recoder <-
 ## variable labels in tables and plots ----
 
 variable_labels <- 
-  list(
+  lst(
     N  = "Total N",
     treatment_descr = "Vaccine product",
     #vax_date = "Vaccination date",
@@ -238,11 +237,37 @@ variable_labels <-
     multimorb = "Morbidity count",
     
     learndis = "Learning disabilities",
-    smi = "Serious mental illness"#,
+    smi = "Serious mental illness",
     
-    # prior_tests_cat = "Number of SARS-CoV-2 tests",
-    # 
-    # prior_covid_infection = "Prior documented SARS-CoV-2 infection",
+    # prior events
+    
+    #COVID-related
+    covid_prior_emergency = "Prior (<1 year) COVID-19 A&E attendance",   
+    covid_prior_admitted = "Prior (<1 year) COVID-19 hospitalisation",   
+    covid_prior_critcare = "Prior (<1 year) COVID-19 critical care",
+
+    # Safety
+    prior_emergency = "Prior (<1 year) A&E attendance", 
+    prior_admitted = "Prior (<1 year) hospitalisation",
+    
+    sgb_prior = "Prior (<1 year) Guillain-Barré syndrome",
+    bells_palsy_prior = "Prior (<1 year) Bell's palsy",
+    ttp_prior = "Prior (<1 year) Thrombocytopenia",
+    ami_prior = "Prior (<1 year) Acute myocardial infarction",
+    stroke_isch_prior = "Prior (<1 year) Ischaemic stroke",
+    ate_prior = "Prior (<1 year) Composite arterial thrombotic event (ATE)",
+    dvt_prior = "Prior (<1 year) Deep vein thrombosis (DVT)",
+    icvt_prior = "Prior (<1 year) Intracranial venous thrombosis (ICVT)",
+    pe_prior = "Prior (<1 year) Pulmonary embolism (PE)",
+    vte_prior = "Prior (<1 year) Composite venous thrombotic event (VTE)",
+    pericarditis_prior = "Prior (<1 year) Pericarditis",
+    myocarditis_prior = "Prior (<1 year) Myocarditis",
+    menorrhagia_prior = "Prior (<1 year) Heavy menstrual bleeding",
+    ery_multi_prior = "Prior (<1 year) Erythema multiforme",
+    anaphylaxis_prior = "Prior (<1 year) Anaphylaxis",
+
+    # tests_cat_prior = "Prior number of SARS-CoV-2 tests",
+    # covid_infection_prior = "Prior documented SARS-CoV-2 infection",
     # 
     # vaxhist_pfizer  = "Previously received Pfizer (original)",
     # vaxhist_az  = "Previously received AZ",
