@@ -1,6 +1,6 @@
 # COMPARES-vaccines
 
-[View on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fopensafely%252FCAP-CES)
+[View on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fopensafely%252FCOMPARES-vaccines)
 
 Details of the purpose and any published outputs from this project can be found at the link above.
 
@@ -24,9 +24,9 @@ As standard, research projects have a MIT license.
 
 # Study details
 
-*A Common Analytic Protocol to compare the safety and effectiveness of Covid-19 vaccines in England using OpenSAFELY* 
+*COMPARES-vaccines: a COMmon Protocol for the Analysis of Relative Effectiveness and Safety of Covid-19 vaccine products*
 
-This repository contains analytic code for a Common Analytic Protocol, applicable to a chosen Covid-19 vaccination campaign in England, 
+This repository contains analytic code for a common analytic protocol, applicable to a chosen Covid-19 vaccination campaign in England, 
 to make head-to-head comparisons between the vaccine products used in that campaign.
 
 TODO: The protocol is available here:...
@@ -95,10 +95,6 @@ For matching, `spec` is the set of variables to match on. For weighting, `spec` 
 Choose _all_ for no subgroups (i.e., the main analysis). Choose _<variable>_ to select a specific variable to stratify on.
 This variable must be exactly matched in the matching run if using `approach="matching"`, and must be used as a stratification variable if using `approach="weighting"` (this requirement is under review!)
 - `outcome`, the outcome of interest, for example _covidadmitted_ or _coviddeath_.
-
-## Protocol
-
-TODO
 
 ## Workspace
 
