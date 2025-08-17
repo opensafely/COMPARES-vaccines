@@ -390,30 +390,11 @@ actions_list <- splice(
     }
   ) |> list_flatten(),
 
- comment("# # # # # # # # # # # # # # # # # # #", "Combine estimates across cohorts, specs, outcomes and subgroups", "# # # # # # # # # # # # # # # # # # #"),
+ comment("# # # # # # # # # # # # # # # # # # #", "Combine estimates across specs, outcomes and subgroups", "# # # # # # # # # # # # # # # # # # #"),
 
   action_contrasts_combine(
     "age75plus"
   ),
-
-#   comment("# # # # # # # # # # # # # # # # # # #", "Files for release", "# # # # # # # # # # # # # # # # # # #"),
-#
-#   action(
-#     name = "release_objects",
-#     run = "r:v2 analysis/release_objects.R",
-#     needs = list(
-#       "combine_age75plus_descriptives",
-#       "combine_age75plus_contrasts",
-#       "combine_cv_descriptives",
-#       "combine_cv_contrasts"
-#     ),
-#     moderately_sensitive = lst(
-#       releaselist = "output/files-for-release.txt",
-#       command = "output/osrelease-command.txt",
-#       output1 = "output/release-objects/*.csv",
-#       output2 = "output/release-objects/*/*.csv",
-#     )
-#   ),
 
   comment("# # # # # # # # # # # # # # # # # # #", "End", "# # # # # # # # # # # # # # # # # # #")
   

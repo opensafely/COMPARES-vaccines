@@ -97,7 +97,7 @@ data_prepared <-
       right = FALSE
     ),
 
-    care_home_combined = care_home_tpp | care_home_code, # any carehome flag
+    carehome = care_home_tpp | care_home_code, # any carehome flag
 
       # clinically at-risk group
     cv = immunosuppressed | ckd | crd | diabetes | cld |

@@ -161,12 +161,14 @@ recoder <-
   lst(
     cohort = c(
       `Clinically vulnerable` = "cv",
-      `Aged 75 years or over` = "age75plus"
+      `Aged 75 years or over` = "age75plus",
+      `Care home residency` = "carehome"
     ),
     subgroups = c(
       `Main` = "all",
       `Age` = "ageband",
       `Clinically at-risk` = "cv",
+      `Ethnicity` = "ethnicity",
       `Prior COVID-19 vaccine count` = "prior_vax_count_group",
       NULL
     ),
@@ -382,7 +384,7 @@ local({
 
 metaparams <-
   expand_grid(
-    cohort = factor(c("age75plus")),
+    cohort = factor(c("age75plus", "cv")),
     method = factor(c("match", "weight")),
     spec = c("A", "B", "C"),
     outcome = factor(recoder$outcome),
