@@ -94,14 +94,11 @@ For matching, `spec` is the set of variables to match on. For weighting, `spec` 
 - `subgroup`, the subgroup variable. Cumulative incidences will be calculated separately within each level of this variable. 
 Choose _all_ for no subgroups (i.e., the main analysis). Choose _<variable>_ to select a specific variable to stratify on.
 This variable must be exactly matched in the matching run if using `method="match"`, and must be used as a stratification variable if using `method="weight"` (this requirement is under review!)
-- `outcome`, the outcome of interest, for example _covidadmitted_ or _coviddeath_.
+- `outcome`, the outcome of interest, for example _covid_admitted_ or _covid_death_.
 
 ## Workspace
 
-TODO 
+This will appear on [the job server page for the ECHO project](https://jobs.opensafely.org/echo-evaluation-of-covid-19-vaccine-histories-using-opensafely/) when it is ready to be run for the first time. 
 
-## Pre-print
-
-TODO
 
 
