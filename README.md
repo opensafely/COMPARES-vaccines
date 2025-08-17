@@ -29,7 +29,9 @@ As standard, research projects have a MIT license.
 This repository contains analytic code for a common analytic protocol, applicable to a chosen Covid-19 vaccination campaign in England, 
 to make head-to-head comparisons between the vaccine products used in that campaign.
 
-TODO: The protocol is available here:...
+## Protocol
+
+Draft version v0.1 of the protocol is available as a [PDF file in the root directory](COMPARES-vaccines protocol draft v0.1 for feedback.pdf)
 
 The Protocol accommodates the following campaign-specific characteristics:
 
@@ -37,7 +39,7 @@ The Protocol accommodates the following campaign-specific characteristics:
 * vaccine products 
 * study eligibility criteria
 
-This repo should be forked (maybe?!) when starting an analysis for the next campaign. 
+This repo should be forked (maybe - TBD) when starting an analysis for the next campaign. 
 
 ## Repository navigation
 
