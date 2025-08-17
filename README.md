@@ -93,7 +93,7 @@ For matching, `spec` is the set of variables to match on. For weighting, `spec` 
 - `method`, taking values _match_ or _weight_.
 - `subgroup`, the subgroup variable. Cumulative incidences will be calculated separately within each level of this variable. 
 Choose _all_ for no subgroups (i.e., the main analysis). Choose _<variable>_ to select a specific variable to stratify on.
-This variable must be exactly matched in the matching run if using `approach="matching"`, and must be used as a stratification variable if using `approach="weighting"` (this requirement is under review!)
+This variable must be exactly matched in the matching run if using `method="match"`, and must be used as a stratification variable if using `method="weight"` (this requirement is under review!)
 - `outcome`, the outcome of interest, for example _covidadmitted_ or _coviddeath_.
 
 ## Workspace
