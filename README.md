@@ -102,8 +102,8 @@ This will appear on [the job server page for the ECHO project](https://jobs.open
 
 ## Outputs
 
-Draft version 0.1 of the protocol is available as a [PDF file](./assets/COMPARES-vaccines-protocol-draft-v0.1.pdf)
+Draft version 0.1 of the protocol is available as a [PDF file](./assets/COMPARES-vaccines-protocol-draft-v0.1.pdf).
 
-A poster describing the protocol, presented at [ISCB46](https://iscb2025.info/), is available as a [PDF file](./assets/COMPARES-vaccines-poster-ISCB46.pdf)
+A poster describing the protocol, presented at [ISCB46](https://iscb2025.info/), is available as a [PDF file](./assets/COMPARES-vaccines-protocol-poster-ISCB46.pdf).
 
 
