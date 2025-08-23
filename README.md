@@ -31,7 +31,7 @@ to make head-to-head comparisons between the vaccine products used in that campa
 
 ## Protocol
 
-Draft version v0.1 of the protocol is available as a [PDF file in the root directory](COMPARES-vaccines protocol draft v0.1 for feedback.pdf)
+Draft version v0.1 of the protocol is available as a [PDF file in the root directory](COMPARES-vaccines-protocol-draft-v0.1.pdf)
 
 The Protocol accommodates the following campaign-specific characteristics:
 
