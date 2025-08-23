@@ -22,16 +22,14 @@ As standard, research projects have a MIT license.
 
 
 
-# Study details
+# Protocol details
 
 *COMPARES-vaccines: a COMmon Protocol for the Analysis of Relative Effectiveness and Safety of Covid-19 vaccine products*
 
+## Overview
+
 This repository contains analytic code for a common analytic protocol, applicable to a chosen Covid-19 vaccination campaign in England, 
 to make head-to-head comparisons between the vaccine products used in that campaign.
-
-## Protocol
-
-Draft version v0.1 of the protocol is available as a [PDF file in the root directory](COMPARES-vaccines-protocol-draft-v0.1.pdf)
 
 The Protocol accommodates the following campaign-specific characteristics:
 
@@ -89,7 +87,7 @@ The analysis scripts in the [`analysis/`](./analysis) directory are organised in
 
 Scripts may take one or more arguments:
 
-- `cohort`, the name of the cohort to be analysed, defined in the [`design.R`](analysis/0-lib/design.R) script.
+- `cohort`, the name of the cohort to be analysed, defined in the [`design.R`](./analysis/0-lib/design.R) script.
 - `spec`, the matching or weighting specification, taking values _A_, _B_, _C_, etc for convenience, and fully defined in the [`design.R`](analysis/0-lib/design.R) script.
 For matching, `spec` is the set of variables to match on. For weighting, `spec` is the model formula passed to the `weightit()` function. 
 - `method`, taking values _match_ or _weight_.
@@ -102,5 +100,10 @@ This variable must be exactly matched in the matching run if using `method="matc
 
 This will appear on [the job server page for the ECHO project](https://jobs.opensafely.org/echo-evaluation-of-covid-19-vaccine-histories-using-opensafely/) when it is ready to be run for the first time. 
 
+## Outputs
+
+Draft version 0.1 of the protocol is available as a [PDF file](./assets/COMPARES-vaccines-protocol-draft-v0.1.pdf)
+
+A poster describing the protocol, presented at [ISCB46](https://iscb2025.info/), is available as a [PDF file](./assets/COMPARES-vaccines-poster-ISCB46.pdf)
 
 
