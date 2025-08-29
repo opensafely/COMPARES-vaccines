@@ -138,11 +138,35 @@ plr_model <- glm(
 # get the robust sandwich vcov matrix
 plr_vcov <- get_vcov(plr_model, vcov = ~patient_id) # equivalent to vcovCL(x = plr_model, cluster = plr_data$patient_id, type = "HC0")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+############################
+# testing using marginal effects for the constrast scripts
+###############################
+
+
 ## cluster-robust variance estimation
 # use newdata with predictions
 # newdata argument with only treatment and time variables only works because we've already applied the weighting! This _will not_ work if there is any additional adjustment in the outcome model
 # this is equivalent to using "avg_predictions" function without newdata argument, with marginalisation over the entire population
-# if post-ipw adjustment is applied then remove "newdata" argument and use "avg_predictions" function instead
+# if adjustment is applied _after_ the use of weights, then remove "newdata" argument and use "avg_predictions" function instead
 data_predictions <-
   predictions(
     plr_model,
@@ -176,7 +200,7 @@ data_predictions <-
 
 # compare estimates across products
 
-# similarly to above, newdata argument will not work if doing any post-ipw adjustment (ie, adjustment in the outcome model)
+# similarly to above, newdata argument will not work if doing any adjustment after applying the weights (ie, adjustment in the outcome model)
 data_comparisons_irr <-
   comparisons(
     plr_model,
