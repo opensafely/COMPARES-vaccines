@@ -148,7 +148,7 @@ table_cohort <-
 write_csv(table_cohort, fs::path(output_dir, "table_cohort.csv"))
 
 
-## output simple datasete containing exlcusions criteria met ----
+## output simple dataset containing exclusions criteria met ----
 
 ## TODO: check if outputting this is necessary
 
@@ -161,7 +161,6 @@ data_inclusioncriteria <- data_criteria |>
     c2 = c1 & prior_vax_interval_atleast12weeks, #& no_prior_productA & no_prior_productB,
     c3 = c2 & prior_vax_1plus,
     c4_1 = c3 & (has_age & has_sex & has_imd & has_region),
-    # c4_2 = c3 & (isnot_hscworker),
     # c4_3 = c3 & (isnot_endoflife),
     # c4_4 = c3 & (has_norecentcovid),
     # c4_5 = c3 & (isnot_inhospital),

@@ -117,7 +117,7 @@ write_feather(table_ess, fs::path(output_dir, "table_ess.arrow"))
 
 data_event_counts <-
   bind_rows(
-    metaparams |> 
+    metaparams |>
       distinct(cohort, subgroup, outcome, .keep_all=TRUE) |>
       mutate(
         method="unadjusted",
@@ -137,8 +137,8 @@ data_event_counts <-
             subgroup_level = .[[subgroup]],
             
             wt = ifelse(
-              method!="unadjusted",
-              .[[paste0("wt_", cohort, "_", method, "_", spec)]],
+              method != "unadjusted",
+              .data[[paste0("wt_", cohort, "_", method, "_", spec)]],
               1
             ),
             treatment_date = vax_date-1L, 
