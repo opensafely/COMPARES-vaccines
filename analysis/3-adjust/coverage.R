@@ -30,95 +30,76 @@ if(length(args)==0){
   # use for interactive testing
   removeobjects <- FALSE
   cohort <- "age75plus"
-  matchset <- "A"
+  method <- "lmw"
+  spec <- "A"
 } else {
   removeobjects <- TRUE
   cohort <- args[[1]]
-  matchset <- args[[2]]
+  method <- args[[2]]
+  spec <- args[[3]]
 }
 
 
 
 # create output directories ----
 
-output_dir <- here_glue("output", "3-cohorts", cohort, "match{matchset}", "report")
+output_dir <- here_glue("output", "3-adjust", cohort, "{method}-{spec}", "report")
 fs::dir_create(output_dir)
 
 ## import unadjusted cohort data ----
-data_cohort <- read_feather(here("output", "3-cohorts", cohort, "data_cohort.arrow"))
+data_cohort <- read_feather(here("output", "2-select", cohort, "data_cohort.arrow"))
 
 ## import matching info ----
-data_matches <- read_feather(here_glue("output", "3-cohorts", cohort, "match{matchset}", "data_matches.arrow"))
+data_weights <- read_feather(here_glue("output", "3-adjust", cohort, "{method}-{spec}", "data_adjusted.arrow"))
 
 
 # append relevant characteristics to match data
 
 data_balance <- 
   data_cohort |>
-  select(patient_id, treatment, any_of(names(variable_labels))) |>
+  select(patient_id, treatment, vax_date, any_of(names(variable_labels))) |>
   left_join(
-    data_matches |> select(patient_id, weight, matched),
+    data_weights |> select(patient_id, weight),
     by = "patient_id"
   ) 
 
-
-
-
-
-# matching coverage on each day of recruitment period ----
-
-
-# matching coverage for boosted people
+# weighting proportion
 data_coverage <-
-  data_matches |>
-  mutate(eligible=1) |>
+  data_balance |>
+  mutate(eligible=1, weight) |>
   group_by(treatment, vax_date) |>
   summarise(
-    n_eligible = sum(eligible, na.rm=TRUE),
-    n_matched = sum(matched, na.rm=TRUE),
+    unweighted = n(),
+    weighted = sum(weight, na.rm=TRUE),
   ) |>
   mutate(
-    n_unmatched = n_eligible - n_matched,
+    diff = weighted - unweighted,
+    ratio = weighted / unweighted,
   ) |>
-  pivot_longer(
-    cols = c(n_unmatched, n_matched),
-    names_to = "status",
-    names_prefix = "n_",
-    values_to = "n"
-  ) |>
-  arrange(treatment, vax_date, status) |>
-  group_by(treatment, vax_date, status) |>
-  summarise(
-    n = sum(n),
-  ) |>
-  group_by(treatment, status) %>%
+  group_by(treatment) %>%
   complete(
     vax_date = full_seq(.$vax_date, 1), # go X days before to
     fill = list(n=0)
   ) |>
+  group_by(treatment) |>
+  arrange(treatment, vax_date) |>
   mutate(
-    cumuln = cumsum(n)
-  ) |>
-  ungroup() |>
-  mutate(
-    status = factor(status, levels=c("unmatched", "matched")),
-    status_descr = fct_recoderelevel(status, recoder$status)
-  ) |>
-  arrange(treatment, status_descr, vax_date)
-
-
+    cumul_unweighted = cumsum(unweighted),
+    cumul_weighted = cumsum(weighted),
+  )
 
 
 data_coverage_rounded <-
   data_coverage |>
-  group_by(treatment, status) |>
+  group_by(treatment) |>
   mutate(
-    cumuln = roundmid_any(cumuln, to = sdc.limit),
-    n = diff(c(0,cumuln)),
+    cumul_unweighted = roundmid_any(cumul_unweighted, to = sdc.limit),
+    cumul_weighted = roundmid_any(cumul_weighted, to = sdc.limit),
+    unweighted = diff(c(0,cumul_unweighted)),
+    weighted = diff(c(0,cumul_weighted)),
   )
 
 write_csv(data_coverage_rounded, fs::path(output_dir, "data_coverage.csv"))
-
 
 
 ## plot matching coverage ----
@@ -127,24 +108,44 @@ xmin <- min(data_coverage$vax_date )
 xmax <- max(data_coverage$vax_date )+1
 
 plot_coverage_n <-
-  data_coverage |>
+  data_coverage_rounded |>
   mutate(
     treatment_descr = fct_recoderelevel(as.character(treatment), recoder$treatment),
-    n=n*((treatment*2) - 1)
+    unweighted = unweighted*((treatment*2) - 1),
+    weighted = weighted*((treatment*2) - 1)
   ) |>
   ggplot()+
   geom_col(
     aes(
       x=vax_date+0.5,
-      y=n,
-      group=paste0(treatment,status),
+      y=weighted,
+      group=treatment_descr,
       fill=treatment_descr,
-      alpha=fct_rev(status),
       colour=NULL
     ),
-    position=position_stack(reverse=TRUE),
-    #alpha=0.8,
+    alpha=0.4,
     width=1
+  )+
+  geom_col(
+    aes(
+      x=vax_date+0.5,
+      y=unweighted,
+      group=treatment_descr,
+      colour=NULL
+    ),
+    fill="grey",
+    alpha=0.5,
+    width=1
+  )+
+  geom_linerange(
+    aes(
+      xmin=vax_date,
+      xmax=vax_date+1,
+      y=unweighted,
+      group=treatment_descr,
+      colour=treatment_descr
+    ),
+    size=1
   )+
   #geom_rect(xmin=xmin, xmax= xmax+1, ymin=-6, ymax=6, fill="grey", colour="transparent")+
   geom_hline(yintercept = 0, colour="black")+
@@ -163,7 +164,7 @@ plot_coverage_n <-
   scale_alpha_discrete(range= c(0.8,0.4))+
   labs(
     x="Date",
-    y="Booster vaccines per day",
+    y="Vaccines per day",
     colour=NULL,
     fill=NULL,
     alpha=NULL
@@ -186,20 +187,30 @@ plot_coverage_cumuln <-
   data_coverage |>
   mutate(
     treatment_descr = fct_recoderelevel(as.character(treatment), recoder$treatment),
-    cumuln=cumuln*((treatment*2) - 1)
+    cumul_unweighted = cumul_unweighted*((treatment*2) - 1),
+    cumul_weighted = cumul_weighted*((treatment*2) - 1)
   ) |>
   ggplot()+
   geom_col(
     aes(
       x=vax_date+0.5,
-      y=cumuln,
-      group=paste0(treatment,status),
+      y=cumul_weighted,
+      group=treatment_descr,
       fill=treatment_descr,
-      alpha=fct_rev(status),
       colour=NULL
     ),
-    position=position_stack(reverse=TRUE),
+    alpha=0.4,
     width=1
+  )+
+  geom_linerange(
+    aes(
+      xmin=vax_date,
+      xmax=vax_date+1,
+      y=cumul_unweighted,
+      group=treatment_descr,
+      colour=treatment_descr
+    ),
+    size=1
   )+
   geom_rect(xmin=xmin, xmax= xmax+1, ymin=-6, ymax=6, fill="grey", colour="transparent")+
   scale_x_date(
@@ -217,7 +228,7 @@ plot_coverage_cumuln <-
   scale_alpha_discrete(range= c(0.8,0.4))+
   labs(
     x="Date",
-    y="Cumulative booster vaccines",
+    y="Cumulative vaccines per day (weighted and unweighted)",
     colour=NULL,
     fill=NULL,
     alpha=NULL
@@ -234,5 +245,5 @@ plot_coverage_cumuln <-
 
 plot_coverage_cumuln
 
-ggsave(plot_coverage_cumuln, filename="coverage_stack.png", path=output_dir)
+ggsave(plot_coverage_cumuln, filename="coverage_cumulative.png", path=output_dir)
 

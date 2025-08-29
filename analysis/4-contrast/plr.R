@@ -81,7 +81,7 @@ data_all <-
     vax_product, 
     treatment,
     vax_date,
-    all_of(weighting_variables[[spec]]),
+    #all_of(weighting_variables[[spec]]),
     all_of(subgroup),
     all_of(paste0(c(outcome, "death", "dereg"), "_date")),
     weight = glue("wt_{cohort}_{method}_{spec}")

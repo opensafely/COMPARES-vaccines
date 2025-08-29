@@ -244,7 +244,7 @@ table1_summary <- function(.data, group, label, threshold) {
       variable_label = factor(variable, levels = names(label),  labels = label),
     ) |>
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
-    select(-fmt_fn, -warning, -error, -gts_column) |>
+    select(-warning, -error, -gts_column) |>
     pivot_wider(
       id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"), 
       names_from = stat_name, 
@@ -334,7 +334,7 @@ table1_svysummary <- function(.data, group, weight, label, threshold) {
       variable_label = factor(variable, levels = names(label),  labels = label),
     ) |>
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
-    select(-fmt_fn, -warning, -error, -gts_column) |>
+    select(-warning, -error, -gts_column) |>
     pivot_wider(
       id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"), 
       names_from = stat_name, 
@@ -377,7 +377,7 @@ table1_svysummary <- function(.data, group, weight, label, threshold) {
     ) |>
     select(
       # remove variables related to sampling weights that are not needed
-      -deff, -p.std.error, -n_unweighted, -N_unweighted, -p_unweighted
+      -p.std.error, -n_unweighted, -N_unweighted, -p_unweighted
     )
   
   return(raw_stats_redacted)
@@ -459,7 +459,7 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
       variable_label = droplevels(factor(variable_label, levels=map_chr(variable_labels, ~.))),
       variable_label,
       variable_level,
-      smd = Diff.Adj, 
+      smd = Diff.Adj,
     ) |>
     arrange(variable_label) 
   

@@ -14,8 +14,6 @@ library("arrow")
 library('survival')
 library("WeightIt")
 library("cobalt")
-library("doParallel")
-
 
 ## Import custom user functions from lib
 source(here("analysis", "0-lib", "utility.R"))
@@ -80,7 +78,7 @@ data_weights <-
     patient_id = data_preweight$patient_id,
     treatment = obj_weightit$treat,
     ps = obj_weightit$ps,
-    weight = obj_weightit$weights, # weight = get_w_from_ps(ps=ps, treat=treatment,  estimand = "ATE")
+    weight = obj_weightit$weights, # weight = get_w_from_ps(ps=ps, treat=treatment, estimand = "ATE")
   ) 
 
 ## weights and PS relationship:
@@ -96,9 +94,4 @@ data_weights <-
   left_join(data_cohort |> select(patient_id, vax_date), by="patient_id") 
 
 write_feather(data_weights, fs::path(output_dir, "data_adjusted.arrow"))
-
-summary(obj_weightit)
-
-
-
 

@@ -375,6 +375,42 @@ local({
 
 
 
+# lmw variables
+
+local({
+  
+  # TODO: make sure these weighting formulae correspond to the protocol
+  # TODO: make sure subgroups are dealt with as desired, either: 
+  # - ignore, and assume appropriate calibration from global model
+  # - independent models in each subgroup (so refit weighting model(s) for each subgroup analysis)
+  # - completely stratified (subgroup1*subgroup2*subgroup3...)
+  # - something else
+  
+  lmw_formulae <- list()
+  lmw_variables <- list()
+  
+  # weighting specification A
+  
+  lmw_formulae$A <- "vax_day + age + cv + sex"
+  
+  lmw_variables$A <- all.vars(as.formula(paste("~", lmw_formulae$A)))
+  
+  # weighting specification B
+  
+  lmw_formulae$B <- "vax_day + age + cv + sex + region + multimorb"
+  
+  lmw_variables$B <- all.vars(as.formula(paste("~", lmw_formulae$B)))
+  
+  # output
+  
+  lmw_formulae <<- lmw_formulae
+  lmw_variables <<- lmw_variables
+  
+  
+})
+
+
+
 ## meta-parameter dataset ---
 ## contains all combinations of design elements that should be run in the study
 ## this is mainly used to construct the project.yaml file, via the create-project.R script
@@ -385,14 +421,14 @@ local({
 metaparams <-
   expand_grid(
     cohort = factor(c("age75plus", "cv")),
-    method = factor(c("match", "weight")),
+    method = factor(c("match", "weight", "lmw")),
     spec = c("A", "B", "C"),
     outcome = factor(recoder$outcome),
     subgroup = factor(recoder$subgroups),
   ) |>
   filter(
     subgroup  %in% c("all", "ageband"),
-    !(spec=="C")
+    spec=="A"
   ) |>
   mutate(
     cohort_descr = fct_recoderelevel(cohort, recoder$cohort),

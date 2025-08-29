@@ -108,74 +108,42 @@ action_select <- function(cohort){
   )
 }
 
-## match actions function ----
-action_match <- function(cohort, spec){
-
-  splice2(
-
-    action(
-      name = glue("adjust_{cohort}_match_{spec}"),
-      run = "r:v2 analysis/3-adjust/match.R",
-      arguments = c(cohort, spec),
-      needs = list(glue("select_{cohort}")),
-      highly_sensitive = lst(
-        arrow = glue("output/3-adjust/{cohort}/match-{spec}/*.arrow")
-      )
-    ),
-
-    action(
-      name = glue("adjust_{cohort}_match_{spec}_report"),
-      run = "r:v2 analysis/3-adjust/report.R",
-      arguments = c(cohort, "match", spec),
-      needs = list(glue("select_{cohort}"),  glue("adjust_{cohort}_match_{spec}")),
-      # highly_sensitive = lst(
-      #   arrow = glue("output/3-adjust/{cohort}/match-{spec}/report/*.arrow"),
-      # ),
-      moderately_sensitive = lst(
-        csv = glue("output/3-adjust/{cohort}/match-{spec}/report/*.csv"),
-        png = glue("output/3-adjust/{cohort}/match-{spec}/report/*.png")
-      )
-    )
-  )
-
-
-}
-
-
-## match actions function ----
-action_weight <- function(cohort, spec){
+## balance actions function ----
+action_balance <- function(cohort, method, spec){
   
   splice2(
+    
     action(
-      name = glue("adjust_{cohort}_weight_{spec}"),
-      run = "r:v2 analysis/3-adjust/weight.R",
-      arguments = c(cohort, spec),
-      needs = list(
-        glue("select_{cohort}")
-      ),
+      name = glue("adjust_{cohort}_{method}_{spec}"),
+      run = "r:v2 analysis/3-adjust/balance.R",
+      arguments = c(cohort, method, spec),
+      needs = list(glue("select_{cohort}")),
       highly_sensitive = lst(
-        arrow = glue("output/3-adjust/{cohort}/weight-{spec}/*.arrow")
+        arrow = glue("output/3-adjust/{cohort}/{method}-{spec}/*.arrow")
       )
     ),
     
     action(
-      name = glue("adjust_{cohort}_weight_{spec}_report"),
+      name = glue("adjust_{cohort}_{method}_{spec}_report"),
       run = "r:v2 analysis/3-adjust/report.R",
-      arguments = c(cohort, "weight", spec),
+      arguments = c(cohort, method, spec),
       needs = list(
-        glue("select_{cohort}"),  
-        glue("adjust_{cohort}_weight_{spec}")
+        glue("select_{cohort}"),
+        glue("adjust_{cohort}_{method}_{spec}")
       ),
       # highly_sensitive = lst(
-      #   arrow = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.arrow"),
+      #   arrow = glue("output/3-adjust/{cohort}/{method}-{spec}/report/*.arrow"),
       # ),
       moderately_sensitive = lst(
-        csv = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.csv"),
-        png = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.png")
+        csv = glue("output/3-adjust/{cohort}/{method}-{spec}/report/*.csv"),
+        png = glue("output/3-adjust/{cohort}/{method}-{spec}/report/*.png")
       )
     )
   )
+  
+  
 }
+
 
 action_combine_weights <- function(cohort){
   cohort0 <- cohort
@@ -358,13 +326,19 @@ actions_list <- splice(
 
   comment("# # # # # # # # # # # # # # # # # # #", "Matching", "# # # # # # # # # # # # # # # # # # #"),
 
-  action_match("age75plus", "A"),
-  action_match("age75plus", "B"),
+  action_balance("age75plus", "match", "A"),
+  action_balance("age75plus", "match", "B"),
   
   comment("# # # # # # # # # # # # # # # # # # #", "Weighting", "# # # # # # # # # # # # # # # # # # #"),
   
-  action_weight("age75plus", "A"),
-  action_weight("age75plus", "B"),
+  action_balance("age75plus", "weight", "A"),
+  action_balance("age75plus", "weight", "B"),
+  
+  comment("# # # # # # # # # # # # # # # # # # #", "LMW", "# # # # # # # # # # # # # # # # # # #"),
+  
+  action_balance("age75plus", "lmw", "A"),
+  action_balance("age75plus", "lmw", "B"),
+  
   
   comment("# # # # # # # # # # # # # # # # # # #", "combine weights from all adjustment strategies", "# # # # # # # # # # # # # # # # # # #"),
   
