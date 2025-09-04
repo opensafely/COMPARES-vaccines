@@ -46,28 +46,25 @@ opensafely/ethnicity-snomed-0removed/22911876
 # PRIMIS
 #######################################################
 
-# TODO: check why some codelists are not using "v2.5" 
-
 #Asthma
-primis-covid19-vacc-uptake/astadm/6dee7f06
-primis-covid19-vacc-uptake/ast/10a3993c
-primis-covid19-vacc-uptake/astrx/6f2f876e
-primis-covid19-vacc-uptake/astrxm1/3e825892
+primis-covid19-vacc-uptake/astadm/v2.5
+primis-covid19-vacc-uptake/ast/v2.5
 primis-covid19-vacc-uptake/astrxm2/v2.5
+primis-covid19-vacc-uptake/astrxm1/v2.5
 
 #Resp
-primis-covid19-vacc-uptake/resp_cov/44ae8c0d
+primis-covid19-vacc-uptake/resp_cov/v2.5
 
 #Chronic heart disease
-primis-covid19-vacc-uptake/chd_cov/5791cbc7
+primis-covid19-vacc-uptake/chd_cov/v2.5
 
 #Chronic kidney disease
-primis-covid19-vacc-uptake/ckd15/09b0b232
-primis-covid19-vacc-uptake/ckd35/7980326d
-primis-covid19-vacc-uptake/ckd_cov/0a7765c1
+primis-covid19-vacc-uptake/ckd15/v2.5
+primis-covid19-vacc-uptake/ckd35/v2.5
+primis-covid19-vacc-uptake/ckd_cov/v2.5
 
 #Chronic liver disease
-primis-covid19-vacc-uptake/cld/2386d8f6
+primis-covid19-vacc-uptake/cld/v2.5
 
 #DM + addison
 primis-covid19-vacc-uptake/diab/v2.5
@@ -127,13 +124,13 @@ opensafely/guillain-barre-syndrome-icd10/4b41b700
 
 
 # BELL'S PALSY
-opensafely/bells-palsy-snomed/14dae2ba
+opensafely/bells-palsy-snomed/35911e8e
 opensafely/bells-palsy-icd-10/7d609d6a
 opensafely/bells-palsy-ecds-restricted-reference-set/40d55c71
 
 # THROMBO ----------------------------------------------------------------------
 # THROMBOCITOPENIA
-opensafely/thrombotic-thrombocytopenia-snomed/67515faf
+opensafely/thrombotic-thrombocytopenia-snomed/20c1d26d
 opensafely/thrombocytopenia-icd-10/1970461a
 
 # ARTERIAL THROMBOTIC
@@ -169,27 +166,27 @@ user/elsie_horne/portal_vein_thrombosis_icd10/22606950
 
 # CARDIO ------------------------------------------------------------------------
 # PERICARDITIS
-opensafely/pericarditis-snomed/37e5393b
+opensafely/pericarditis-snomed/6b881dc6
 opensafely/pericarditis-icd-10/1ed5c606
 opensafely/pericarditis-ecds/2a67796d
 
 # MYOCARDITIS
-opensafely/myocarditis/6cb6df9b
+opensafely/myocarditis/36b67766
 opensafely/myocarditis-icd-10/53a76c66
 opensafely/myocarditis-ecds/4376eca2
 
 # OTHER --------------------------------------------------------------------------
 
 # HEAVY MENTRUAL BLEEDING
-opensafely/heavy-menstrual-bleeding-snomed/2d1a3963
-opensafely/heavy-menstrual-bleeding-icd-10/140ac62e
+opensafely/heavy-menstrual-bleeding-snomed/6d1584e4
+opensafely/heavy-menstrual-bleeding-icd-10/0624f81a
 
 # ERYTHEMA MULTIFORME
-opensafely/erythema-multiforme-snomed/3a97f931
+opensafely/erythema-multiforme-snomed/1e0f1277
 opensafely/erythema-multiforme-icd-10/327fb94f
 opensafely/erythema-multiforme-ecds/4b8f2c84
 
 # ANAPHYLAXIS
-opensafely/anaphylaxis-snomed/61ebdfc3
+opensafely/anaphylaxis-snomed/3843de84
 opensafely/anaphylaxis-ecds/7afb52f8
-opensafely/anaphylaxis-icd-10/74cf1f7d
+opensafely/anaphylaxis-icd-10/515351b9
