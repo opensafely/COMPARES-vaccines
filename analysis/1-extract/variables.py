@@ -177,7 +177,7 @@ def has_asthma(index_date):
     prior_meds = medications.where(medications.date.is_on_or_before(index_date))
     count_astrx_oral = (
         prior_meds
-        .where(prior_meds.dmd_code.is_in(codelists.astrx))
+        .where(prior_meds.dmd_code.is_in(codelists.astrxm2))
         .where(prior_meds.date.is_on_or_between(index_date - years(2), index_date))
         .count_for_patient()
     )
