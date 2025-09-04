@@ -130,46 +130,6 @@ actions:
         png: output/3-adjust/age75plus/weight-B/report/*.png
 
   ## # # # # # # # # # # # # # # # # # # # 
-  ## LMW 
-  ## # # # # # # # # # # # # # # # # # # # 
-
-  adjust_age75plus_lmw_A:
-    run: r:v2 analysis/3-adjust/balance.R age75plus lmw A
-    needs:
-    - select_age75plus
-    outputs:
-      highly_sensitive:
-        arrow: output/3-adjust/age75plus/lmw-A/*.arrow
-
-  adjust_age75plus_lmw_A_report:
-    run: r:v2 analysis/3-adjust/report.R age75plus lmw A
-    needs:
-    - select_age75plus
-    - adjust_age75plus_lmw_A
-    outputs:
-      moderately_sensitive:
-        csv: output/3-adjust/age75plus/lmw-A/report/*.csv
-        png: output/3-adjust/age75plus/lmw-A/report/*.png
-
-  adjust_age75plus_lmw_B:
-    run: r:v2 analysis/3-adjust/balance.R age75plus lmw B
-    needs:
-    - select_age75plus
-    outputs:
-      highly_sensitive:
-        arrow: output/3-adjust/age75plus/lmw-B/*.arrow
-
-  adjust_age75plus_lmw_B_report:
-    run: r:v2 analysis/3-adjust/report.R age75plus lmw B
-    needs:
-    - select_age75plus
-    - adjust_age75plus_lmw_B
-    outputs:
-      moderately_sensitive:
-        csv: output/3-adjust/age75plus/lmw-B/report/*.csv
-        png: output/3-adjust/age75plus/lmw-B/report/*.png
-
-  ## # # # # # # # # # # # # # # # # # # # 
   ## combine weights from all adjustment strategies 
   ## # # # # # # # # # # # # # # # # # # # 
 

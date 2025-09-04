@@ -334,10 +334,10 @@ actions_list <- splice(
   action_balance("age75plus", "weight", "A"),
   action_balance("age75plus", "weight", "B"),
   
-  comment("# # # # # # # # # # # # # # # # # # #", "LMW", "# # # # # # # # # # # # # # # # # # #"),
-  
-  action_balance("age75plus", "lmw", "A"),
-  action_balance("age75plus", "lmw", "B"),
+  # comment("# # # # # # # # # # # # # # # # # # #", "LMW", "# # # # # # # # # # # # # # # # # # #"),
+  # 
+  # action_balance("age75plus", "lmw", "A"),
+  # action_balance("age75plus", "lmw", "B"),
   
   
   comment("# # # # # # # # # # # # # # # # # # #", "combine weights from all adjustment strategies", "# # # # # # # # # # # # # # # # # # #"),
