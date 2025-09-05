@@ -349,7 +349,7 @@ actions_list <- splice(
   comment("### Aalen-Johansen estimates"),
   pmap(
     metaparams |>
-      filter(cohort == "age75plus"),
+      filter(cohort == "age75plus", method != "lmw"),
     function(cohort, method, spec, subgroup, outcome, ...){
       action_aj_contrast(cohort, method, spec, subgroup, outcome)
     }
