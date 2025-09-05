@@ -12,8 +12,8 @@
 # Preliminaries ----
 
 ## Import libraries ----
-library('tidyverse')
-library('here')
+library("tidyverse")
+library("here")
 
 ## Import custom user functions from lib
 source(here("analysis", "0-lib", "utility.R"))
@@ -48,7 +48,7 @@ list2env(study_dates, globalenv())
 # maximum follow-up duration, in days
 # currently up to 24 weeks after time-zero
 
-maxfup <- 7L*24L
+maxfup <- 7L * 24L
 
 
 # Look-up table for all potential outcomes of interest
@@ -62,35 +62,35 @@ events_lookup <- tribble(
 
 
   # Effectiveness
-  #"covid_emergency", "covid_emergency_date", "COVID-19 A&E attendance", 
-  "covid_admitted", "covid_admitted_date", "COVID-19 hospitalisation", 
-  #"covid_critcare", "covid_critcare_date", "COVID-19 critical care", 
-  "covid_death", "covid_death_date", "COVID-19 death", 
-  
+  # "covid_emergency", "covid_emergency_date", "COVID-19 A&E attendance",
+  "covid_admitted", "covid_admitted_date", "COVID-19 hospitalisation",
+  # "covid_critcare", "covid_critcare_date", "COVID-19 critical care",
+  "covid_death", "covid_death_date", "COVID-19 death",
+
 
   # safety
-  #"admitted", "admitted_date", "Unplanned hospitalisation", 
-  #"emergency", "emergency_date", "A&E attendance", 
-  "death", "death_date", "Any death", 
-  #"sgb", "sgb_date", "Guillain-Barré syndrome",
+  # "admitted", "admitted_date", "Unplanned hospitalisation",
+  # "emergency", "emergency_date", "A&E attendance",
+  "death", "death_date", "Any death",
+  # "sgb", "sgb_date", "Guillain-Barré syndrome",
   "bells_palsy", "bells_palsy_date", "Bell's palsy",
   "ttp", "ttp_date", "Thrombocytopenia",
-  #"ami", "ami_date", "Acute myocardial infarction",
-  #"stroke_isch", "stroke_isch_date", "Ischaemic stroke",
-  #"ate", "ate_date", "Composite arterial thrombotic event (ATE)",
-  #"dvt", "dvt_date", "Deep vein thrombosis (DVT)",
-  #"icvt", "icvt_date", "Intracranial venous thrombosis (ICVT)",
-  #"pe", "pe_date", "Pulmonary embolism (PE)",
-  #"vte", "vte_date", "Composite venous thrombotic event (VTE)",
-  #"pericarditis", "pericarditis_date", "Pericarditis",
-  #"myocarditis", "myocarditis_date", "Myocarditis",
-  #"menorrhagia", "menorrhagia_date", "Heavy menstrual bleeding",
-  #"ery_multi", "ery_multi_date", "Erythema multiforme",
-  #"anaphylaxis", "anaphylaxis_date", "Anaphylaxis",
+  # "ami", "ami_date", "Acute myocardial infarction",
+  # "stroke_isch", "stroke_isch_date", "Ischaemic stroke",
+  # "ate", "ate_date", "Composite arterial thrombotic event (ATE)",
+  # "dvt", "dvt_date", "Deep vein thrombosis (DVT)",
+  # "icvt", "icvt_date", "Intracranial venous thrombosis (ICVT)",
+  # "pe", "pe_date", "Pulmonary embolism (PE)",
+  # "vte", "vte_date", "Composite venous thrombotic event (VTE)",
+  # "pericarditis", "pericarditis_date", "Pericarditis",
+  # "myocarditis", "myocarditis_date", "Myocarditis",
+  # "menorrhagia", "menorrhagia_date", "Heavy menstrual bleeding",
+  # "ery_multi", "ery_multi_date", "Erythema multiforme",
+  # "anaphylaxis", "anaphylaxis_date", "Anaphylaxis",
 
   # negative control
-  #"noncovid_death", "noncovid_death_date", "Non-COVID-19 death", 
-  #"fracture", "fracture_date", "Fracture", 
+  # "noncovid_death", "noncovid_death_date", "Non-COVID-19 death",
+  # "fracture", "fracture_date", "Fracture",
 )
 
 
@@ -104,7 +104,7 @@ max_prior_vax_count <- 10L
 
 productA <- "pfizer"
 productB <- "moderna"
-#productC <- "vidprevtyn"
+# productC <- "vidprevtyn"
 
 # lookup to rename TPP product names to coding-friendly product names
 vax_product_lookup <- c(
@@ -149,7 +149,7 @@ treatment_lookup <-
   )
 
 # where to split follow-up time after recruitment
-postbaselinecuts <- as.integer(c(0,7,14,28,56,84,112,140,168))
+postbaselinecuts <- as.integer(c(0, 7, 14, 28, 56, 84, 112, 140, 168))
 
 # redaction threshold
 sdc.limit <- 6L
@@ -173,7 +173,7 @@ recoder <-
       NULL
     ),
     status = c(
-      `Unmatched`= "unmatched",
+      `Unmatched` = "unmatched",
       `Matched` = "matched"
     ),
     treatment = c(
@@ -184,23 +184,29 @@ recoder <-
     all = c(` ` = "all"),
     ageband = c(
       "50-64", "65-74", "75-79", "80-84", "85+"
-    ) %>% {set_names(.,.)},
+    ) %>%
+      {
+        set_names(., .)
+      },
     cv = c(
       `Clinically at-risk` = "TRUE",
       `Not clinically at-risk` = "FALSE"
     ),
     prior_vax_count_group = c(
       "0", "1-2", "3-5", "6+"
-    ) %>% {set_names(.,.)},
+    ) %>%
+      {
+        set_names(., .)
+      },
   )
 
 ## variable labels in tables and plots ----
 
-variable_labels <- 
+variable_labels <-
   lst(
     N  = "Total N",
     treatment_descr = "Vaccine product",
-    #vax_date = "Vaccination date",
+    # vax_date = "Vaccination date",
     vax_day = "Vaccination day",
     prior_vax_interval = "Days since previous vaccine",
     prior_vax_count_group = "Previous vaccine count",
@@ -211,23 +217,23 @@ variable_labels <-
     imd_Q5 = "Deprivation",
     region = "Region",
     cv = "Clinically at-risk",
-    
-    #housebound = "Clinically housebound",
-    #care_home_combined = "Care/nursing home resident",
-    
+
+    # housebound = "Clinically housebound",
+    # care_home_combined = "Care/nursing home resident",
+
     severe_obesity = "Body Mass Index > 40 kg/m^2",
-    
+
     chd = "Chronic heart disease",
     ckd = "Chronic kidney disease",
     diabetes = "Diabetes",
     cld = "Chronic liver disease",
     crd = "Chronic respiratory disease",
-    #asthma = "Asthma",
+    # asthma = "Asthma",
     cns = "Chronic neurological disease",
-    
+
     immunosuppressed = "Immunosuppressed",
-    #immuno_any = "Immunosuppressed (all)",
-    
+    # immuno_any = "Immunosuppressed (all)",
+
     # immdx = "Immunocompromising diagnosis",
     # immrx = "Immunosuppressive medications, previous 3 years",
     # dxt_chemo = "Chemotherapy, previous 3 years",
@@ -235,23 +241,23 @@ variable_labels <-
     # asplenia = "Asplenia or poor spleen function",
     # solid_organ_transplant = "Solid organ transplant",
     # hiv_aids = "HIV/AIDS",
-    
+
     multimorb = "Morbidity count",
-    
+
     learndis = "Learning disabilities",
     smi = "Serious mental illness",
-    
+
     # prior events
-    
-    #COVID-related
-    covid_prior_emergency = "Prior (<1 year) COVID-19 A&E attendance",   
-    covid_prior_admitted = "Prior (<1 year) COVID-19 hospitalisation",   
+
+    # COVID-related
+    covid_prior_emergency = "Prior (<1 year) COVID-19 A&E attendance",
+    covid_prior_admitted = "Prior (<1 year) COVID-19 hospitalisation",
     covid_prior_critcare = "Prior (<1 year) COVID-19 critical care",
 
     # Safety
-    prior_emergency = "Prior (<1 year) A&E attendance", 
+    prior_emergency = "Prior (<1 year) A&E attendance",
     prior_admitted = "Prior (<1 year) hospitalisation",
-    
+
     sgb_prior = "Prior (<1 year) Guillain-Barré syndrome",
     bells_palsy_prior = "Prior (<1 year) Bell's palsy",
     ttp_prior = "Prior (<1 year) Thrombocytopenia",
@@ -270,7 +276,7 @@ variable_labels <-
 
     # tests_cat_prior = "Prior number of SARS-CoV-2 tests",
     # covid_infection_prior = "Prior documented SARS-CoV-2 infection",
-    # 
+    #
     # vaxhist_pfizer  = "Previously received Pfizer (original)",
     # vaxhist_az  = "Previously received AZ",
     # vaxhist_moderna  = "Previously received Moderna",
@@ -278,29 +284,28 @@ variable_labels <-
     # vaxhist_pfizerXBB15  = "Previously received Pfizer/XBB.1.5",
     # vaxhist_modernaomicron  = "Previously received Moderna/Omicron",
     # vaxhist_modernaXBB15  = "Previously received Moderna/XBB.1.5",
-  ) 
+  )
 
 
 ## model formulae ----
 
-treated_period_variables <- paste0("treatment_period_id", "_", seq_len(length(postbaselinecuts)-1))
+treated_period_variables <- paste0("treatment_period_id", "_", seq_len(length(postbaselinecuts) - 1))
 
 # Matching variables
 
 local({
-  
   # TODO: make sure these matching variables correspond to the protocol
-  
-  matching_variables = list()
+
+  matching_variables <- list()
 
   # matching specification A
   exact <- c(
     "ageband",
     "cv",
-    #"sex",
-    #"region",
-    #"imd_Q5",
-    #"multimorb",
+    # "sex",
+    # "region",
+    # "imd_Q5",
+    # "multimorb",
     NULL
   )
   caliper <- c(
@@ -310,7 +315,7 @@ local({
     NULL
   )
   all <- c(exact, names(caliper))
-    matching_variables$A = lst(exact, caliper, all)
+  matching_variables$A <- lst(exact, caliper, all)
 
   # matching specification B
   exact <- c(
@@ -318,10 +323,10 @@ local({
     "cv",
     "sex",
     "region",
-    #"imd_Q5",
+    # "imd_Q5",
     "prior_vax_count_group",
     "multimorb",
-    #"immunosuppressed",
+    # "immunosuppressed",
     NULL
   )
   caliper <- c(
@@ -332,7 +337,7 @@ local({
     NULL
   )
   all <- c(exact, names(caliper))
-  matching_variables$B = lst(exact, caliper, all)
+  matching_variables$B <- lst(exact, caliper, all)
 
   matching_variables <<- matching_variables
 
@@ -342,35 +347,34 @@ local({
 # Weighting variables
 
 local({
-  
   # TODO: make sure these weighting formulae correspond to the protocol
-  # TODO: make sure subgroups are dealt with as desired, either: 
+  # TODO: make sure subgroups are dealt with as desired, either:
   # - ignore, and assume appropriate calibration from global model
   # - independent models in each subgroup (so refit weighting model(s) for each subgroup analysis)
   # - completely stratified (subgroup1*subgroup2*subgroup3...)
   # - something else
-  
+
   weighting_formulae <- list()
   weighting_variables <- list()
-  
+
   # weighting specification A
 
   weighting_formulae$A <- "vax_day + age + cv + sex + region"
-  
+
   weighting_variables$A <- all.vars(as.formula(paste("~", weighting_formulae$A)))
-  
+
   # weighting specification B
-  
+
   weighting_formulae$B <- "vax_day + age + cv + sex + region + multimorb"
-  
+
   weighting_variables$B <- all.vars(as.formula(paste("~", weighting_formulae$B)))
-  
+
   # output
-  
+
   weighting_formulae <<- weighting_formulae
   weighting_variables <<- weighting_variables
-  
-  
+
+
 })
 
 
@@ -378,35 +382,34 @@ local({
 # lmw variables
 
 local({
-  
   # TODO: make sure these weighting formulae correspond to the protocol
-  # TODO: make sure subgroups are dealt with as desired, either: 
+  # TODO: make sure subgroups are dealt with as desired, either:
   # - ignore, and assume appropriate calibration from global model
   # - independent models in each subgroup (so refit weighting model(s) for each subgroup analysis)
   # - completely stratified (subgroup1*subgroup2*subgroup3...)
   # - something else
-  
+
   lmw_formulae <- list()
   lmw_variables <- list()
-  
+
   # weighting specification A
-  
+
   lmw_formulae$A <- "vax_day + age + cv + sex"
-  
+
   lmw_variables$A <- all.vars(as.formula(paste("~", lmw_formulae$A)))
-  
+
   # weighting specification B
-  
+
   lmw_formulae$B <- "vax_day + age + cv + sex + region + multimorb"
-  
+
   lmw_variables$B <- all.vars(as.formula(paste("~", lmw_formulae$B)))
-  
+
   # output
-  
+
   lmw_formulae <<- lmw_formulae
   lmw_variables <<- lmw_variables
-  
-  
+
+
 })
 
 
@@ -416,7 +419,7 @@ local({
 ## this is mainly used to construct the project.yaml file, via the create-project.R script
 ## but also picked up in a few places elsewhere
 
-#TODO: check this is capturing everything
+# TODO: check this is capturing everything
 
 metaparams <-
   expand_grid(
@@ -426,13 +429,15 @@ metaparams <-
     outcome = factor(recoder$outcome),
     subgroup = factor(recoder$subgroups),
   ) |>
-  filter(
-    subgroup  %in% c("all", "ageband"),
-    spec=="A"
-  ) |>
   mutate(
     cohort_descr = fct_recoderelevel(cohort, recoder$cohort),
     outcome_descr = fct_recoderelevel(outcome, recoder$outcome),
     subgroup_descr = fct_recoderelevel(subgroup, recoder$subgroups),
+  ) |>
+  # select only some parameters to avoid too much dev work
+  filter(
+    cohort == "age75plus",
+    method != "lmw",
+    subgroup  %in% c("all", "ageband"),
+    spec == "A"
   )
-

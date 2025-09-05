@@ -19,10 +19,6 @@ source(here("analysis", "0-lib", "utility.R"))
 ## Import design elements
 source(here("analysis", "0-lib", "design.R"))
 
-metaparams <-
-  metaparams |>
-  filter(cohort == "age75plus", method != "lmw")
-
 ## restrict metaparams to those current available:
 metaparams_cohort_method_spec <-
   metaparams |>
