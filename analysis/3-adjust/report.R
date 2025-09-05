@@ -32,7 +32,7 @@ if(length(args)==0){
   # use for interactive testing
   removeobjects <- FALSE
   cohort <- "age75plus"
-  method <- "match"
+  method <- "lmw"
   spec <- "A"
 } else {
   removeobjects <- TRUE

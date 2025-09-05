@@ -1,16 +1,16 @@
 ######################################
-# Purpose: 
-# create the project-yaml file 
+# Purpose:
+# create the project-yaml file
 ######################################
 
 
 # Preliminaries ----
 
 ## Import libraries ----
-library('tidyverse')
-library('yaml')
-library('here')
-library('glue')
+library("tidyverse")
+library("yaml")
+library("here")
+library("glue")
 
 
 ## Import custom user functions from lib
@@ -19,14 +19,13 @@ source(here("analysis", "0-lib", "utility.R"))
 ## Import design elements
 source(here("analysis", "0-lib", "design.R"))
 
-
 ## restrict metaparams to those current available:
-metaparams_cohort_method_spec <- 
+metaparams_cohort_method_spec <-
   metaparams |>
   select(cohort, method, spec) |>
-  unique() 
+  unique()
 
-metaparams_cohort_method_spec_subgroup_outcome <- 
+metaparams_cohort_method_spec_subgroup_outcome <-
   metaparams |>
   select(cohort, method, spec, subgroup, outcome) |>
   unique()
@@ -35,18 +34,18 @@ metaparams_cohort_method_spec_subgroup_outcome <-
 # create action functions ----
 
 ## create comment function ----
-comment <- function(...){
+comment <- function(...) {
   list_comments <- list(...)
-  comments <- map(list_comments, ~paste0("## ", ., " ##"))
+  comments <- map(list_comments, ~ paste0("## ", ., " ##"))
   comments
 }
 
-splice2 <- function(..., name_spec="{inner}", name_repair = "minimal") {
-  list_flatten(x=lst(...), name_spec = name_spec, name_repair = name_repair)
+splice2 <- function(..., name_spec = "{inner}", name_repair = "minimal") {
+  list_flatten(x = lst(...), name_spec = name_spec, name_repair = name_repair)
 }
 
 ## create function to convert comment "actions" in a yaml string into proper comments
-convert_comment_actions <-function(yaml.txt){
+convert_comment_actions <- function(yaml.txt) {
   yaml.txt %>%
     str_replace_all("\\\n(\\s*)\\'\\'\\:(\\s*)\\'", "\n\\1")  %>%
     str_replace_all("([^\\'])\\\n(\\s*)\\#\\#", "\\1\n\n\\2\\#\\#") %>%
@@ -56,14 +55,14 @@ convert_comment_actions <-function(yaml.txt){
 
 ## generic action function ----
 action <- function(
-  name,
-  run,
-  arguments=NULL,
-  needs=NULL,
-  highly_sensitive=NULL,
-  moderately_sensitive=NULL,
-  ... # other arguments / options for special action types
-){
+    name,
+    run,
+    arguments = NULL,
+    needs = NULL,
+    highly_sensitive = NULL,
+    moderately_sensitive = NULL,
+    ... # other arguments / options for special action types
+    ) {
 
   outputs <- list(
     highly_sensitive = highly_sensitive,
@@ -71,13 +70,13 @@ action <- function(
   )
   outputs[sapply(outputs, is.null)] <- NULL
 
-  
-  if(!is.null(names(arguments))){
+
+  if (!is.null(names(arguments))) {
     arguments <- paste0("--", names(arguments), "=", arguments)
   }
-  
+
   action <- list(
-    run = paste(c(run, arguments), collapse=" "),
+    run = paste(c(run, arguments), collapse = " "),
     needs = needs,
     outputs = outputs,
     ... = ...
@@ -93,7 +92,7 @@ action <- function(
 
 ## select action function ----
 
-action_select <- function(cohort){
+action_select <- function(cohort) {
   action(
     name = glue("select_{cohort}"),
     run = "r:v2 analysis/2-select/select.R",
@@ -108,32 +107,35 @@ action_select <- function(cohort){
   )
 }
 
-## match actions function ----
-action_match <- function(cohort, spec){
+## balance actions function ----
+action_balance <- function(cohort, method, spec) {
 
   splice2(
 
     action(
-      name = glue("adjust_{cohort}_match_{spec}"),
-      run = "r:v2 analysis/3-adjust/match.R",
-      arguments = c(cohort, spec),
+      name = glue("adjust_{cohort}_{method}_{spec}"),
+      run = "r:v2 analysis/3-adjust/balance.R",
+      arguments = c(cohort, method, spec),
       needs = list(glue("select_{cohort}")),
       highly_sensitive = lst(
-        arrow = glue("output/3-adjust/{cohort}/match-{spec}/*.arrow")
+        arrow = glue("output/3-adjust/{cohort}/{method}-{spec}/*.arrow")
       )
     ),
 
     action(
-      name = glue("adjust_{cohort}_match_{spec}_report"),
+      name = glue("adjust_{cohort}_{method}_{spec}_report"),
       run = "r:v2 analysis/3-adjust/report.R",
-      arguments = c(cohort, "match", spec),
-      needs = list(glue("select_{cohort}"),  glue("adjust_{cohort}_match_{spec}")),
+      arguments = c(cohort, method, spec),
+      needs = list(
+        glue("select_{cohort}"),
+        glue("adjust_{cohort}_{method}_{spec}")
+      ),
       # highly_sensitive = lst(
-      #   arrow = glue("output/3-adjust/{cohort}/match-{spec}/report/*.arrow"),
+      #   arrow = glue("output/3-adjust/{cohort}/{method}-{spec}/report/*.arrow"),
       # ),
       moderately_sensitive = lst(
-        csv = glue("output/3-adjust/{cohort}/match-{spec}/report/*.csv"),
-        png = glue("output/3-adjust/{cohort}/match-{spec}/report/*.png")
+        csv = glue("output/3-adjust/{cohort}/{method}-{spec}/report/*.csv"),
+        png = glue("output/3-adjust/{cohort}/{method}-{spec}/report/*.png")
       )
     )
   )
@@ -142,42 +144,7 @@ action_match <- function(cohort, spec){
 }
 
 
-## match actions function ----
-action_weight <- function(cohort, spec){
-  
-  splice2(
-    action(
-      name = glue("adjust_{cohort}_weight_{spec}"),
-      run = "r:v2 analysis/3-adjust/weight.R",
-      arguments = c(cohort, spec),
-      needs = list(
-        glue("select_{cohort}")
-      ),
-      highly_sensitive = lst(
-        arrow = glue("output/3-adjust/{cohort}/weight-{spec}/*.arrow")
-      )
-    ),
-    
-    action(
-      name = glue("adjust_{cohort}_weight_{spec}_report"),
-      run = "r:v2 analysis/3-adjust/report.R",
-      arguments = c(cohort, "weight", spec),
-      needs = list(
-        glue("select_{cohort}"),  
-        glue("adjust_{cohort}_weight_{spec}")
-      ),
-      # highly_sensitive = lst(
-      #   arrow = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.arrow"),
-      # ),
-      moderately_sensitive = lst(
-        csv = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.csv"),
-        png = glue("output/3-adjust/{cohort}/weight-{spec}/report/*.png")
-      )
-    )
-  )
-}
-
-action_combine_weights <- function(cohort){
+action_combine_weights <- function(cohort) {
   cohort0 <- cohort
   action(
     name = glue("adjust_combine_{cohort}"),
@@ -185,13 +152,13 @@ action_combine_weights <- function(cohort){
     needs = list(
       glue("select_{cohort}"),
       glue_data(
-        .x=metaparams_cohort_method_spec |> 
+        .x = metaparams_cohort_method_spec |>
           select(cohort, method, spec) |>
           filter(cohort == cohort0),
         "adjust_{cohort}_{method}_{spec}"
       )
     ) |> list_c(),
-    
+
     highly_sensitive = lst(
       arrow = glue("output/3-adjust/{cohort}/combine/*.arrow"),
     )
@@ -200,42 +167,42 @@ action_combine_weights <- function(cohort){
 
 ## get AJ actions function ----
 action_aj_contrast <- function(
-  cohort, method, spec, subgroup, outcome
-){
-    dir_output <- glue("output/4-contrast/{cohort}/{method}-{spec}/{subgroup}/{outcome}/aj/")
-  
-    action(
-      name = glue("aj_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
-      run = "r:v2 analysis/4-contrast/aj.R",
-      #arguments = c(cohort, method, spec, subgroup, outcome),
-      arguments = c(
-        "df_input" = glue("output/3-adjust/{cohort}/combine/data_weights.arrow"), 
-        "dir_output" = dir_output,
-        "exposure" = "treatment",
-        "subgroups" = glue("{subgroup}"),
-        "origin_date" = "vax_date",
-        "event_date" = glue("{outcome}_date"),
-        "censoring_date" = "censor_date",
-        "competing_date" = "death_date",
-        "weight" = glue("wt_{cohort}_{method}_{spec}"),
-        "max_fup" = maxfup,
-        "min_count" = sdc.limit,
-        "method" = "constant",
-        "contrast" = "TRUE",
-        "plot" = "TRUE"
-      ),
-      
-      needs = list(
-        glue("adjust_combine_{cohort}")
-      ),
-      highly_sensitive = lst(
-        arrow = fs::path(dir_output,"*.arrow"),
-      ),
-      moderately_sensitive = lst(
-        csv = fs::path(dir_output,"*.csv"),
-        png = fs::path(dir_output,"*.png"),
-      )
+    cohort, method, spec, subgroup, outcome
+    ) {
+  dir_output <- glue("output/4-contrast/{cohort}/{method}-{spec}/{subgroup}/{outcome}/aj/")
+
+  action(
+    name = glue("aj_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
+    run = "r:v2 analysis/4-contrast/aj.R",
+    # arguments = c(cohort, method, spec, subgroup, outcome),
+    arguments = c(
+      "df_input" = glue("output/3-adjust/{cohort}/combine/data_weights.arrow"),
+      "dir_output" = dir_output,
+      "exposure" = "treatment",
+      "subgroups" = glue("{subgroup}"),
+      "origin_date" = "vax_date",
+      "event_date" = glue("{outcome}_date"),
+      "censoring_date" = "censor_date",
+      "competing_date" = "death_date",
+      "weight" = glue("wt_{cohort}_{method}_{spec}"),
+      "max_fup" = maxfup,
+      "min_count" = sdc.limit,
+      "method" = "constant",
+      "contrast" = "TRUE",
+      "plot" = "TRUE"
+    ),
+
+    needs = list(
+      glue("adjust_combine_{cohort}")
+    ),
+    highly_sensitive = lst(
+      arrow = fs::path(dir_output, "*.arrow"),
+    ),
+    moderately_sensitive = lst(
+      csv = fs::path(dir_output, "*.csv"),
+      png = fs::path(dir_output, "*.png"),
     )
+  )
 }
 
 
@@ -243,29 +210,29 @@ action_aj_contrast <- function(
 ## get PLR actions function ----
 action_plr_contrast <- function(
     cohort, method, spec, subgroup, outcome
-){
+    ) {
   dir_output <- glue("output/4-contrast/{cohort}/{method}-{spec}/{subgroup}/{outcome}/plr/")
-  
+
   action(
     name = glue("plr_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
-    run = "r:v2 analysis/4-contrast/plr.R", 
+    run = "r:v2 analysis/4-contrast/plr.R",
     arguments = c(
-      "cohort" = glue("{cohort}"), 
-      "method" = glue("{method}"), 
+      "cohort" = glue("{cohort}"),
+      "method" = glue("{method}"),
       "spec" = glue("{spec}"),
       "subgroup" = glue("{subgroup}"),
       "outcome" = glue("{outcome}")
     ),
     needs = list(
-      #glue("select_{cohort}"),
+      # glue("select_{cohort}"),
       glue("adjust_combine_{cohort}")
     ),
     highly_sensitive = lst(
-      arrow = fs::path(dir_output,"*.arrow"),
+      arrow = fs::path(dir_output, "*.arrow"),
     ),
     moderately_sensitive = lst(
-      csv = fs::path(dir_output,"*.csv"),
-      png = fs::path(dir_output,"*.png"),
+      csv = fs::path(dir_output, "*.csv"),
+      png = fs::path(dir_output, "*.png"),
     )
   )
 }
@@ -273,17 +240,17 @@ action_plr_contrast <- function(
 ## model action function ----
 action_contrasts_combine <- function(
     cohort
-){
+    ) {
 
   action(
     name = glue("combine_{cohort}_contrasts"),
     run = glue("r:v2 analysis/4-contrast/combine-contrasts.R"),
     arguments = c(cohort),
     needs = glue_data(
-      .x = metaparams |> 
+      .x = metaparams |>
         select(spec, method, subgroup, outcome) |>
-        unique() |> 
-        expand_grid(strategy=c("plr", "aj")),
+        unique() |>
+        expand_grid(strategy = c("plr", "aj")),
       "{strategy}_{cohort}_{method}_{spec}_{subgroup}_{outcome}"
     ),
     moderately_sensitive = lst(
@@ -298,18 +265,18 @@ action_contrasts_combine <- function(
 ## defaults ----
 defaults_list <- lst(
   version = "3.0",
-  expectations= lst(population_size=1000L)
+  expectations = lst(population_size = 1000L)
 )
 
 ## actions ----
 actions_list <- splice(
 
   comment("# # # # # # # # # # # # # # # # # # #",
-          "DO NOT EDIT project.yaml DIRECTLY",
-          "This file is created by create-project.R",
-          "Edit and run create-project.R to update the project.yaml",
-          "# # # # # # # # # # # # # # # # # # #"
-          ),
+    "DO NOT EDIT project.yaml DIRECTLY",
+    "This file is created by create-project.R",
+    "Edit and run create-project.R to update the project.yaml",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
 
   comment("# # # # # # # # # # # # # # # # # # #", "Pre-server scripts", "# # # # # # # # # # # # # # # # # # #"),
@@ -328,11 +295,11 @@ actions_list <- splice(
   action(
     name = "extract",
     run = paste(
-      "ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py", 
+      "ehrql:v1 generate-dataset analysis/1-extract/dataset_definition.py",
       "--output output/1-extract/extract.arrow",
       "--dummy-data-file analysis/1-extract/dummy_extract.arrow",
       "--",
-      glue("--studystart_date={studystart_date}"), 
+      glue("--studystart_date={studystart_date}"),
       glue("--studyend_date={studyend_date}")
     ),
     needs = list(),
@@ -358,46 +325,50 @@ actions_list <- splice(
 
   comment("# # # # # # # # # # # # # # # # # # #", "Matching", "# # # # # # # # # # # # # # # # # # #"),
 
-  action_match("age75plus", "A"),
-  action_match("age75plus", "B"),
-  
+  action_balance("age75plus", "match", "A"),
+  action_balance("age75plus", "match", "B"),
+
   comment("# # # # # # # # # # # # # # # # # # #", "Weighting", "# # # # # # # # # # # # # # # # # # #"),
-  
-  action_weight("age75plus", "A"),
-  action_weight("age75plus", "B"),
-  
+
+  action_balance("age75plus", "weight", "A"),
+  action_balance("age75plus", "weight", "B"),
+
+  # comment("# # # # # # # # # # # # # # # # # # #", "LMW", "# # # # # # # # # # # # # # # # # # #"),
+  #
+  # action_balance("age75plus", "lmw", "A"),
+  # action_balance("age75plus", "lmw", "B"),
+
+
   comment("# # # # # # # # # # # # # # # # # # #", "combine weights from all adjustment strategies", "# # # # # # # # # # # # # # # # # # #"),
-  
+
   action_combine_weights("age75plus"),
-  
+
   comment("# # # # # # # # # # # # # # # # # # #", "Estimate cumulative incidence curves", "# # # # # # # # # # # # # # # # # # #"),
-  
+
   comment("### Aalen-Johansen estimates"),
   pmap(
-    metaparams |>
-      filter(cohort == "age75plus"),
-    function(cohort, method, spec, subgroup, outcome, ...){
+    metaparams,
+    function(cohort, method, spec, subgroup, outcome, ...) {
       action_aj_contrast(cohort, method, spec, subgroup, outcome)
     }
   ) |> list_flatten(),
 
   comment("### Pooled logistic regression estimates"),
   pmap(
-    metaparams |>
-      filter(cohort == "age75plus"),
-    function(cohort, method, spec, subgroup, outcome, ...){
+    metaparams,
+    function(cohort, method, spec, subgroup, outcome, ...) {
       action_plr_contrast(cohort, method, spec, subgroup, outcome)
     }
   ) |> list_flatten(),
 
- comment("# # # # # # # # # # # # # # # # # # #", "Combine estimates across specs, outcomes and subgroups", "# # # # # # # # # # # # # # # # # # #"),
+  comment("# # # # # # # # # # # # # # # # # # #", "Combine estimates across specs, outcomes and subgroups", "# # # # # # # # # # # # # # # # # # #"),
 
   action_contrasts_combine(
     "age75plus"
   ),
 
   comment("# # # # # # # # # # # # # # # # # # #", "End", "# # # # # # # # # # # # # # # # # # #")
-  
+
 )
 
 
@@ -408,7 +379,7 @@ project_list <- splice2(
 
 ## convert list to yaml, reformat comments and whitespace ----
 thisproject <-
-  as.yaml(project_list, indent=2) %>%
+  as.yaml(project_list, indent = 2) %>%
   # convert comment actions to comments
   convert_comment_actions() %>%
   # add one blank line before level 1 and level 2 keys
@@ -417,38 +388,34 @@ thisproject <-
 
 
 # if running via opensafely, check that the project on disk is the same as the project created here:
-if (Sys.getenv("OPENSAFELY_BACKEND") %in% c("expectations", "tpp")){
+if (Sys.getenv("OPENSAFELY_BACKEND") %in% c("expectations", "tpp")) {
 
   thisprojectsplit <- str_split(thisproject, "\n")[[1]]
   currentproject <- readLines(here("project.yaml"))
 
   stopifnot("project.yaml is not up-to-date with create-project.R.  Run create-project.R before running further actions." = identical(thisprojectsplit, currentproject))
 
-# if running manually, output new project as normal
-} else if (Sys.getenv("OPENSAFELY_BACKEND") %in% c("")){
-
-## output to file ----
+  # if running manually, output new project as normal
+} else if (Sys.getenv("OPENSAFELY_BACKEND") %in% c("")) {
+  ## output to file ----
   writeLines(thisproject, here("project.yaml"))
-#yaml::write_yaml(project_list, file =here("project.yaml"))
+  # yaml::write_yaml(project_list, file =here("project.yaml"))
 
-## grab all action names and send to a txt file
+  ## grab all action names and send to a txt file
 
-names(actions_list) %>% tibble(action=.) %>%
-  mutate(
-    model = action==""  & lag(action!="", 1, TRUE),
-    model_number = cumsum(model),
-  ) %>%
-  group_by(model_number) %>%
-  summarise(
-    sets = str_trim(paste(action, collapse=" "))
-  ) %>% pull(sets) %>%
-  paste(collapse="\n") %>%
-  writeLines(here("actions.txt"))
+  names(actions_list) %>% tibble(action = .) %>%
+    mutate(
+      model = action == ""  & lag(action != "", 1, TRUE),
+      model_number = cumsum(model),
+    ) %>%
+    group_by(model_number) %>%
+    summarise(
+      sets = str_trim(paste(action, collapse = " "))
+    ) %>% pull(sets) %>%
+    paste(collapse = "\n") %>%
+    writeLines(here("actions.txt"))
 
-# fail if backend not recognised
+  # fail if backend not recognised
 } else {
   stop("Backend not recognised")
 }
-
-
-

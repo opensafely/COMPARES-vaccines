@@ -1,7 +1,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Purpose: 
-# use IPW to create a weighted pseudo population such that covariates are balanced across treatment groups
+# use lmw package (NOT CURENTLY IN OpenSAFELY R image) to obtain the implied weights if doing outcome regression to estimate the ATE
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 # Preliminaries ----
@@ -12,9 +12,9 @@ library('here')
 library('glue')
 library("arrow")
 library('survival')
-library("WeightIt")
 library("cobalt")
 library("doParallel")
+library("lmw")
 
 
 ## Import custom user functions from lib
@@ -43,7 +43,7 @@ if(length(args)==0){
 
 ## create output directories ----
 
-output_dir <- here_glue("output", "3-adjust", cohort, "weight-{spec}")
+output_dir <- here_glue("output", "3-adjust", cohort, "lmw-{spec}")
 fs::dir_create(output_dir)
 
 # Import and prepare data ----
@@ -53,7 +53,11 @@ data_cohort <- read_feather(here_glue("output", "2-select", cohort, "data_cohort
 
 print_data_size(data_cohort)
 
-## select variables used for weighting
+# for now, use same variables as weighting model
+lmw_variables <- weighting_variables
+lmw_formulae <- weighting_formulae
+
+## select variables used for outcome model
 data_preweight <-
   data_cohort |>
   select(
@@ -61,30 +65,32 @@ data_preweight <-
     vax_product,
     treatment,
     vax_date,
-    all_of(weighting_variables[[spec]]),
+    all_of(lmw_variables[[spec]]),
   ) |>
   arrange(patient_id)
 
-# calculate balancing weights using the weightit function
-obj_weightit <- 
-  weightit(
-    formula = formula(paste0("treatment ~ ", weighting_formulae[[spec]])),
+# calculate balancing weights using the lmw function
+
+# need to check order here!!
+obj_lmw <- 
+  lmw(
+    formula = formula(paste0("~ ", "treatment + ", lmw_formulae[[spec]])),
     data = data_preweight,
-    method = "glm", 
+    treat = "treatment",
     estimand = "ATE",
-    stabilize = TRUE
+    method = "MRI", # TODO: or use the other one that splits by treatment??
   )
 
 data_weights <- 
   tibble(
     patient_id = data_preweight$patient_id,
-    treatment = obj_weightit$treat,
-    ps = obj_weightit$ps,
-    weight = obj_weightit$weights, # weight = get_w_from_ps(ps=ps, treat=treatment,  estimand = "ATE")
-  ) 
+    treatment = data_preweight$treatment, # treatment = obj_lmw$treat <--- this is a factor, not a binary so doesn't work as nicely as taking from original dataset
+    weight = obj_lmw$weights, 
+    ps = (treatment/weight) + ((1-treatment)*(1-(1/weight)))
+  )
 
 ## weights and PS relationship:
-# weight = (treatment/ps) + ((1-treatment)/(1-ps)),
+# weight = (treatment/ps) + ((1-treatment)/(1-ps)), or use WeightIt::get_w_from_ps(ps=ps, treat=treatment,  estimand = "ATE")
 # ps = (treatment/weight) + ((1-treatment)*(1-(1/weight)))
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -96,8 +102,6 @@ data_weights <-
   left_join(data_cohort |> select(patient_id, vax_date), by="patient_id") 
 
 write_feather(data_weights, fs::path(output_dir, "data_adjusted.arrow"))
-
-summary(obj_weightit)
 
 
 

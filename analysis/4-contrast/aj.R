@@ -48,7 +48,7 @@ if(length(args)==0){
   method <- "constant"
   max_fup <- as.numeric("168")
   concise <- as.logical("TRUE")
-  plot <- as.logical("FALSE")
+  plot <- as.logical("TRUE")
   contrast <- as.logical("TRUE")
   filename_suffix <- as.character("")
 } else {
