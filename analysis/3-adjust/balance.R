@@ -1,6 +1,6 @@
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# Purpose: 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Purpose:
 # use one of 3 methods to balance pre-treatment variables across treatment groups
 #
 #
@@ -17,16 +17,16 @@
 # these weight can be obtained without using the outcome variable!
 #
 #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Preliminaries ----
 
 ## Import libraries ----
-library('tidyverse')
-library('here')
-library('glue')
+library("tidyverse")
+library("here")
+library("glue")
 library("arrow")
-library('survival')
+library("survival")
 library("cobalt")
 
 ## Import custom user functions from lib
@@ -39,12 +39,12 @@ source(here("analysis", "0-lib", "design.R"))
 
 ## import command-line arguments ----
 
-args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 
-if(length(args)==0){
+if (length(args) == 0) {
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age75plus" #currently `age75plus` or `cv`
+  cohort <- "age75plus" # currently `age75plus` or `cv`
   method <- "lmw"
   spec <- "A"
 } else {
@@ -69,14 +69,14 @@ print_data_size(data_cohort)
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Balance using method = match ----
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-if(method == "match"){
-  
+if (method == "match") {
+
   library("MatchIt")
-  
+
   ## select all matching candidates and variables necessary for matching
   data_prematch <-
     data_cohort |>
@@ -95,11 +95,11 @@ if(method == "match"){
       all_of(matching_variables[[spec]]$all),
     ) |>
     arrange(patient_id)
-  
-  ## match using single-threaded version 
+
+  ## match using single-threaded version
   ## (see scrapyard directory for unused version using parallelisation)
-  
-  obj_matchit <- 
+
+  obj_matchit <-
     matchit(
       formula = treatment ~ 1,
       data = data_prematch,
@@ -107,14 +107,14 @@ if(method == "match"){
       replace = FALSE,
       estimand = "ATT", # since we are doing exact matching, ATT is equivalent to ATU. although we'll actually get the ATO (average treatment in the overlap)
       exact = matching_variables[[spec]]$exact,
-      caliper = matching_variables[[spec]]$caliper, std.caliper=FALSE,
+      caliper = matching_variables[[spec]]$caliper, std.caliper = FALSE,
       m.order = "data", # data is sorted on (effectively random) patient ID
-      #verbose = TRUE,
+      # verbose = TRUE,
       ratio = 1L # could also consider exact matching only, with n:m ratio, determined by availability
     )
-  
-  
-  data_matches <- 
+
+
+  data_matches <-
     tibble(
       patient_id = data_prematch$patient_id,
       matched = !is.na(obj_matchit$subclass),
@@ -122,10 +122,10 @@ if(method == "match"){
       threadmatch_id = as.integer(obj_matchit$subclass),
       treatment = obj_matchit$treat,
       weight = obj_matchit$weights,
-      ps = (treatment/weight) + ((1-treatment)*(1-(1/weight)))
-    ) 
-  
-  
+      ps = (treatment / weight) + ((1 - treatment) * (1 - (1 / weight)))
+    )
+
+
   data_weights <-
     data_matches |>
     arrange(thread_id, threadmatch_id) |>
@@ -134,15 +134,15 @@ if(method == "match"){
     )
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Balance using method = weight ----
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-if(method == "weight"){
+if (method == "weight") {
 
-  
+
   library("WeightIt")
-  
+
   ## select variables used for weighting
   data_preweight <-
     data_cohort |>
@@ -154,25 +154,27 @@ if(method == "weight"){
       all_of(weighting_variables[[spec]]),
     ) |>
     arrange(patient_id)
-  
+
   # calculate balancing weights using the weightit function
-  obj_weightit <- 
+  # note, the resulting weights are simply the inverse of the predicted probability of receiving the treatment received, `w = ((treatment==1)/propensity) + ((treatment==0)/(1-propensity))`
+  # if stabilised, then `w_stabilised = w * (((treatment==1)*mean(treatment==1)) + ((treatment==0)*mean(treatment==0)))`
+  obj_weightit <-
     weightit(
       formula = formula(paste0("treatment ~ ", weighting_formulae[[spec]])),
       data = data_preweight,
-      method = "glm", 
+      method = "glm",
       estimand = "ATE",
       stabilize = TRUE
     )
-  
-  data_weights <- 
+
+  data_weights <-
     tibble(
       patient_id = data_preweight$patient_id,
       treatment = obj_weightit$treat,
       ps = obj_weightit$ps,
       weight = obj_weightit$weights, # weight = get_w_from_ps(ps=ps, treat=treatment, estimand = "ATE")
-    ) 
-  
+    )
+
   ## weights and PS relationship:
   # weight = (treatment/ps) + ((1-treatment)/(1-ps)),
   # ps = (treatment/weight) + ((1-treatment)*(1-(1/weight)))
@@ -180,14 +182,14 @@ if(method == "weight"){
 }
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Balance using method = lmw ----
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-if(method == "lmw"){
-  
+if (method == "lmw") {
+
   library("lmw")
-  
+
   ## select variables used for outcome models
   data_prelmw <-
     data_cohort |>
@@ -199,9 +201,9 @@ if(method == "lmw"){
       all_of(lmw_variables[[spec]]),
     ) |>
     arrange(patient_id)
-  
+
   # calculate balancing weights using the lmw function from lmw package
-  obj_lmw <- 
+  obj_lmw <-
     lmw(
       formula = formula(paste0("~ ", "treatment + ", lmw_formulae[[spec]])),
       data = data_prelmw,
@@ -209,20 +211,19 @@ if(method == "lmw"){
       estimand = "ATE",
       method = "MRI", # MRI gets weights as if there were a separate outcome model for each treatment group
     )
-  
-  data_weights <- 
+
+  data_weights <-
     tibble(
       patient_id = data_prelmw$patient_id,
       treatment = data_prelmw$treatment, # treatment = obj_lmw$treat <--- this is a factor, not a binary so doesn't work as nicely as taking from original dataset
-      weight = obj_lmw$weights, 
-      ps = (treatment/weight) + ((1-treatment)*(1-(1/weight)))
+      weight = obj_lmw$weights,
+      ps = (treatment / weight) + ((1 - treatment) * (1 - (1 / weight)))
     )
-  
+
 }
-  
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Export ----
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 write_feather(data_weights, fs::path(output_dir, "data_adjusted.arrow"))
-
