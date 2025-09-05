@@ -133,17 +133,15 @@ data_event_counts <-
 
         data_all %>%
           mutate(
-
             subgroup_level = .[[subgroup]],
-
             wt = ifelse(
               method != "unadjusted",
-              .data[[paste0("wt_", cohort, "_", method, "_", spec)]],
-              1
+              data_all[[paste("wt", cohort, method, spec, sep = "_")]],
+              rep(1, nrow(data_all))
             ),
             treatment_date = vax_date - 1L,
 
-            event_date = as.Date(.data[[paste0(outcome, "_date")]]),
+            event_date = as.Date(data_all[[paste0(outcome, "_date")]]),
 
             # person-time is up to and including censor date
             censor_date = pmin(
