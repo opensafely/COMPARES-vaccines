@@ -1,4 +1,6 @@
 code,term
+1064811000000103,Moderate acute exacerbation of asthma
+1064821000000109,Life threatening acute exacerbation of asthma
 10674711000119105,Acute severe exacerbation of asthma co-occurrent with allergic rhinitis
 10674791000119101,Acute exacerbation of intermittent allergic asthma
 10674991000119104,Intermittent allergic asthma
@@ -6,14 +8,28 @@ code,term
 10675431000119106,Severe persistent allergic asthma
 10675471000119109,Acute severe exacerbation of severe persistent allergic asthma
 10675551000119104,Acute severe exacerbation of severe persistent asthma co-occurrent with allergic rhinitis
+10675591000119109,Severe persistent allergic asthma controlled
+10675631000119109,Severe persistent asthma controlled co-occurrent with allergic rhinitis
+10675671000119107,Severe persistent allergic asthma uncontrolled
+10675711000119106,Severe persistent asthma uncontrolled co-occurrent with allergic rhinitis
 10675751000119107,Severe uncontrolled persistent asthma
 10675871000119106,Mild persistent allergic asthma
 10675911000119109,Acute severe exacerbation of mild persistent allergic asthma
 10675991000119100,Acute severe exacerbation of mild persistent allergic asthma co-occurrent with allergic rhinitis
+10676031000119106,Mild persistent allergic asthma controlled
+10676071000119109,Mild persistent asthma controlled
+10676111000119102,Mild persistent asthma controlled co-occurrent with allergic rhinitis
+10676151000119101,Mild persistent allergic asthma uncontrolled
+10676191000119106,Mild persistent asthma uncontrolled
+10676231000119102,Mild persistent asthma uncontrolled co-occurrent with allergic rhinitis
 10676271000119104,Acute exacerbation of moderate persistent allergic asthma
+10676351000119103,Moderate persistent asthma controlled
 10676391000119108,Moderate persistent allergic asthma
 10676431000119103,Acute severe exacerbation of moderate persistent allergic asthma
 10676511000119109,Acute severe exacerbation of moderate persistent asthma co-occurrent with allergic rhinitis
+10676551000119105,Moderate persistent allergic asthma controlled
+10676631000119100,Moderate persistent allergic asthma uncontrolled
+10676711000119103,Moderate persistent asthma uncontrolled
 10692681000119108,Aspirin exacerbated respiratory disease
 10692721000119102,Chronic obstructive asthma co-occurrent with acute exacerbation of asthma
 10692761000119107,Asthma-chronic obstructive pulmonary disease overlap syndrome
@@ -22,11 +38,15 @@ code,term
 1086711000000100,Life threatening acute exacerbation of intrinsic asthma
 1103911000000103,Severe asthma with fungal sensitisation
 11641008,Millers' asthma
+11944003,Feather-pickers' disease
 12428000,Intrinsic asthma without status asthmaticus
 124991000119109,Severe persistent asthma co-occurrent with allergic rhinitis
 125001000119103,Moderate persistent asthma co-occurrent with allergic rhinitis
 125011000119100,Mild persistent asthma co-occurrent with allergic rhinitis
 125021000119107,Intermittent asthma co-occurrent with allergic rhinitis
+13151001,Flax-dressers' disease
+135171000119106,Acute exacerbation of moderate persistent asthma
+135181000119109,Acute exacerbation of mild persistent asthma
 161527007,History of asthma
 16584951000119101,Oral steroid-dependent asthma
 1741000119102,Intermittent asthma uncontrolled
@@ -38,6 +58,7 @@ code,term
 195977004,Mixed asthma
 19849005,Meat-wrappers' asthma
 225057002,Brittle asthma
+233672007,Byssinosis grade 3
 233678006,Childhood asthma
 233679003,Late onset asthma
 233683003,Hay fever with asthma
@@ -47,7 +68,9 @@ code,term
 2360001000004109,Steroid dependent asthma
 266361008,Non-allergic asthma
 281239006,Exacerbation of asthma
+30352005,Allergic-infective asthma
 304527002,Acute asthma
+312453004,Asthma - currently active
 31387002,Exercise-induced asthma
 34015007,Bakers' asthma
 370218001,Mild asthma
@@ -55,6 +78,7 @@ code,term
 370220003,Occasional asthma
 370221004,Severe asthma
 389145006,Allergic asthma
+395022009,Asthma night-time symptoms
 401000119107,Asthma with irreversible airway obstruction
 401193004,Asthma confirmed
 404804003,Platinum asthma
@@ -81,6 +105,7 @@ code,term
 57607007,Occupational asthma
 59786004,Weavers' cough
 63088003,Allergic asthma without status asthmaticus
+641000119106,Intermittent asthma well controlled
 703953004,Allergic asthma caused by Dermatophagoides pteronyssinus
 703954005,Allergic asthma caused by Dermatophagoides farinae
 707444001,Uncomplicated asthma
@@ -103,6 +128,7 @@ code,term
 733858005,Acute severe refractory exacerbation of asthma
 734904007,Life threatening acute exacerbation of asthma
 734905008,Moderate acute exacerbation of asthma
+735587000,Acute severe exacerbation of asthma co-occurrent and due to allergic asthma
 735588005,Uncomplicated allergic asthma
 735589002,Uncomplicated non-allergic asthma
 762521001,Exacerbation of allergic asthma
@@ -110,7 +136,9 @@ code,term
 782520007,Exacerbation of allergic asthma due to infection
 786836003,Near fatal asthma
 829976001,Thunderstorm asthma
+85761009,Byssinosis
 866881000000101,Chronic asthma with fixed airflow obstruction
+89099002,Chronic allergic bronchitis
 92807009,Chemical-induced asthma
 93432008,Drug-induced asthma
 99031000119107,Acute exacerbation of asthma co-occurrent with allergic rhinitis
