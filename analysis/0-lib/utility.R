@@ -16,8 +16,8 @@ ceiling_any <- function(x, to = 1) {
   ceiling(plyr::round_any(x / to, 1 / 100000000)) * to
 }
 
-floor_any <- function(x, to=1){
-  x - x%%to
+floor_any <- function(x, to = 1) {
+  x - x %% to
 }
 
 # get nth largest value from list
@@ -41,30 +41,30 @@ fct_case_when <- function(...) {
   args <- as.list(match.call())
   levels <- sapply(args[-1], function(f) f[[3]])  # extract RHS of formula
   levels <- levels[!is.na(levels)]
-  factor(dplyr::case_when(...), levels=levels)
+  factor(dplyr::case_when(...), levels = levels)
 }
 
 # recode factor levels based on a "lookup" named vector
 # whose names are the new factor levels, and values are the old factor levels
-fct_recoderelevel <- function(x, lookup){
+fct_recoderelevel <- function(x, lookup) {
   stopifnot(!is.na(names(lookup)))
-  factor(x, levels=lookup, labels=names(lookup))
+  factor(x, levels = lookup, labels = names(lookup))
 }
 
 # create a vector of event times, given an origin date, event date, and censoring date
 # returns time-to-event date or time to censor date, which is earlier
-tte <- function(origin_date, event_date, censor_date, na.censor=FALSE){
+tte <- function(origin_date, event_date, censor_date, na.censor = FALSE) {
   if (na.censor) {
-    censor_date <- dplyr::if_else(censor_date>event_date, as.Date(NA), censor_date)
+    censor_date <- dplyr::if_else(censor_date > event_date, as.Date(NA), censor_date)
   }
-  as.numeric(pmin(event_date-origin_date, censor_date-origin_date, na.rm=TRUE))
+  as.numeric(pmin(event_date - origin_date, censor_date - origin_date, na.rm = TRUE))
 }
 
 # returns FALSE if event_date is censored by censor_date, or if event_date is NA. Otherwise TRUE
 # if censor_date is the same day as event_date, it is assumed that event_date occurs first (ie, the event happened)
-censor_indicator <- function(event_date, censor_date){
-   stopifnot("all censoring dates must be non-missing" =  all(!is.na(censor_date)))
-  !((event_date>censor_date) | is.na(event_date))
+censor_indicator <- function(event_date, censor_date) {
+  stopifnot("all censoring dates must be non-missing" =  all(!is.na(censor_date)))
+  !((event_date > censor_date) | is.na(event_date))
 }
 
 # function to convert ethnicity 16 group into 5 group
@@ -107,10 +107,10 @@ standardise_characteristics <-
       labels = c("1 (most deprived)", "2", "3", "4", "5 (least deprived)"),
       include.lowest = TRUE,
       right = FALSE
-    ) #,
+    ) # ,
     ## PRIMIS clinical variables
-   # cv = crd | ast | chd | ckd | cld | cns | learndis | diab | immuno | asplen | obes | sev_ment
- #FIXME add additional vulnerability variables when defined and extracted
+    # cv = crd | ast | chd | ckd | cld | cns | learndis | diab | immuno | asplen | obes | sev_ment
+    # FIXME add additional vulnerability variables when defined and extracted
   )
 
 
@@ -213,12 +213,11 @@ import_extract <- function(custom_file_path, ehrql_file_path) {
 ## Create table1-style summary of characteristics, with SDC applied ----
 
 table1_summary <- function(.data, group, label, threshold) {
-  
   ## this function is highly dependent on the structure of tbl_summary object internals!
   ## be careful if this package is updated
-  
+
   group_quo <- enquo(group)
-  
+
   ## create a table of baseline characteristics between each treatment group, before matching / weighting
   tab_summary <-
     .data |>
@@ -236,9 +235,9 @@ table1_summary <- function(.data, group, label, threshold) {
       ),
     )
 
-  ## extract structured info from tbl_summary object to apply SDC to the counts 
-  raw_stats <- 
-    tab_summary$cards$tbl_summary |> 
+  ## extract structured info from tbl_summary object to apply SDC to the counts
+  raw_stats <-
+    tab_summary$cards$tbl_summary |>
     mutate(
       variable = factor(variable, levels = names(label)),
       variable_label = factor(variable, levels = names(label),  labels = label),
@@ -246,46 +245,46 @@ table1_summary <- function(.data, group, label, threshold) {
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
     select(-warning, -error, -gts_column) |>
     pivot_wider(
-      id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"), 
-      names_from = stat_name, 
+      id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"),
+      names_from = stat_name,
       values_from = stat
     ) |>
     mutate(
       across(
         c(n, N),
-        ~{
-          map_int(., ~{
-            if(is.null(.)) NA else as.integer(.)
+        ~ {
+          map_int(., ~ {
+            if (is.null(.)) NA else as.integer(.)
           })
         }
       ),
       across(
         c(p, median, p10, p25, p75, p90, mean, sd),
-        ~{
-          map_dbl(., ~{
-            if(is.null(.)) NA else as.numeric(.)
+        ~ {
+          map_dbl(., ~ {
+            if (is.null(.)) NA else as.numeric(.)
           })
         }
       ),
       across(
         c(group1_level, variable_level),
-        ~{
-          map_chr(., ~{
-            if(is.null(.)) NA else as.character(.)
+        ~ {
+          map_chr(., ~ {
+            if (is.null(.)) NA else as.character(.)
           })
         }
       ),
-    )|>
+    ) |>
     arrange(variable_label, group1, group1_level)
-  
-  raw_stats_redacted <- 
+
+  raw_stats_redacted <-
     raw_stats |>
     mutate(
       n = roundmid_any(n, threshold),
       N = roundmid_any(N, threshold),
       p = n / N,
     )
-  
+
   return(raw_stats_redacted)
 }
 
@@ -295,14 +294,13 @@ table1_summary <- function(.data, group, label, threshold) {
 ## Create table1-style summary of characteristics, with SDC applied, with weighting applied ----
 
 table1_svysummary <- function(.data, group, weight, label, threshold) {
-  
   ## this function is highly dependent on the structure of tbl_summary object internals!
   ## be careful if this package is updated
-  
+
   group_quo <- enquo(group)
   weight_quo <- enquo(weight)
-  
-    ## create a table of baseline characteristics between each treatment group, before matching / weighting
+
+  ## create a table of baseline characteristics between each treatment group, before matching / weighting
   tab_svysummary <-
     .data |>
     select(
@@ -319,16 +317,16 @@ table1_svysummary <- function(.data, group, weight, label, threshold) {
       by = !!group_quo,
       label = label[names(label) %in% names(.)],
       statistic = list(
-        #N ~ "{N}",
+        # N ~ "{N}",
         all_categorical() ~ "{n} ({p}%)",
         all_continuous() ~ "{mean} ({sd}); ({p10}, {p25}, {median}, {p75}, {p90})"
       ),
       include = -!!weight_quo
     )
-  
-  ## extract structured info from tbl_summary object to apply SDC to the counts 
-  raw_stats <- 
-    tab_svysummary$cards$tbl_svysummary |> 
+
+  ## extract structured info from tbl_summary object to apply SDC to the counts
+  raw_stats <-
+    tab_svysummary$cards$tbl_svysummary |>
     mutate(
       variable = factor(variable, levels = names(label)),
       variable_label = factor(variable, levels = names(label),  labels = label),
@@ -336,39 +334,39 @@ table1_svysummary <- function(.data, group, weight, label, threshold) {
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
     select(-warning, -error, -gts_column) |>
     pivot_wider(
-      id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"), 
-      names_from = stat_name, 
+      id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"),
+      names_from = stat_name,
       values_from = stat
     ) |>
     mutate(
       across(
         c(n, N),
-        ~{
-          map_int(., ~{
-            if(is.null(.)) NA else as.integer(.)
+        ~ {
+          map_int(., ~ {
+            if (is.null(.)) NA else as.integer(.)
           })
         }
       ),
       across(
         c(p, median, p10, p25, p75, p90, mean, sd),
-        ~{
-          map_dbl(., ~{
-            if(is.null(.)) NA else as.numeric(.)
+        ~ {
+          map_dbl(., ~ {
+            if (is.null(.)) NA else as.numeric(.)
           })
         }
       ),
       across(
         c(group1_level, variable_level),
-        ~{
-          map_chr(., ~{
-            if(is.null(.)) NA else as.character(.)
+        ~ {
+          map_chr(., ~ {
+            if (is.null(.)) NA else as.character(.)
           })
         }
       ),
-    )|>
+    ) |>
     arrange(variable_label, group1, group1_level)
-  
-  raw_stats_redacted <- 
+
+  raw_stats_redacted <-
     raw_stats |>
     mutate(
       n = roundmid_any(n, threshold),
@@ -379,7 +377,7 @@ table1_svysummary <- function(.data, group, weight, label, threshold) {
       # remove variables related to sampling weights that are not needed
       -p.std.error, -n_unweighted, -N_unweighted, -p_unweighted
     )
-  
+
   return(raw_stats_redacted)
 }
 
@@ -388,30 +386,30 @@ table1_svysummary <- function(.data, group, weight, label, threshold) {
 ## Combine info from table1-style summary with smd data from cobalt, with SDC applied, with weighting applied ----
 
 # note that we use cobalt here rather than calculated directly because the
-# pooled standard deviation used in the calculation of the SMD is based on 
+# pooled standard deviation used in the calculation of the SMD is based on
 # the cohort before weighting, not on the weighted SDs (eg `sqrt(mean(sd^2))`)
-# so it's easier just to grab from cobalt than to get the weighted and unweighted 
+# so it's easier just to grab from cobalt than to get the weighted and unweighted
 # stats each time
 
 table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
-  
+
   treatment_quo <- enquo(treatment)
   weight_quo <- enquo(weight)
-  
+
   table1 <-
     .data |>
     table1_svysummary(
-      group = !!treatment_quo, 
+      group = !!treatment_quo,
       weight = !!weight_quo,
-      label = label, 
+      label = label,
       threshold = sdc.limit
     )
-  
+
   # Balance table ----
-  
+
   ## get variable-level names as provided by the cobalt package
   ## so they can be joined with data from the gtsummary package
-  
+
   cobalt_variable_names <-
     table1 |>
     filter(group1 == quo_name(enquo(treatment))) |>
@@ -426,26 +424,26 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
       )
     ) |>
     unique()
-  
+
   ## invoke `bal.tab` to get standardised mean differences
   ## and add process variable names
-  obj_balance <- 
+  obj_balance <-
     cobalt::bal.tab(
-      x = .data |> select(any_of(names(label))), 
-      data = .data |> select(!!weight_quo, !!treatment_quo) ,
+      x = .data |> select(any_of(names(label))),
+      data = .data |> select(!!weight_quo, !!treatment_quo),
       weights = "weight",
       treat = "treatment",
-      stats = c("mean.diffs"), 
+      stats = c("mean.diffs"),
       disp = c("m", "sd"),
-      s.d.denom = "pooled", 
-      binary = "std", 
+      s.d.denom = "pooled",
+      binary = "std",
       continuous = "std"
-    ) 
-  
+    )
+
   # print balance info to log
   # print(obj_balance)
-  
-  table_smd <- 
+
+  table_smd <-
     obj_balance %>%
     `[[`("Balance") |>
     tibble::rownames_to_column("cobalt_name") |>
@@ -456,21 +454,21 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
     ) |>
     transmute(
       variable,
-      variable_label = droplevels(factor(variable_label, levels=map_chr(variable_labels, ~.))),
+      variable_label = droplevels(factor(variable_label, levels = map_chr(variable_labels, ~.))),
       variable_label,
       variable_level,
       smd = Diff.Adj,
     ) |>
-    arrange(variable_label) 
-  
-  table_balance <- 
+    arrange(variable_label)
+
+  table_balance <-
     table1 |>
     select(-group1) |>
     filter(!is.na(group1_level))  |>
     pivot_wider(
       id_cols = c(variable, variable_label, variable_level, context),
       names_from = group1_level,
-      names_sep= "_",
+      names_sep = "_",
       values_from = c(n, N, p, mean, sd, p10, p25, median, p75, p90),
       names_vary = "slowest"
     ) |>
@@ -478,9 +476,9 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
       table_smd,
       by = c("variable", "variable_label", "variable_level")
     )
-  
+
   ## note that the adjusted SMDis calculated as follows in cobalt:
-  
+
   # obj_balance1$Balance |>
   #   mutate(
   #     smd = (M.1.Adj  - M.0.Adj) / sqrt(((SD.1.Un^2)+(SD.0.Un^2))/2)
@@ -499,82 +497,102 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
 # - time variable
 # - weighting variable
 # Note that, when balancing weights are used in the model and there are no time-varying confounders (except time itself)
-# then the newdata value can just be a dataset with time and treatment, and the id and weighting variables are not needed 
+# then the newdata value can just be a dataset with time and treatment, and the id and weighting variables are not needed
 # (since the two patients in that dataset (one for each treatment) are represent the population as a whole)
 # the "test-cmlinc-variance" script demonstrates this equivalence by running against the entire dataset (with treatment set to 0 or 1)
 # versus the simple dataset with treatment status and time only.
-cmlinc_variance <- function(model, vcov, newdata, id, time, weights){
-  
-  if(missing(newdata)){ newdata <- model$model }
+cmlinc_variance <- function(model, vcov, newdata, time, id, weights) {
+  # if no grouping ID, then set to uniformly 1
+  if (missing(id)) {
+    id <- rep(1, length(time))
+  }
+
+  # if no weights, then set to uniformly 1
+  if (missing(weights)) {
+    weights <- rep(1, length(time))
+  }
+
+  # if no vcov matrix supplied, then get it from the model
+  if (missing(vcov)) {
+    vcov <- vcov(model)
+  }
+
+  # same for new data
+  if (missing(newdata)) {
+    newdata <- model$model
+  }
+
   tt <- terms(model) # this helpfully grabs the correct spline basis from the model, rather than recalculating based on `newdata`
   Terms <- delete.response(tt)
-  m.mat <- model.matrix(Terms, data=newdata)
+  m.mat <- model.matrix(Terms, data = newdata)
   m.coef <- model$coef
-  
+
   N <- nrow(m.mat)
   K <- length(m.coef)
-  
+
   # log-odds, nu_t, at time t
   nu <- m.coef %*% t(m.mat) # t_i x 1
   # part of partial derivative
-  pdc <- (exp(nu)/((1+exp(nu))^2)) # t_i x 1
+  pdc <- (exp(nu) / ((1 + exp(nu))^2)) # t_i x 1
   # summand for partial derivative of P_t(theta_t | X_t), for each time t and term k
-  
-  #summand <- crossprod(diag(as.vector(pdc)), m.mat)    # t_i  x k
-  summand <- matrix(0, nrow=N, ncol=K)
-  for (k in seq_len(K)){
-    summand[,k] <- m.mat[,k] * as.vector(pdc)
+
+  # summand <- crossprod(diag(as.vector(pdc)), m.mat)    # t_i  x k
+  summand <- matrix(0, nrow = N, ncol = K)
+  for (k in seq_len(K)) {
+    summand[, k] <- m.mat[, k] * as.vector(pdc)
   }
-  
-  # cumulative sum of summand, by patient_id  # t_i x k
-  cmlsum <- matrix(0, nrow=N, ncol=K)
-  for (k in seq_len(K)){
-    cmlsum[,k] <- ave(summand[,k], id, FUN=cumsum)
+
+  # cumulative sum of summand, by id  # t_i x k
+  cmlsum <- matrix(0, nrow = N, ncol = K)
+  for (k in seq_len(K)) {
+    cmlsum[, k] <- ave(summand[, k], id, FUN = cumsum)
   }
-  
+
   ## multiply by model weights (weights are normalised here so we can use `sum` later, not `weighted.mean`)
-  normweights <- weights / ave(weights, time, FUN=sum) # t_i x 1
-  
-  #wgtcmlsum <- crossprod(diag(normweights), cmlsum ) # t_i x k
-  wgtcmlsum <- matrix(0, nrow=N, ncol=K)
-  for (k in seq_len(K)){
-    wgtcmlsum[,k] <- cmlsum[,k] * normweights
+  normweights <- weights / ave(weights, time, FUN = sum) # t_i x 1
+
+  # wgtcmlsum <- crossprod(diag(normweights), cmlsum ) # t_i x k
+  wgtcmlsum <- matrix(0, nrow = N, ncol = K)
+  for (k in seq_len(K)) {
+    wgtcmlsum[, k] <- cmlsum[, k] * normweights
   }
-  
+
   # partial derivative of cumulative incidence at t
   partial_derivative <- rowsum(wgtcmlsum, time)
-  
+
   variance <- rowSums(crossprod(t(partial_derivative), vcov) * partial_derivative) # t x 1
-  
+
   variance
 }
 
 # providing SEs for response when vcov is different to model object - is this functionality provided by marginaleffects?
-predict.glm.custom.vcov <- function(x, vcov, newdata){
-  if(missing(newdata)){ newdata <- x$model }
+predict.glm.custom.vcov <- function(x, vcov, newdata) {
+  if (missing(newdata)) {
+    newdata <- x$model
+  }
   tt <- terms(x)
   Terms <- delete.response(tt)
-  m.mat <- model.matrix(Terms,data=newdata)
+  m.mat <- model.matrix(Terms, data = newdata)
   m.coef <- x$coef
   fit <- as.vector(m.mat %*% x$coef)
-  se.fit <- sqrt(diag(m.mat%*%vcov%*%t(m.mat)))
-  return(list(fit=fit,se.fit=se.fit))
+  se.fit <- sqrt(diag(m.mat %*% vcov %*% t(m.mat)))
+  return(list(fit = fit, se.fit = se.fit))
 }
 
 
 ## Print the number of rows and the size on disk of a R object ----
 
-print_data_size <- function(.data){
+print_data_size <- function(.data) {
   object_name <- deparse(substitute(.data))
   cat(
     glue(object_name, " data size = ", nrow(.data)),
-    glue(object_name, " memory usage = ", format(object.size(.data), units="GB", standard="SI", digits=3L)),
+    glue(object_name, " memory usage = ", format(object.size(.data), units = "GB", standard = "SI", digits = 3L)),
     "",
     sep = "\n"
   )
 }
 
 ## use glue with here for easy filepaths
-here_glue <- function(...){
+here_glue <- function(...) {
   here::here(glue(..., .sep = "/"))
 }
