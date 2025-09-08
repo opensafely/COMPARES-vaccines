@@ -189,6 +189,27 @@ vcov2_naive <- vcov(model2_naive)
 vcov2_HC0 <- vcov(model2_HC0)
 vcov2_asympt <- vcov(model2_asympt)
 
+
+
+# get estimate for each treatment at each time point
+# NOTE: we could use predictions() here instead of avg_predictions(),
+# because we've got the weights and there is no post-weighting outcome model
+# so we don't need to average over all patients, but simply predict the outcome at each time point for teach treatment
+# this is much quicker that predicting outcomes for all patients.
+# for example:
+# predictions(
+#   model3_asympt,
+#   newdata = expand_grid(
+#     treatment =  c(0L, 1L),
+#     time = seq_len(maxfup)
+#   ),
+#   type = "response",
+#   by = c("treatment", "time"),
+#   # transform = \(x) {cumprod(1-x)} unfortunately this doesn't provide standard errors we need
+# )
+
+
+
 ## variance estimation with naive SEs
 predictions2_naive <-
   avg_predictions(
