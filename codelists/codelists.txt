@@ -190,3 +190,10 @@ opensafely/erythema-multiforme-ecds/4b8f2c84
 opensafely/anaphylaxis-snomed/3843de84
 opensafely/anaphylaxis-ecds/7afb52f8
 opensafely/anaphylaxis-icd-10/515351b9
+
+######################################################
+# NEGATIVE CONTROL
+#######################################################
+
+opensafely/acute-otitis-media/256a932e
+ukhsa/skin-and-soft-tissue-infections/2dfc111b

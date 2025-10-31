@@ -465,6 +465,10 @@ dataset.anaphylaxis_prior = any_of([
     dataset.anaphylaxis_prior_admitted
 ])
 
+# Negative control
+dataset.acute_otitis_gp = prior_gp_event(vax_date, 1, codelists.acute_otitis)
+dataset.celulitis_gp = prior_gp_event(vax_date, 1, codelists.celulitis)
+
 #######################################################################################
 # Post-baseline variables: outcomes, competing outcomes, and censoring
 #######################################################################################
@@ -752,8 +756,8 @@ dataset.anaphylaxis_date = minimum_of(
 #dataset.fracture_admitted_date = next_hospital_admission(vax_date, codelists.fractures_icd10)
 #dataset.fracturedeath_date = ons_deaths.cause_of_death_is_in(codelists.fractures_icd10).date
 
-# TODO: add all negative control outcomes here
-
+dataset.acute_otitis_gp_date = next_gp_event(vax_date, codelists.acute_otitis)
+dataset.cellulitis_gp_date = next_gp_event(vax_date, codelists.cellulitis)
 # #######################################################################################
 # # Population
 # #######################################################################################

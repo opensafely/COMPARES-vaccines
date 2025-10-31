@@ -619,3 +619,22 @@ anaphylaxis_ecds = codelist_from_csv(
     "codelists/opensafely-anaphylaxis-ecds.csv",
     column="code",
 )
+
+######################################
+# Negative controls
+######################################
+
+acute_otitis = codelist_from_csv(
+    "codelists/opensafely-acute-otitis-media.csv",
+    column="code",
+)
+
+ukhsa_skin_infections = codelist_from_csv(
+    "codelists/ukhsa-skin-and-soft-tissue-infections.csv",
+    column="code",
+)
+
+potentially_vaccine_related = ["860816004", "863907000", "449671007"]
+
+cellulitis = ukhsa_skin_infections - potentially_vaccine_related
+
