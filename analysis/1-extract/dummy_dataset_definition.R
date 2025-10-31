@@ -674,6 +674,7 @@ sim_list <- lst(
     missing_rate = ~0.7
   ),
 )
+
 bn <- bn_create(sim_list, known_variables = known_variables)
 
 bn_plot(bn)
