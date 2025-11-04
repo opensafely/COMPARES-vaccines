@@ -123,9 +123,15 @@ plot_contrasts <- function(data_contrasts, timeslice, method, spec, estimate, es
   method0 <- method
   spec0 <- spec
   
-  plot_temp <-
-    data_contrasts |>
-    filter(cohort0==cohort, method0==method, spec0==spec, time==timeslice) |>
+  df <- data_contrasts |> 
+  filter(cohort0==cohort, method0==method, spec0==spec, time==timeslice) |> 
+  drop_na(subgroup_descr, outcome_descr, subgroup_level_descr, {{estimate}}, {{estimate.ll}}, {{estimate.ul}})
+
+  
+  # In case no data to plot
+  if (nrow(df) == 0L) return(invisible(NULL)) 
+
+  plot_temp <-   df  |>
     group_by(outcome_descr) |>
     ggplot(aes(y=subgroup_level_descr)) +
     geom_vline(aes(xintercept=0), linetype="dotted", colour="darkgrey")+
