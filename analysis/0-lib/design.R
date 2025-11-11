@@ -91,6 +91,8 @@ events_lookup <- tribble(
   # negative control
   # "noncovid_death", "noncovid_death_date", "Non-COVID-19 death",
   # "fracture", "fracture_date", "Fracture",
+  # "acute_otitis", "acute_otitis_gp_date", "Acute otitis media"
+  # "cellulitis", "cellulitis_gp_date", "Cellulitis"
 )
 
 

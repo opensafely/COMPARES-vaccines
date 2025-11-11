@@ -611,6 +611,18 @@
       "url": "https://www.opencodelists.org/codelist/opensafely/anaphylaxis-icd-10/515351b9/",
       "downloaded_at": "2025-08-06 15:04:21.373836Z",
       "sha": "1b6fe3c570bc636aff9bd2fc861f0e04ada8bebf"
+    },
+    "opensafely-acute-otitis-media.csv": {
+      "id": "opensafely/acute-otitis-media/256a932e",
+      "url": "https://www.opencodelists.org/codelist/opensafely/acute-otitis-media/256a932e/",
+      "downloaded_at": "2025-10-31 11:58:48.469912Z",
+      "sha": "0b55b1388aceaad895dc938bd0119fac87add516"
+    },
+    "ukhsa-skin-and-soft-tissue-infections.csv": {
+      "id": "ukhsa/skin-and-soft-tissue-infections/2dfc111b",
+      "url": "https://www.opencodelists.org/codelist/ukhsa/skin-and-soft-tissue-infections/2dfc111b/",
+      "downloaded_at": "2025-10-31 11:58:48.573053Z",
+      "sha": "b1441883485170ba4fd7c42d6221bd976803ce32"
     }
   }
 }

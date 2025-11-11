@@ -285,6 +285,9 @@ sim_list <- lst(
   anaphylaxis_prior_admitted = bn_node(~ rbernoulli(n = ..n, p = 0.01)),
   anaphylaxis_prior = bn_node(~ rbernoulli(n = ..n, p = 0.01)),
 
+  # Negative control
+  acute_otitis_gp = bn_node(~ rbernoulli(n = ..n, p = 0.01)),
+  cellulitis_gp = bn_node(~ rbernoulli(n = ..n, p = 0.01)),
   ## post-baseline events (outcomes)
   ### all-cause outcomes
   emergency_day = bn_node(
@@ -662,7 +665,16 @@ sim_list <- lst(
       anaphylaxis_death_day
     ),
   ),
+  acute_otitis_gp_day = bn_node(
+    ~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+    missing_rate = ~0.8
+  ),
+  cellulitis_gp_day = bn_node(
+    ~ as.integer(runif(n = ..n, vax_day, vax_day + 100)),
+    missing_rate = ~0.7
+  ),
 )
+
 bn <- bn_create(sim_list, known_variables = known_variables)
 
 bn_plot(bn)
