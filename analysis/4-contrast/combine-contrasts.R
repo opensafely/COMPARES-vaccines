@@ -123,15 +123,8 @@ plot_contrasts <- function(data_contrasts, timeslice, method, spec, estimate, es
   method0 <- method
   spec0 <- spec
   
-  df <- data_contrasts |> 
-  filter(cohort0==cohort, method0==method, spec0==spec, time==timeslice) |> 
-  drop_na(subgroup_descr, outcome_descr, subgroup_level_descr, {{estimate}}, {{estimate.ll}}, {{estimate.ul}})
-
-  
-  # In case no data to plot
-  if (nrow(df) == 0L) return(invisible(NULL)) 
-
-  plot_temp <-   df  |>
+  plot_temp <-
+    filter(cohort0==cohort, method0==method, spec0==spec, time==timeslice) |> 
     group_by(outcome_descr) |>
     ggplot(aes(y=subgroup_level_descr)) +
     geom_vline(aes(xintercept=0), linetype="dotted", colour="darkgrey")+
@@ -167,11 +160,15 @@ plot_contrasts <- function(data_contrasts, timeslice, method, spec, estimate, es
   plot_temp
 }
 
-for (method in c("match", "weight")){
-  for (spec in c("A", "B")){
-    plot_contrasts(contrasts_plr, timeslice=90, method, spec, rd, rd.ll, rd.ul, "rd")
-    plot_contrasts(contrasts_plr, timeslice=90, method, spec, rr, rr.ll, rr.ul, "rr")
-    plot_contrasts(contrasts_aj, timeslice=90, method, spec, rd, rd.ll, rd.ul, "rd")
-    plot_contrasts(contrasts_aj, timeslice=90, method, spec, rr, rr.ll, rr.ul, "rr")
+# select unique combinations of method and spec, and plot contrasts for [plr, aj] * [rd, rr]
+metaparams |> 
+  select(method, spec) |> 
+  distinct() %>%
+  {
+    walk2(.$method, .$spec, ~{
+      plot_contrasts(contrasts_plr, timeslice=90, .x, .y, rd, rd.ll, rd.ul, "rd")
+      plot_contrasts(contrasts_plr, timeslice=90, .x, .y, rr, rr.ll, rr.ul, "rr")
+      plot_contrasts(contrasts_aj, timeslice=90, .x, .y, rd, rd.ll, rd.ul, "rd")
+      plot_contrasts(contrasts_aj, timeslice=90, .x, .y, rr, rr.ll, rr.ul, "rr")
+    })
   }
-}
