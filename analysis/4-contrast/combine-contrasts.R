@@ -124,6 +124,7 @@ plot_contrasts <- function(data_contrasts, timeslice, method, spec, estimate, es
   spec0 <- spec
   
   plot_temp <-
+    data_contrasts |>
     filter(cohort0==cohort, method0==method, spec0==spec, time==timeslice) |> 
     group_by(outcome_descr) |>
     ggplot(aes(y=subgroup_level_descr)) +
