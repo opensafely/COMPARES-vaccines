@@ -239,7 +239,7 @@ def has_severe_obesity(index_date):
     )
     # Severe obesity
     severe_obesity = case(
-        when(aged18plus).then(False),
+        when(aged18plus).then(True),
         when(
             (date_sev_obesity > event_bmi.date) | 
             (date_sev_obesity.is_not_null() & event_bmi.date.is_null())
