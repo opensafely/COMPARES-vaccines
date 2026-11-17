@@ -22,7 +22,7 @@ source(here("analysis", "0-lib", "utility.R"))
 source(here("analysis", "0-lib", "design.R"))
 
 ## Import redaction functions
-source(here("analysis", "0-lib", "redaction.R"))
+#source(here("analysis", "0-lib", "redaction.R"))
 
 
 ## import command-line arguments ----
