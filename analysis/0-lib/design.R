@@ -53,23 +53,21 @@ maxfup <- 7L * 24L
 # - `event_var` is the full variable name
 # - `event_descr` is the verbose variable name used in summary table/figure outputs
 events_lookup <- tribble(
-  ~event, ~event_var, ~event_descr,
-
+  ~event            , ~event_var             , ~event_descr               ,
 
   # Effectiveness
-  # "covid_emergency", "covid_emergency_date", "COVID-19 A&E attendance",
-  "covid_admitted", "covid_admitted_date", "COVID-19 hospitalisation",
-  # "covid_critcare", "covid_critcare_date", "COVID-19 critical care",
-  "covid_death", "covid_death_date", "COVID-19 death",
-
+  "covid_emergency" , "covid_emergency_date" , "COVID-19 A&E attendance"  ,
+  "covid_admitted"  , "covid_admitted_date"  , "COVID-19 hospitalisation" ,
+  "covid_critcare"  , "covid_critcare_date"  , "COVID-19 critical care"   ,
+  "covid_death"     , "covid_death_date"     , "COVID-19 death"           ,
 
   # safety
   # "admitted", "admitted_date", "Unplanned hospitalisation",
   # "emergency", "emergency_date", "A&E attendance",
-  "death", "death_date", "Any death",
+  "death"           , "death_date"           , "Any death"                ,
   # "sgb", "sgb_date", "Guillain-Barré syndrome",
-  "bells_palsy", "bells_palsy_date", "Bell's palsy",
-  "ttp", "ttp_date", "Thrombocytopenia",
+  "bells_palsy"     , "bells_palsy_date"     , "Bell's palsy"             ,
+  "ttp"             , "ttp_date"             , "Thrombocytopenia"         ,
   # "ami", "ami_date", "Acute myocardial infarction",
   # "stroke_isch", "stroke_isch_date", "Ischaemic stroke",
   # "ate", "ate_date", "Composite arterial thrombotic event (ATE)",
@@ -270,7 +268,7 @@ recoder <-
 
 variable_labels <-
   lst(
-    N  = "Total N",
+    N = "Total N",
     treatment_descr = "Vaccine product",
     # vax_date = "Vaccination date",
     vax_day = "Vaccination day",
@@ -308,10 +306,11 @@ variable_labels <-
     # solid_organ_transplant = "Solid organ transplant",
     # hiv_aids = "HIV/AIDS",
 
-    multimorb = "Morbidity count",
-
     learndis = "Learning disabilities",
     smi = "Serious mental illness",
+
+    cv_count = "Number of risk groups",
+    cv_count_grp = "Number of risk groups (cat)",
 
     # prior events
 
@@ -342,14 +341,6 @@ variable_labels <-
 
     # tests_cat_prior = "Prior number of SARS-CoV-2 tests",
     # covid_infection_prior = "Prior documented SARS-CoV-2 infection",
-    #
-    # vaxhist_pfizer  = "Previously received Pfizer (original)",
-    # vaxhist_az  = "Previously received AZ",
-    # vaxhist_moderna  = "Previously received Moderna",
-    # vaxhist_pfizerBA1  = "Previously received Pfizer/BA.1",
-    # vaxhist_pfizerXBB15  = "Previously received Pfizer/XBB.1.5",
-    # vaxhist_modernaomicron  = "Previously received Moderna/Omicron",
-    # vaxhist_modernaXBB15  = "Previously received Moderna/XBB.1.5",
   )
 
 
@@ -368,16 +359,17 @@ local({
   exact <- c(
     "ageband",
     "cv",
+    "immunosuppressed",
     # "sex",
     # "region",
     # "imd_Q5",
-    # "multimorb",
+    # "cv_count",
     NULL
   )
   caliper <- c(
     vax_day = 3,
     age = 3,
-    prior_vax_interval_bigM = 14,
+    #prior_vax_interval_bigM = 14,
     NULL
   )
   all <- c(exact, names(caliper))
@@ -388,17 +380,16 @@ local({
     "ageband",
     "cv",
     "sex",
-    "region",
-    # "imd_Q5",
+    #"imd_Q5",
     "prior_vax_count_group",
-    "multimorb",
-    # "immunosuppressed",
+    "immunosuppressed",
+    "cv_notimmuno_count_grp",
     NULL
   )
   caliper <- c(
     vax_day = 3,
     age = 3,
-    prior_vax_interval_bigM = 28,
+    #prior_vax_interval_bigM = 28,
     imd = 5000,
     NULL
   )
@@ -417,7 +408,7 @@ local({
   # TODO: make sure subgroups are dealt with as desired, either:
   # - ignore, and assume appropriate calibration from global model
   # - independent models in each subgroup (so refit weighting model(s) for each subgroup analysis)
-  # - completely stratified (subgroup1*subgroup2*subgroup3...)
+  # - completely stratified (subgroup1*subgroup2*subgroup3*...)
   # - something else
 
   weighting_formulae <- list()
@@ -425,13 +416,13 @@ local({
 
   # weighting specification A
 
-  weighting_formulae$A <- "vax_day + age + cv + sex + region"
+  weighting_formulae$A <- "vax_day + age + sex + imd_Q5 + cv"
 
   weighting_variables$A <- all.vars(as.formula(paste("~", weighting_formulae$A)))
 
   # weighting specification B
 
-  weighting_formulae$B <- "vax_day + age + cv + sex + region + multimorb"
+  weighting_formulae$B <- "vax_day + age + sex + imd_Q5 + immunosuppressed + cv_notimmuno_count_grp"
 
   weighting_variables$B <- all.vars(as.formula(paste("~", weighting_formulae$B)))
 
@@ -445,28 +436,21 @@ local({
 
 
 
-# lmw variables
+# lmw variables (experimental)
 
 local({
-  # TODO: make sure these weighting formulae correspond to the protocol
-  # TODO: make sure subgroups are dealt with as desired, either:
-  # - ignore, and assume appropriate calibration from global model
-  # - independent models in each subgroup (so refit weighting model(s) for each subgroup analysis)
-  # - completely stratified (subgroup1*subgroup2*subgroup3...)
-  # - something else
-
   lmw_formulae <- list()
   lmw_variables <- list()
 
   # weighting specification A
 
-  lmw_formulae$A <- "vax_day + age + cv + sex"
+  lmw_formulae$A <- "vax_day + age + sex + cv"
 
   lmw_variables$A <- all.vars(as.formula(paste("~", lmw_formulae$A)))
 
   # weighting specification B
 
-  lmw_formulae$B <- "vax_day + age + cv + sex + region + multimorb"
+  lmw_formulae$B <- "vax_day + age + sex + imd_Q5 + multimorb"
 
   lmw_variables$B <- all.vars(as.formula(paste("~", lmw_formulae$B)))
 
@@ -474,8 +458,6 @@ local({
 
   lmw_formulae <<- lmw_formulae
   lmw_variables <<- lmw_variables
-
-
 })
 
 
@@ -492,8 +474,8 @@ metaparams <-
     cohort = factor(c("age65plus", "cv")),
     method = factor(c("match", "weight", "lmw")),
     spec = c("A", "B", "C"),
-    outcome = factor(recoder$outcome),
     subgroup = factor(recoder$subgroups),
+    outcome = factor(recoder$outcome),
   ) |>
   mutate(
     cohort_descr = fct_recoderelevel(cohort, recoder$cohort),
@@ -504,6 +486,6 @@ metaparams <-
   filter(
     #    cohort == "age65plus",
     method != "lmw",
-    subgroup  %in% c("all", "ageband"),
-    spec == "A"
+    subgroup %in% c("all", "ageband"),
+    spec %in% c("A", "B")
   )
