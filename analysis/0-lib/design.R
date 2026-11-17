@@ -38,11 +38,6 @@ study_dates <-
 list2env(study_dates, globalenv())
 
 
-# define cohorts ----
-
-# TODO: define cohorts here, eg age_eligible and clinically vulnerable specific for each campaign
-
-
 # define outcomes ----
 
 # maximum follow-up duration, in days

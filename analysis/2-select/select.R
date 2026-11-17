@@ -176,8 +176,6 @@ remove(data_cohort)
 
 ## output simple dataset containing exclusions criteria met ----
 
-## TODO: check if outputting this is necessary
-
 data_inclusioncriteria <- data_criteria |>
   transmute(
     patient_id,

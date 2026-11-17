@@ -145,9 +145,6 @@ formula_time_treatment <- event_indicator ~ treatment + ns(time, 4) + treatment:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # standard errors calculated using pooled logistic regression,
 # but this does not account for uncertainty in the weights
-# TODO: maybe incorporate competing risks with death as a competing risk - see https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8471
-#       currently not in the protocol and not too important given death rare, but sensible
-# TODO: incorporate proper standard errors incorporating weighting uncertainty
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 data_persontime <-

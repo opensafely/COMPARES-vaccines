@@ -3,7 +3,7 @@
 # Purpose: Combine AJ and PLR estimates for all models within each cohort
 # # # # # # # # # # # # # # # # # # # # #
 
-# TODO: this may need to be modified to interact nicely with Airlock
+# TODO: this may need to be modified to interact nicely with filesize limits in Airlock
 # for example by combining at different levels
 
 # Preliminaries ----

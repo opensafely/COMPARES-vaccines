@@ -84,12 +84,6 @@ vax_date = index_vaccination.date
 dataset.vax_date = vax_date
 dataset.vax_product = index_vaccination.product_name
 
-# We define baseline variables on the day _before_ the study date,
-# because we assume any health interactions or events recorded on the day of vaccination
-# occurred after vaccination
-# TODO: consider whether this is necessary and whether to include vax_date or not when defining baseline variables
-baseline_date = vax_date - days(1)
-
 # address info as at vaccination date
 address = addresses.for_patient_on(vax_date)
 
@@ -189,10 +183,6 @@ dataset.vax_covid_prior_count = (
   .where(vaccinations.date.is_before(vax_date))
   .count_for_patient()
 )
-
-# TODO: add variables to see if either of Product A or product B have been received prior to curent vax date
-# TODO: add variables to see if _any_ vaccine of interest has previously been received
-
 #######################################################################################
 # Occupation / residency
 #######################################################################################
@@ -223,9 +213,6 @@ dataset.inhospital = (
     .where(apcs.patient_classification == "1")
     .exists_for_patient()
 )
-
-# TODO: add all relevant variables
-# eg housebound, end-of-life, carehome residency, etc
 
 #######################################################################################
 # Flu co-vax
