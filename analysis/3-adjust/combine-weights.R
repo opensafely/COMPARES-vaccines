@@ -25,7 +25,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 0) {
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age65plus"
+  cohort <- "cv"
 } else {
   removeobjects <- TRUE
   cohort <- args[[1]]
@@ -60,9 +60,16 @@ data_weights <-
       list(cohort, method, spec),
       function(cohort, method, spec) {
         dat <-
-          here("output", "3-adjust", cohort, glue("{method}-{spec}"), "data_adjusted.arrow") |>
+          here(
+            "output",
+            "3-adjust",
+            cohort,
+            glue("{method}-{spec}"),
+            "data_adjusted.arrow"
+          ) |>
           read_feather() |>
-          select(patient_id, treatment, weight)
+          select(patient_id, treatment, weight) |>
+          mutate(treatment = as.integer(treatment)) # something odd going on with typing for this when passed from WeightIt, so need to set as an integer
         dat
       }
     )
@@ -159,7 +166,12 @@ data_event_counts <-
               na.rm = TRUE
             ),
 
-            event_time = tte(treatment_date, event_date, censor_date, na.censor = FALSE),
+            event_time = tte(
+              treatment_date,
+              event_date,
+              censor_date,
+              na.censor = FALSE
+            ),
             event_indicator = censor_indicator(event_date, censor_date),
           ) |>
           group_by(subgroup_level, treatment) |>
