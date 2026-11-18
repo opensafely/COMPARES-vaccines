@@ -13,6 +13,8 @@ library("WeightIt")
 library("survival")
 library("splines")
 library("sandwich")
+library("fastglm")
+
 # library("marginaleffects")
 
 ## Import custom user functions from lib
@@ -152,7 +154,7 @@ data_persontime <-
   uncount(event_time, .remove = FALSE) |> # may change this from event_time to final censoring time in case we want keep dead people under follow up
   mutate(
     time = sequence(rle(patient_id)$lengths), # equivalent-ish to group_by(patient_id) |> mutate(row_number())
-    event_indicator = (time == event_time) & (event_indicator == TRUE)
+    event_indicator = ((time == event_time) & (event_indicator == TRUE))*1L
   )
 
 # create dataset to link estimates onto
@@ -180,6 +182,7 @@ subgroup_models <-
               family = binomial(),
               weights = weight,
               data = plrdata,
+              method = fastglm_fit,
               model = TRUE, # this needs to be true for vcovCL to work as needed - shame because it takes up a lot of memory
               x = FALSE,
               y = FALSE
@@ -212,7 +215,8 @@ subgroup_models <-
 
         if (!is.null(model)) {
           # sandwich::vcovCL doesn't handle formulae properly! hence inclusion of "model=TRUE" above - be careful
-          vcov <- vcovCL(x = model, cluster = plrdata$patient_id, type = "HC0") # or use `marginaleffects::get_vcov(model, vcov = ~patient_id)`
+          #vcov <- vcovCL(x = model, cluster = plrdata$patient_id, type = "HC0") # or use `marginaleffects::get_vcov(model, vcov = ~patient_id)`
+          vcov <- marginaleffects::get_vcov(model, vcov = ~patient_id)
           
           estimates_scaffold %>%
             mutate(
