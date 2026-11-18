@@ -72,7 +72,7 @@ table_balance <-
     N = 1L,
   ) |>
   table1_summary_smd(
-    treatment = treatment,
+    group = treatment,
     weight = weight, 
     label = variable_labels,
     threshold = sdc.limit
