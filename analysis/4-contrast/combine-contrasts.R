@@ -69,8 +69,10 @@ combine_model_outputs <- function(type, strategy, split) {
         }
       )
     ) |>
-    unnest(data) #|>
-  # nest(.by = {{split}})
+    unnest(data) |>
+    # select weekly data only to reduce output checking burden
+    # and ensure filesize are under 5000 row limit
+    filter(time %in% as.integer(seq_len(maxfup/7)*7)) 
 
 }
 
@@ -99,6 +101,7 @@ write_split_data(contrasts_aj, output_dir, "contrasts_aj_", outcome, subgroup)
 output_dir_plots <- path(output_dir, "plots")
 dir_create(output_dir_plots)
 
+## save PLR estiamtes
 # metaparams |>
 #   mutate(
 #     plotdir = here("output", "4-contrast", cohort, glue("{method}-{spec}"), subgroup, outcome, "plr", "plot.png"),
@@ -108,6 +111,7 @@ dir_create(output_dir_plots)
 #     walk2(.$plotdir, .$plotnewdir, ~ file_copy(.x, .y, overwrite = TRUE))
 #   }
 
+# save AJ estiamtes
 metaparams |>
   mutate(
     plotdir = here("output", "4-contrast", cohort, glue("{method}-{spec}"), subgroup, outcome, "aj", "plot.png"),
@@ -166,6 +170,7 @@ plot_contrasts <- function(data_contrasts, timeslice, method, spec, strategy, es
 }
 
 # select unique combinations of method and spec, and plot contrasts for [plr, aj] * [rd, rr]
+# at 16 weeks
 metaparams |>
   select(method, spec) |>
   distinct() %>%

@@ -197,7 +197,7 @@ table_outcomes <-
     across(
       any_of(events_lookup$event_var),
       \(x) {
-        coalesce(x <= (vax_date + max(postbaselinecuts)), FALSE)
+        coalesce(x <= (vax_date + maxfup), FALSE)
       }
     )
   ) %>%

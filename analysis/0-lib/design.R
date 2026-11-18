@@ -42,9 +42,12 @@ list2env(study_dates, globalenv())
 
 # maximum follow-up duration, in days
 # currently up to 24 weeks after time-zero
-
 maxfup <- 7L * 24L
 
+# where to split follow-up time after recruitment
+postbaselinecuts <- as.integer(c(0, 7, 14, 28, 56, 84, 112, 140, 168))
+
+stopifnot("last cut in postbaseline follow up splits should be same as max follow up" = max(postbaselinecuts)==maxfup)
 
 # Look-up table for all potential outcomes of interest
 # this look-up table is used by `create-project.R` to select outcomes that are used in comparisons between products
@@ -212,8 +215,6 @@ treatment_lookup <-
     "moderna_JN1", "mRNA-1273/JN.1",
   )
 
-# where to split follow-up time after recruitment
-postbaselinecuts <- as.integer(c(0, 7, 14, 28, 56, 84, 112, 140, 168))
 
 # redaction threshold
 sdc.limit <- 6L
