@@ -115,6 +115,7 @@ table_ess <-
     values_from = ess
   )
 
+write_csv(table_ess, fs::path(output_dir, "table_ess.csv"))
 write_feather(table_ess, fs::path(output_dir, "table_ess.arrow"))
 
 
@@ -193,4 +194,6 @@ data_event_counts <-
   ) |>
   ungroup()
 
+write_csv(data_event_counts, fs::path(output_dir, "table_event_counts.csv"))
 write_feather(data_event_counts, fs::path(output_dir, "table_event_counts.arrow"))
+
