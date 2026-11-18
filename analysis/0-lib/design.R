@@ -38,18 +38,16 @@ study_dates <-
 list2env(study_dates, globalenv())
 
 
-# define cohorts ----
-
-# TODO: define cohorts here, eg age_eligible and clinically vulnerable specific for each campaign
-
-
 # define outcomes ----
 
 # maximum follow-up duration, in days
 # currently up to 24 weeks after time-zero
-
 maxfup <- 7L * 24L
 
+# where to split follow-up time after recruitment
+postbaselinecuts <- as.integer(c(0, 7, 14, 28, 56, 84, 112, 140, 168))
+
+stopifnot("last cut in postbaseline follow up splits should be same as max follow up" = max(postbaselinecuts)==maxfup)
 
 # Look-up table for all potential outcomes of interest
 # this look-up table is used by `create-project.R` to select outcomes that are used in comparisons between products
@@ -58,23 +56,21 @@ maxfup <- 7L * 24L
 # - `event_var` is the full variable name
 # - `event_descr` is the verbose variable name used in summary table/figure outputs
 events_lookup <- tribble(
-  ~event, ~event_var, ~event_descr,
-
+  ~event            , ~event_var             , ~event_descr               ,
 
   # Effectiveness
-  # "covid_emergency", "covid_emergency_date", "COVID-19 A&E attendance",
-  "covid_admitted", "covid_admitted_date", "COVID-19 hospitalisation",
-  # "covid_critcare", "covid_critcare_date", "COVID-19 critical care",
-  "covid_death", "covid_death_date", "COVID-19 death",
-
+  "covid_emergency" , "covid_emergency_date" , "COVID-19 A&E attendance"  ,
+  "covid_admitted"  , "covid_admitted_date"  , "COVID-19 hospitalisation" ,
+  "covid_critcare"  , "covid_critcare_date"  , "COVID-19 critical care"   ,
+  "covid_death"     , "covid_death_date"     , "COVID-19 death"           ,
 
   # safety
   # "admitted", "admitted_date", "Unplanned hospitalisation",
   # "emergency", "emergency_date", "A&E attendance",
-  "death", "death_date", "Any death",
+  "death"           , "death_date"           , "Any death"                ,
   # "sgb", "sgb_date", "Guillain-Barré syndrome",
-  "bells_palsy", "bells_palsy_date", "Bell's palsy",
-  "ttp", "ttp_date", "Thrombocytopenia",
+  "bells_palsy"     , "bells_palsy_date"     , "Bell's palsy"             ,
+  "ttp"             , "ttp_date"             , "Thrombocytopenia"         ,
   # "ami", "ami_date", "Acute myocardial infarction",
   # "stroke_isch", "stroke_isch_date", "Ischaemic stroke",
   # "ate", "ate_date", "Composite arterial thrombotic event (ATE)",
@@ -104,54 +100,121 @@ max_prior_vax_count <- 10L
 # output from https://jobs.opensafely.org/opensafely-internal/tpp-vaccination-names/ workspace
 # shows all possible covid vaccination names in TPP
 
-productA <- "pfizer"
-productB <- "moderna"
-# productC <- "vidprevtyn"
+productA <- "pfizer_JN1"
+productB <- "moderna_JN1"
+
+# Analysis population definition with respect to influenza coadministration.
+# Options:
+# - TRUE: restrict the main analysis to individuals who received influenza vaccination on the same day as the COVID-19 vaccine.
+# - FALSE: include all eligible individuals regardless of influenza coadministration.
+#
+# Note: flu coadministration descriptive analyses are always performed among all eligible individuals (i.e. regardless of this setting).
+restrict_to_coadmin_flu <- TRUE 
+
 
 # lookup to rename TPP product names to coding-friendly product names
 vax_product_lookup <- c(
-  "pfizer" = "COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
-  "az" = "COVID-19 Vaccine Vaxzevria 0.5ml inj multidose vials (AstraZeneca)",
-  "moderna" = "COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
-  "pfizerBA1" = "Comirnaty Original/Omicron BA.1 COVID-19 Vacc md vials",
-  "pfizerBA45" = "Comirnaty Original/Omicron BA.4-5 COVID-19 Vacc md vials",
-  "pfizerXBB15" = "Comirnaty Omicron XBB.1.5 COVID-19 Vacc md vials",
-  "vidprevtyn" = "COVID-19 Vacc VidPrevtyn (B.1.351) 0.5ml inj multidose vials",
-  "modernaomicron" = "COVID-19 Vac Spikevax (Zero)/(Omicron) inj md vials",
-  "pfizerchildren" = "COVID-19 mRNA Vaccine Comirnaty Children 5-11yrs 10mcg/0.2ml dose conc for disp for inj MDV (Pfizer)",
-  "azhalf" = "COVID-19 Vac AZD2816 (ChAdOx1 nCOV-19) 3.5x10*9 viral part/0.5ml dose sol for inj MDV (AstraZeneca)",
-  "modernaXBB15" = "COVID-19 Vacc Spikevax (XBB.1.5) 0.1mg/1ml inj md vials",
-  "novavax" = "COVID-19 Vac Nuvaxovid (recombinant, adj) 5micrograms/0.5ml dose susp for inj MDV (Novavax CZ a.s.)"
+  # Pfizer adult
+  "pfizer_original" = "COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
+  "pfizer_BA1" = "Comirnaty Original/Omicron BA.1 COVID-19 Vacc md vials",
+  "pfizer_BA45" = "Comirnaty Original/Omicron BA.4-5 COVID-19 Vacc md vials",
+  "pfizer_XBB15" = "Comirnaty Omicron XBB.1.5 COVID-19 Vacc md vials",
+  "pfizer_JN1" = "Comirnaty JN.1 COVID-19 mRNA Vaccine 0.3ml inj md vials (Pfizer Ltd)",
+  "pfizer_LP81" = "Comirnaty LP.8.1 COVID-19 Vacc 30microg/0.3ml dose inj pfs (Pfizer Ltd)",
+  "pfizer_KP2" = "Comirnaty KP.2 COVID-19 Vacc 30microg/0.3ml dose inj md vial (Pfizer Ltd)",
+  "pfizer_KP2_pfs" = "Comirnaty KP.2 COVID-19 Vacc 30microg/0.3ml dose inj pfs (Pfizer Ltd)",
+
+  "pfizer_unspecified" = "Comirnaty COVID-19 mRNA Vacc ready to use 0.3ml inj md vials",
+
+  # Pfizer children
+
+  "pfizer_original_children" = "COVID-19 mRNA Vaccine Comirnaty Children 5-11yrs 10mcg/0.2ml dose conc for disp for inj MDV (Pfizer)",
+  "pfizer_JN1_children" = "Comirnaty JN.1 Children 5-11yrs COVID-19 Vacc 0.3ml sd vials (Pfizer Ltd)",
+  "pfizer_XBB15_children" = "Comirnaty Omicron XBB.1.5 Child 5-11y COVID-19 Vacc md vials",
+  "pfizer_LP81_children" = "Comirnaty LP.8.1 Children 5-11y COVID-19 Vacc 0.3ml sd vials  (Pfizer Ltd)", # note double space before "(Pfizer Ltd)"
+
+  "pfizer_original_under5" = "Comirnaty Children 6m-4yrs COVID-19 mRNA Vacc 0.2ml md vials",
+  "pfizer_JN1_under5" = "Comirnaty JN.1 Children 6m-4yrs COVID-19 Vacc 0.3ml md vials (Pfizer Ltd)",
+  "pfizer_XBB15_under5" = "Comirnaty Omicron XBB.1.5 Child 6m-4y COVID-19 Vacc md vials",
+  "pfizer_LP81_under5" = "Comirnaty LP.8.1 Children 6m-4y COVID-19 Vacc 0.3m md vials  (Pfizer Ltd)", # note, double space before "(Pfizer Ltd)"
+
+  # Astrazeneca
+
+  "az_original" = "COVID-19 Vaccine Vaxzevria 0.5ml inj multidose vials (AstraZeneca)",
+  "az_original_half" = "COVID-19 Vac AZD2816 (ChAdOx1 nCOV-19) 3.5x10*9 viral part/0.5ml dose sol for inj MDV (AstraZeneca)",
+
+  # Moderna
+
+  "moderna_original" = "COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
+  "moderna_omicron" = "COVID-19 Vac Spikevax (Zero)/(Omicron) inj md vials",
+  "moderna_BA45" = "COVID-19 Vacc Spikevax Orig/Omicron BA.4/BA.5 inj md vials",
+  "moderna_XBB15" = "COVID-19 Vacc Spikevax (XBB.1.5) 0.1mg/1ml inj md vials",
+  "moderna_JN1" = "Spikevax JN.1 COVID-19 Vacc 0.1mg/ml inj md vials (Moderna, Inc)",
+  "moderna_omicron2" = "COVID-19 Vaccine Moderna (mRNA-1273.529) 50micrograms/0.25ml dose sol for inj MDV",
+  "moderna_unspecified" = "COVID-19 Vaccine Moderna 0.5ml dispersion for inj vials",
+
+  # Sanofi-GSK
+  "sanofigsk_B1" = "COVID-19 Vacc VidPrevtyn (B.1.351) 0.5ml inj multidose vials",
+  "sanofigsk_D614" = "COVID-19 Vac Sanofi (CoV2 preS dTM monovalent D614 (recombinant)) 5mcg/0.5ml dose susp for inj MDV",
+  "sanofigsk_D614B1" = "COVID-19 Vacc Sanofi (D614+B.1.351) 0.5ml inj md vials",
+
+
+  # Novavax
+  "novavax" = "COVID-19 Vac Nuvaxovid (recombinant, adj) 5micrograms/0.5ml dose susp for inj MDV (Novavax CZ a.s.)",
+
+  # Sputnik
+  "sputnik_i_multi" = "COVID-19 Vacc Sputnik V Component I 0.5ml multidose vials",
+  "sputnik_ii_multi" = "COVID-19 Vacc Sputnik V Component II 0.5ml multidose vials",
+  "sputnik_i_inj" = "COVID-19 Vaccine Sputnik V Component I 0.5ml inj vials",
+  "sputnik_ii_inj" = "COVID-19 Vaccine Sputnik V Component II 0.5ml inj vials",
+
+  # Janssen
+  "jansenn" = "COVID-19 Vaccine Janssen (Ad26.COV2-S (recomb)) 0.5ml dose solution for injection multidose vials",
+
+  # Sinopharm
+  "sinopharm" = "COVID-19 Vac Sinopharm BIBP (inactivated adjuvanted) 6.5U/0.5ml dose susp for inj vials",
+
+  # Valneva
+  "valneva" = "COVID-19 Vaccine Valneva (inactivated adj whole virus) 40antigen units/0.5ml dose susp for inj MDV",
+
+  # Medicago
+  "medicago" = "COVID-19 Vaccine Medicago (CoVLP) 3.75micrograms/0.5ml dose emulsion for injection multidose vials",
+
+  # Convidecia
+  "convidecia" = "COVID-19 Vaccine Convidecia 0.5ml inj vials",
+
+  # Covaxin
+  "covaxin" = "COVID-19 Vac Covaxin (NIV-2020-770 inactivated) 6micrograms/0.5ml dose susp for inj MDV",
+
+  # Coronavac
+  "coronavac" = "COVID-19 Vac CoronaVac (adjuvanted) 600U/0.5ml dose susp for inj vials",
+
+  # Covishield
+  "covishield" = "COVID-19 Vac Covishield (ChAdOx1 S recombinant) 5x10*9 viral particles/0.5ml dose sol for inj MDV",
+
+  # Covovax
+  "covovax" = "COVID-19 Vac Covovax (adjuvanted) 5micrograms/0.5ml dose susp for inj MDV (Serum Institute of India)",
+
+  # Not specified
+  "unspecified" = "SARS-2 Coronavirus vaccine"
+
 )
 
 
 # look-up to rename coding-friendly product names to publication-friendly product names
 vax_shortname_lookup <- c(
-  "BNT162b2" = "pfizer",
-  "ChAdOx1" = "az",
-  "mRNA-1273" = "moderna",
-  "BNT162b2/BA.1" = "pfizerBA1",
-  "BNT162b2/BA.4-5" = "pfizerBA45",
-  "BNT162b2/XBB.1.5" = "pfizerXBB15",
-  "VidPrevtyn" = "vidprevtyn",
-  "mRNA-1273/omicron" = "modernaomicron",
-  "BNT162b2/children" = "pfizerchildren",
-  "ChAdOx1/2" = "azhalf",
-  "mRNA-1273/XBB.1.5" = "modernaXBB15",
-  "Novavax" = "novavax",
-  "Other" = "other"
+  "BNT162b2/JN.1" = "pfizer_JN1",
+  "mRNA-1273/JN.1" = "moderna_JN1"
 )
 
 
 treatment_lookup <-
   tribble(
     ~treatment, ~treatment_descr,
-    "pfizerBA45", "pfizer/BA.4-5",
-    "sanofi", "Sanofi",
+    "pfizer_JN1", "pfizer/JN.1",
+    "moderna_JN1", "mRNA-1273/JN.1",
   )
 
-# where to split follow-up time after recruitment
-postbaselinecuts <- as.integer(c(0, 7, 14, 28, 56, 84, 112, 140, 168))
 
 # redaction threshold
 sdc.limit <- 6L
@@ -163,7 +226,7 @@ recoder <-
   lst(
     cohort = c(
       `Clinically vulnerable` = "cv",
-      `Aged 75 years or over` = "age75plus",
+      `Aged 65 years or over` = "age65plus",
       `Care home residency` = "carehome"
     ),
     subgroups = c(
@@ -179,8 +242,8 @@ recoder <-
       `Matched` = "matched"
     ),
     treatment = c(
-      `pfizer/BA.4-5` = "0",
-      `Sanofi` = "1"
+      `pfizer/JN.1` = "0",
+      `mRNA-1273/JN.1` = "1"
     ),
     outcome = set_names(events_lookup$event, events_lookup$event_descr),
     all = c(` ` = "all"),
@@ -206,7 +269,7 @@ recoder <-
 
 variable_labels <-
   lst(
-    N  = "Total N",
+    N = "Total N",
     treatment_descr = "Vaccine product",
     # vax_date = "Vaccination date",
     vax_day = "Vaccination day",
@@ -244,10 +307,11 @@ variable_labels <-
     # solid_organ_transplant = "Solid organ transplant",
     # hiv_aids = "HIV/AIDS",
 
-    multimorb = "Morbidity count",
-
     learndis = "Learning disabilities",
     smi = "Serious mental illness",
+
+    cv_count = "Number of risk groups",
+    cv_count_grp = "Number of risk groups (cat)",
 
     # prior events
 
@@ -278,14 +342,6 @@ variable_labels <-
 
     # tests_cat_prior = "Prior number of SARS-CoV-2 tests",
     # covid_infection_prior = "Prior documented SARS-CoV-2 infection",
-    #
-    # vaxhist_pfizer  = "Previously received Pfizer (original)",
-    # vaxhist_az  = "Previously received AZ",
-    # vaxhist_moderna  = "Previously received Moderna",
-    # vaxhist_pfizerBA1  = "Previously received Pfizer/BA.1",
-    # vaxhist_pfizerXBB15  = "Previously received Pfizer/XBB.1.5",
-    # vaxhist_modernaomicron  = "Previously received Moderna/Omicron",
-    # vaxhist_modernaXBB15  = "Previously received Moderna/XBB.1.5",
   )
 
 
@@ -304,16 +360,17 @@ local({
   exact <- c(
     "ageband",
     "cv",
+    "immunosuppressed",
     # "sex",
     # "region",
     # "imd_Q5",
-    # "multimorb",
+    # "cv_count",
     NULL
   )
   caliper <- c(
     vax_day = 3,
     age = 3,
-    prior_vax_interval_bigM = 14,
+    #prior_vax_interval_bigM = 14,
     NULL
   )
   all <- c(exact, names(caliper))
@@ -324,17 +381,16 @@ local({
     "ageband",
     "cv",
     "sex",
-    "region",
-    # "imd_Q5",
+    #"imd_Q5",
     "prior_vax_count_group",
-    "multimorb",
-    # "immunosuppressed",
+    "immunosuppressed",
+    "cv_notimmuno_count_grp",
     NULL
   )
   caliper <- c(
     vax_day = 3,
     age = 3,
-    prior_vax_interval_bigM = 28,
+    #prior_vax_interval_bigM = 28,
     imd = 5000,
     NULL
   )
@@ -353,7 +409,7 @@ local({
   # TODO: make sure subgroups are dealt with as desired, either:
   # - ignore, and assume appropriate calibration from global model
   # - independent models in each subgroup (so refit weighting model(s) for each subgroup analysis)
-  # - completely stratified (subgroup1*subgroup2*subgroup3...)
+  # - completely stratified (subgroup1*subgroup2*subgroup3*...)
   # - something else
 
   weighting_formulae <- list()
@@ -361,13 +417,13 @@ local({
 
   # weighting specification A
 
-  weighting_formulae$A <- "vax_day + age + cv + sex + region"
+  weighting_formulae$A <- "vax_day + age + sex + imd_Q5 + cv"
 
   weighting_variables$A <- all.vars(as.formula(paste("~", weighting_formulae$A)))
 
   # weighting specification B
 
-  weighting_formulae$B <- "vax_day + age + cv + sex + region + multimorb"
+  weighting_formulae$B <- "vax_day + age + sex + imd_Q5 + immunosuppressed + cv_notimmuno_count_grp"
 
   weighting_variables$B <- all.vars(as.formula(paste("~", weighting_formulae$B)))
 
@@ -381,28 +437,21 @@ local({
 
 
 
-# lmw variables
+# lmw variables (experimental)
 
 local({
-  # TODO: make sure these weighting formulae correspond to the protocol
-  # TODO: make sure subgroups are dealt with as desired, either:
-  # - ignore, and assume appropriate calibration from global model
-  # - independent models in each subgroup (so refit weighting model(s) for each subgroup analysis)
-  # - completely stratified (subgroup1*subgroup2*subgroup3...)
-  # - something else
-
   lmw_formulae <- list()
   lmw_variables <- list()
 
   # weighting specification A
 
-  lmw_formulae$A <- "vax_day + age + cv + sex"
+  lmw_formulae$A <- "vax_day + age + sex + cv"
 
   lmw_variables$A <- all.vars(as.formula(paste("~", lmw_formulae$A)))
 
   # weighting specification B
 
-  lmw_formulae$B <- "vax_day + age + cv + sex + region + multimorb"
+  lmw_formulae$B <- "vax_day + age + sex + imd_Q5 + multimorb"
 
   lmw_variables$B <- all.vars(as.formula(paste("~", lmw_formulae$B)))
 
@@ -410,8 +459,6 @@ local({
 
   lmw_formulae <<- lmw_formulae
   lmw_variables <<- lmw_variables
-
-
 })
 
 
@@ -425,11 +472,11 @@ local({
 
 metaparams <-
   expand_grid(
-    cohort = factor(c("age75plus", "cv")),
+    cohort = factor(c("age65plus", "cv")),
     method = factor(c("match", "weight", "lmw")),
     spec = c("A", "B", "C"),
-    outcome = factor(recoder$outcome),
     subgroup = factor(recoder$subgroups),
+    outcome = factor(recoder$outcome),
   ) |>
   mutate(
     cohort_descr = fct_recoderelevel(cohort, recoder$cohort),
@@ -438,8 +485,8 @@ metaparams <-
   ) |>
   # select only some parameters to avoid too much dev work
   filter(
-    cohort == "age75plus",
+    #    cohort == "age65plus",
     method != "lmw",
-    subgroup  %in% c("all", "ageband"),
-    spec == "A"
+    subgroup %in% c("all", "ageband"),
+    spec %in% c("A", "B")
   )

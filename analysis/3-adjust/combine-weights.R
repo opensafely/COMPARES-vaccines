@@ -25,7 +25,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 0) {
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age75plus"
+  cohort <- "cv"
 } else {
   removeobjects <- TRUE
   cohort <- args[[1]]
@@ -41,15 +41,14 @@ fs::dir_create(output_dir)
 data_cohort <- read_feather(here("output", "2-select", cohort, "data_cohort.arrow"))
 
 ## create dataset of metaparameters to import
-cohort0 <- cohort
+
+# make sure we only use configuration for selected cohort
+metaparams_filtered <- metaparams |> filter(cohort == !!cohort)
 
 metaparams_cohort_method_spec <-
-  metaparams |>
+  metaparams_filtered |>
   select(cohort, method, spec) |>
-  unique() |>
-  filter(
-    cohort == cohort0,
-  )
+  unique()
 
 ## weights ----
 ## create dataset that contains only patient IDs and the weights from all different adjustment strategies
@@ -61,9 +60,16 @@ data_weights <-
       list(cohort, method, spec),
       function(cohort, method, spec) {
         dat <-
-          here("output", "3-adjust", cohort, glue("{method}-{spec}"), "data_adjusted.arrow") |>
+          here(
+            "output",
+            "3-adjust",
+            cohort,
+            glue("{method}-{spec}"),
+            "data_adjusted.arrow"
+          ) |>
           read_feather() |>
-          select(patient_id, treatment, weight)
+          select(patient_id, treatment, weight) |>
+          mutate(treatment = as.integer(treatment)) # something odd going on with typing for this when passed from WeightIt, so need to set as an integer
         dat
       }
     )
@@ -109,6 +115,7 @@ table_ess <-
     values_from = ess
   )
 
+write_csv(table_ess, fs::path(output_dir, "table_ess.csv"))
 write_feather(table_ess, fs::path(output_dir, "table_ess.arrow"))
 
 
@@ -117,13 +124,14 @@ write_feather(table_ess, fs::path(output_dir, "table_ess.arrow"))
 
 data_event_counts <-
   bind_rows(
-    metaparams |>
+    # create dummy params for "unadjusted" method, where the weights are 1
+    metaparams_filtered |>
       distinct(cohort, subgroup, outcome, .keep_all = TRUE) |>
       mutate(
         method = "unadjusted",
         spec = ""
       ),
-    metaparams
+    metaparams_filtered
   ) |>
   group_by(cohort, method, spec, subgroup, outcome) |>
   mutate(
@@ -134,11 +142,11 @@ data_event_counts <-
         data_all %>%
           mutate(
             subgroup_level = .[[subgroup]],
-            wt = ifelse(
-              method != "unadjusted",
-              data_all[[paste("wt", cohort, method, spec, sep = "_")]],
+            wt = if (method != "unadjusted") {
+              data_all[[paste("wt", cohort, method, spec, sep = "_")]]
+            } else {
               rep(1, nrow(data_all))
-            ),
+            },
             treatment_date = vax_date - 1L,
 
             event_date = as.Date(data_all[[paste0(outcome, "_date")]]),
@@ -159,18 +167,33 @@ data_event_counts <-
               na.rm = TRUE
             ),
 
-            event_time = tte(treatment_date, event_date, censor_date, na.censor = FALSE),
+            event_time = tte(
+              treatment_date,
+              event_date,
+              censor_date,
+              na.censor = FALSE
+            ),
             event_indicator = censor_indicator(event_date, censor_date),
           ) |>
           group_by(subgroup_level, treatment) |>
           summarise(
             n = roundmid_any(sum(wt), sdc.limit),
             persontime = sum(wt * as.numeric(censor_date - (vax_date - 1))),
-            count = sum(wt * event_indicator)
+            weighted_event_count = sum(wt * event_indicator)
           )
       }
     )
   ) |>
-  unnest(data)
+  unnest(data) |>
+  group_by(cohort, method, spec, outcome, subgroup, subgroup_level) |>
+  mutate(
+    flag_subgroups_both_treatments_with_events = all(weighted_event_count >= 1),
+    flag_subgroups_only1treatment_with_events = any(weighted_event_count >= 1) & any(weighted_event_count < 1),
+    flag_subgroups_both_treatments_with_min_events = all(weighted_event_count > sdc.limit),
+    flag_subgroups_only1treatment_with_min_events = any(weighted_event_count > sdc.limit) & any(weighted_event_count <= sdc.limit),
+  ) |>
+  ungroup()
 
+write_csv(data_event_counts, fs::path(output_dir, "table_event_counts.csv"))
 write_feather(data_event_counts, fs::path(output_dir, "table_event_counts.arrow"))
+

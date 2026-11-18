@@ -31,7 +31,7 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age75plus"
+  cohort <- "age65plus"
   method <- "match"
   spec <- "A"
   subgroup <- "all"
@@ -132,8 +132,6 @@ formula_time_treatment <- event_indicator ~ treatment + ns(time, 4) + treatment:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # standard errors calculated using pooled logistic regression,
 # but this does not account for uncertainty in the weights
-# TODO: incorporate competing risks
-# TODO: incorporate standard errors
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 data_persontime <- 

@@ -444,11 +444,11 @@
       "downloaded_at": "2025-05-19 10:47:14.722341Z",
       "sha": "ab665e36ad2bfd73aea38579fcaab2451f2aff46"
     },
-    "user-elsie_horne-other_arterial_embolism_icd10.csv": {
-      "id": "user/elsie_horne/other_arterial_embolism_icd10/463adc5d",
-      "url": "https://www.opencodelists.org/codelist/user/elsie_horne/other_arterial_embolism_icd10/463adc5d/",
-      "downloaded_at": "2025-05-19 10:47:14.782469Z",
-      "sha": "1400d26dcbdabfd0920bc61da9e39a66e111e19d"
+    "opensafely-other-arterial-embolism-icd10.csv": {
+      "id": "opensafely/other-arterial-embolism-icd10/0a6f9ef9",
+      "url": "https://www.opencodelists.org/codelist/opensafely/other-arterial-embolism-icd10/0a6f9ef9/",
+      "downloaded_at": "2026-05-12 15:12:34.276317Z",
+      "sha": "3a9cdd3fa2ba3a45b6bb5e3397f179e4aa527dd6"
     },
     "user-tomsrenin-dvt_main.csv": {
       "id": "user/tomsrenin/dvt_main/1c76a027",

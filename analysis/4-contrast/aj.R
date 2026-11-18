@@ -1,4 +1,5 @@
 # # # # # # # # # # # # # # # # # # # # #
+
 # Purpose: Get disclosure-safe Aalen-Johansen estimates.
 # This is very heavily based on the Kaplan-Meier reusable action: https://github.com/opensafely-actions/kaplan-meier-function
 # The function requires an origin date, an event date, a censoring date, and optionally a competing event date, which are converted into a (time , status) pair that is passed to `survival::Surv`
@@ -35,15 +36,15 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  df_input <- "output/3-adjust/age75plus/combine/data_weights.arrow"
+  df_input <- "output/3-adjust/cv/combine/data_weights.arrow"
   dir_output <- "output/4-contrast/test/"
   exposure <- c("treatment")
-  subgroups <- c("all")
+  subgroups <- c("ageband")
   origin_date <- "vax_date"
   event_date <- "covid_admitted_date"
-  censoring_date <- "dereg_date" 
+  censoring_date <- "censor_date" 
   competing_date <- "death_date"
-  weight <- "wt_age75plus_match_A"
+  weight <- "wt_cv_match_A"
   min_count <- as.integer("6")
   method <- "constant"
   max_fup <- as.numeric("168")
@@ -124,6 +125,7 @@ if(length(args)==0){
 
 exposure_syms <- syms(exposure)
 subgroup_syms <- syms(subgroups)
+
 
 # Create output directory ----
 
@@ -211,29 +213,29 @@ if(!identical(as.integer(times_count), c(0L, 0L, nrow(data_tte)))) {
 
 # Calculate max follow-up time available in the data ----
 # and print to log file
-
-if(length(exposure)>0){
-  max_time_data <-
-    data_tte |>
-    group_by(!!!exposure_syms) |>
-    summarise(
-      max_fup_time = max(event_time),
-      max_event_time = max(event_time[event_indicator])
-    )
-  
-  cat("maximum follow-up time in exposure levels [", paste0(max_time_data[[exposure]], collapse=", "), "] is [", paste0(max_time_data$max_fup_time, collapse= ", "), "]", "\n")
-  cat("maximum event time in exposure levels [", paste0(max_time_data[[exposure]], collapse=", "), "] is [", paste0(max_time_data$max_event_time, collapse= ", "), "]", "\n")
-} else {
-  max_time_data <-
-    data_tte |>
-    summarise(
-      max_fup_time = max(event_time),
-      max_event_time = max(event_time[event_indicator])
-    )
-  cat("maximum follow-up time is [", paste0(max_time_data$max_fup_time, collapse= ", "), "]", "\\n")
-  cat("maximum event time is [", paste0(max_time_data$max_event_time, collapse= ", "), "]", "\\n")
-}
-
+suppressWarnings(
+  if(length(exposure)>0){
+    max_time_data <-
+      data_tte |>
+      group_by(!!!exposure_syms, !!!subgroup_syms) |>
+      summarise(
+        max_fup_time = max(event_time),
+        max_event_time = max(event_time[event_indicator])
+      ) 
+    
+    print(max_time_data)
+  } else {
+    max_time_data <-
+      data_tte |>
+      group_by(!!!subgroup_syms) |>
+      summarise(
+        max_fup_time = max(event_time),
+        max_event_time = max(event_time[event_indicator])
+      )
+    
+    print(max_time_data)
+  }
+)
 
 # Calculate AJ estimates ------
 
@@ -272,30 +274,63 @@ data_surv <-
   dplyr::group_by(!!!subgroup_syms, !!!exposure_syms) |>
   tidyr::nest() |>
   dplyr::mutate(
-    surv_obj_tidy_0 = purrr::map(data, ~ {
-      survival::survfit(
-        survival::Surv(event_time, event_status_factor) ~ 1,
-        data = .x,
-        conf.type="log",
-        weight = .weight
-      ) |>
-      broom::tidy() |>
-      tidyr::complete(
-        time = seq_len(max_fup), # fill in 1 row for each day of follow up
-        fill = list(n.event = 0L, n.censor = 0L) # fill in zero events on those days
-      ) |>
-      tidyr::fill(n.risk, .direction = c("up"))
-    }),
-    
+
     surv_obj_tidy = purrr::map(data, ~ {
+      
+      ## this horrible work around ensures that if no events occur, the function still produces a surv_object
+      ## explanation: if no events occur and we use competing events (eg, `survival::Surv(event_time, event_status_factor) ~ 1`, for some factor `event_status_factor`),
+      ## then survfit doesn't work: "error in `temp[, k, drop = FALSE]`: subscript out of bounds". This is not really a bug, but an unhelpful failure mode.
+      ## it works as expected when using a binary status
+      ## the workaround is to add a pretend event _after_ the maximum follow-up date, but the crop event times to only be max_fup or lower in the tidied output
+      
+      if (((.x |> filter(event_status>0) |> nrow()) == 0L)) {
+      
+        # select one patient who reached maximum follow up time without an event
+        modified_patient_id <- 
+          .x |> 
+          filter(
+            event_time==max(event_time), 
+            event_status==0
+          ) |> 
+          filter(row_number()==1) |> 
+          pull(patient_id)
+        
+        # add a fake event after the max follow up time
+        .x_modified_patient <-
+          .x |>
+          filter(patient_id == modified_patient_id) |>
+          mutate(
+            event_time = 1L + event_time,
+            event_indicator = TRUE,
+            event_status = 1L,
+            event_status_factor = factor("outcome", levels = c("censored", "outcome", "competing"))
+          )
+        
+        max_event_time = max(.x_modified_patient$event_time) - 1L
+        
+        # combine new modified patient with the remaining patients
+        .x_modified <- .x |>
+          filter(patient_id != modified_patient_id) |>
+          bind_rows(.x_modified_patient) |>
+          arrange(patient_id)
+      
+      } else {
+        .x_modified <- .x
+        
+        max_event_time = max_fup
+      }
+      
       surv_obj_tidy_long <- 
         survival::survfit(
           survival::Surv(event_time, event_status_factor) ~ 1,
-          data = .x,
+          data = .x_modified,
           conf.type="log-log",
           weight = .weight
         ) |>
-        broom::tidy() 
+        broom::tidy() |> 
+        filter(time <= max_event_time)
+      
+      ## end of workaround
       
       surv_obj_tidy <-
         bind_cols(
@@ -337,7 +372,7 @@ data_surv <-
       surv_obj_tidy
     }),
   ) |>
-  select(-data, -surv_obj_tidy_0) |>
+  select(-data) |> 
   tidyr::unnest(surv_obj_tidy)
 
 ## Round the count values in the survival data ----
@@ -607,3 +642,4 @@ if((length(exposure)>0) & contrast){
   arrow::write_feather(data_contrasts_rounded, fs::path(dir_output, glue("contrasts{filename_suffix}.arrow")))
   write_csv(data_contrasts_rounded, fs::path(dir_output, glue("contrasts{filename_suffix}.csv")))
 }
+

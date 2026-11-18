@@ -31,7 +31,7 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age75plus"
+  cohort <- "age65plus"
   method <- "lmw"
   spec <- "A"
 } else {
@@ -72,7 +72,7 @@ table_balance <-
     N = 1L,
   ) |>
   table1_summary_smd(
-    treatment = treatment,
+    group = treatment,
     weight = weight, 
     label = variable_labels,
     threshold = sdc.limit

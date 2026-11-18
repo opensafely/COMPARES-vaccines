@@ -32,7 +32,7 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age75plus" #currently `age75plus` or `cv`
+  cohort <- "age65plus" #currently `age65plus` or `cv`
   spec <- "A"
 } else {
   removeobjects <- TRUE
@@ -72,13 +72,13 @@ data_preweight <-
 # calculate balancing weights using the lmw function
 
 # need to check order here!!
-obj_lmw <- 
+obj_lmw <-
   lmw(
     formula = formula(paste0("~ ", "treatment + ", lmw_formulae[[spec]])),
     data = data_preweight,
     treat = "treatment",
     estimand = "ATE",
-    method = "MRI", # TODO: or use the other one that splits by treatment??
+    method = "MRI", # or use the other one that splits by treatment??
   )
 
 data_weights <- 

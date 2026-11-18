@@ -44,7 +44,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 0) {
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age75plus" # currently `age75plus` or `cv`
+  cohort <- "age65plus" # currently `age65plus` or `cv`
   method <- "lmw"
   spec <- "A"
 } else {

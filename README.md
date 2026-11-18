@@ -52,12 +52,13 @@ This repo should be forked (maybe - TBD) when starting an analysis for the next 
 The analysis scripts in the [`analysis/`](./analysis) directory are organised into sub-directories as follows:
 
 - [`0-lib/`](./analysis/0-lib/):
-  - [`design.R`](./analysis/0-lib/design.R) defines the campaign-specific design elements (or parameters) used throughout the study (start and end dates, eligibility, products, etc).
+  - [`design.R`](./analysis/0-lib/design.R) defines the campaign-specific design elements (or parameters) used throughout the study (eligibility, products, etc).
   It also defines matching and weighting specification, look-up dictionaries, and other useful objects. 
   This script is run at the start of all subsequent R scripts, 
   including the [`create-project.R`](./analysis/lib-0/create-project.R)script to ensure study-wide parameters are passed to the dataset definition via the project.yaml.
   - [`create-project.R`](./analysis/lib-0/create-project.R) creates the [`project.yaml`](./project.yaml) file defining action outputs and dependencies.
   - [`utility.R`](./analysis/0-lib/utility.R) defines functions used throughout the codebase. This script is run at the start of all subsequent R scripts.
+  - [`study-dates.json`](./analysis/0-lib/study-dates.json) defines the key dates of the specific campaign under study.
 - [`1-extract/`](./analysis/1-extract/):
   - [`dataset_definition.py`](./analysis/1-extract/dataset_definition.py) is the script defining the dataset to extract from the database, using ehrQL. 
   - [`dummy_dataset_definition.R`](./analysis/1-extract/dummy_dataset_definition.R) defines a custom dummy dataset.  
