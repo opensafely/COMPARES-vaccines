@@ -76,8 +76,8 @@ combine_model_outputs <- function(type, strategy, split) {
 
 }
 
-# estimates_plr <- combine_model_outputs("estimates", "plr")
-# contrasts_plr <- combine_model_outputs("contrasts", "plr")
+estimates_plr <- combine_model_outputs("estimates", "plr")
+contrasts_plr <- combine_model_outputs("contrasts", "plr")
 estimates_aj <- combine_model_outputs("estimates", "aj")
 contrasts_aj <- combine_model_outputs("contrasts", "aj")
 
@@ -90,8 +90,8 @@ write_split_data <- function(.data, dir, fileprefix, ...) {
     group_walk(~ write_csv(.x, path(dir, glue("{fileprefix}{paste(t(.y),collapse='-')}.csv"))))
 }
 
-# write_split_data(estimates_plr, output_dir, "estimates_plr_", outcome, subgroup)
-# write_split_data(contrasts_plr, output_dir, "contrasts_plr_", outcome, subgroup)
+write_split_data(estimates_plr, output_dir, "estimates_plr_", outcome, subgroup)
+write_split_data(contrasts_plr, output_dir, "contrasts_plr_", outcome, subgroup)
 write_split_data(estimates_aj, output_dir, "estimates_aj_", outcome, subgroup)
 write_split_data(contrasts_aj, output_dir, "contrasts_aj_", outcome, subgroup)
 
@@ -102,14 +102,14 @@ output_dir_plots <- path(output_dir, "plots")
 dir_create(output_dir_plots)
 
 ## save PLR estiamtes
-# metaparams |>
-#   mutate(
-#     plotdir = here("output", "4-contrast", cohort, glue("{method}-{spec}"), subgroup, outcome, "plr", "plot.png"),
-#     plotnewdir = path(output_dir_plots, glue("plr_{method}-{spec}_{subgroup}_{outcome}.png")),
-#   ) %>%
-#   {
-#     walk2(.$plotdir, .$plotnewdir, ~ file_copy(.x, .y, overwrite = TRUE))
-#   }
+metaparams |>
+  mutate(
+    plotdir = here("output", "4-contrast", cohort, glue("{method}-{spec}"), subgroup, outcome, "plr", "plot.png"),
+    plotnewdir = path(output_dir_plots, glue("plr_{method}-{spec}_{subgroup}_{outcome}.png")),
+  ) %>%
+  {
+    walk2(.$plotdir, .$plotnewdir, ~ file_copy(.x, .y, overwrite = TRUE))
+  }
 
 # save AJ estiamtes
 metaparams |>
@@ -176,8 +176,8 @@ metaparams |>
   distinct() %>%
   {
     walk2(.$method, .$spec, ~ {
-      # plot_contrasts(contrasts_plr, timeslice = 16 * 7, .x, .y, "plr", rd, rd.ll, rd.ul, "rd")
-      # plot_contrasts(contrasts_plr, timeslice = 16 * 7, .x, .y, "plr", rr, rr.ll, rr.ul, "rr")
+      plot_contrasts(contrasts_plr, timeslice = 16 * 7, .x, .y, "plr", rd, rd.ll, rd.ul, "rd")
+      plot_contrasts(contrasts_plr, timeslice = 16 * 7, .x, .y, "plr", rr, rr.ll, rr.ul, "rr")
       plot_contrasts(contrasts_aj, timeslice = 16 * 7, .x, .y, "aj", rd, rd.ll, rd.ul, "rd")
       plot_contrasts(contrasts_aj, timeslice = 16 * 7, .x, .y, "aj", rr, rr.ll, rr.ul, "rr")
     })
