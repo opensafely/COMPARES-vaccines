@@ -168,17 +168,24 @@ data_tte <-
     !!!subgroup_syms,
     .weight = .data[[weight]],
     event_date = as.Date(.data[[event_date]]),
-    origin_date = as.Date(.data[[origin_date]])
+    origin_date = as.Date(.data[[origin_date]]),
     censoring_date = pmin(
       as.Date(.data[[censoring_date]]),
       origin_date + max_fup,
       na.rm = TRUE
     ),
     competing_date = as.Date(.data[[competing_date]]),
-    endpoint_date = pmin(censoring_date, event_date, competing_date, na.rm=TRUE),
+    endpoint_date = pmin(
+      censoring_date,
+      event_date,
+      competing_date,
+      na.rm = TRUE
+    ),
     event_time = as.integer(endpoint_date - origin_date),
-    
-    event_indicator = !((event_date>pmin(censoring_date, competing_date, na.rm=TRUE) | is.na(event_date))),
+
+    event_indicator = !((event_date >
+      pmin(censoring_date, competing_date, na.rm = TRUE) |
+      is.na(event_date))),
 
     event_status = case_when(
       # 0 = censored, 1 = event of interest, 2 = competing event
@@ -189,7 +196,11 @@ data_tte <-
       .default = NA_integer_
     ),
     # here censor value is first in the factor to work with Surv as required
-    event_status_factor = factor(event_status, levels=c("0", "1", "2"), labels = c("censored", "outcome", "competing")), 
+    event_status_factor = factor(
+      event_status,
+      levels = c("0", "1", "2"),
+      labels = c("censored", "outcome", "competing")
+    ),
   )
 
 if(max_fup==Inf) max_fup <- max(data_tte$event_time)+1
