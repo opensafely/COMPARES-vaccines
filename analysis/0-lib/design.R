@@ -56,52 +56,57 @@ stopifnot("last cut in postbaseline follow up splits should be same as max follo
 # - `event_var` is the full variable name
 # - `event_descr` is the verbose variable name used in summary table/figure outputs
 events_lookup <- tribble(
-  ~event            , ~event_var             , ~event_descr               ,
+  ~event_type     , ~event            , ~event_var             , ~event_descr                                ,
+
+  # all-cause
+  "all-cause"     , "emergency"       , "emergency_date"       , "A&E attendance"                            ,
+  "all-cause"     , "admitted"        , "admitted_date"        , "Unplanned hospitalisation"                 ,
+  "all-cause"     , "death"           , "death_date"           , "Any death"                                 ,
 
   # Effectiveness
-  "covid_emergency" , "covid_emergency_date" , "COVID-19 A&E attendance"  ,
-  "covid_admitted"  , "covid_admitted_date"  , "COVID-19 hospitalisation" ,
-  "covid_critcare"  , "covid_critcare_date"  , "COVID-19 critical care"   ,
-  "covid_death"     , "covid_death_date"     , "COVID-19 death"           ,
+  "effectiveness" , "covid_emergency" , "covid_emergency_date" , "COVID-19 A&E attendance"                   ,
+  "effectiveness" , "covid_admitted"  , "covid_admitted_date"  , "COVID-19 hospitalisation"                  ,
+  "effectiveness" , "covid_critcare"  , "covid_critcare_date"  , "COVID-19 critical care"                    ,
+  "effectiveness" , "covid_death"     , "covid_death_date"     , "COVID-19 death"                            ,
 
   # safety
-  # "admitted", "admitted_date", "Unplanned hospitalisation",
-  # "emergency", "emergency_date", "A&E attendance",
-  "death"           , "death_date"           , "Any death"                ,
-  # "sgb", "sgb_date", "Guillain-Barré syndrome",
-  "bells_palsy"     , "bells_palsy_date"     , "Bell's palsy"             ,
-  "ttp"             , "ttp_date"             , "Thrombocytopenia"         ,
-  # "ami", "ami_date", "Acute myocardial infarction",
-  # "stroke_isch", "stroke_isch_date", "Ischaemic stroke",
-  # "ate", "ate_date", "Composite arterial thrombotic event (ATE)",
-  # "dvt", "dvt_date", "Deep vein thrombosis (DVT)",
-  # "icvt", "icvt_date", "Intracranial venous thrombosis (ICVT)",
-  # "pe", "pe_date", "Pulmonary embolism (PE)",
-  # "vte", "vte_date", "Composite venous thrombotic event (VTE)",
-  # "pericarditis", "pericarditis_date", "Pericarditis",
-  # "myocarditis", "myocarditis_date", "Myocarditis",
-  # "menorrhagia", "menorrhagia_date", "Heavy menstrual bleeding",
-  # "ery_multi", "ery_multi_date", "Erythema multiforme",
-  # "anaphylaxis", "anaphylaxis_date", "Anaphylaxis",
+  "safety"        , "sgb"             , "sgb_date"             , "Guillain-Barré syndrome"                   ,
+  "safety"        , "bells_palsy"     , "bells_palsy_date"     , "Bell's palsy"                              ,
+  "safety"        , "ttp"             , "ttp_date"             , "Thrombocytopenia"                          ,
+  "safety"        , "ami"             , "ami_date"             , "Acute myocardial infarction"               ,
+  "safety"        , "stroke_isch"     , "stroke_isch_date"     , "Ischaemic stroke"                          ,
+  "safety"        , "ate"             , "ate_date"             , "Composite arterial thrombotic event (ATE)" ,
+  "safety"        , "dvt"             , "dvt_date"             , "Deep vein thrombosis (DVT)"                ,
+  "safety"        , "icvt"            , "icvt_date"            , "Intracranial venous thrombosis (ICVT)"     ,
+  "safety"        , "pe"              , "pe_date"              , "Pulmonary embolism (PE)"                   ,
+  "safety"        , "vte"             , "vte_date"             , "Composite venous thrombotic event (VTE)"   ,
+  "safety"        , "pericarditis"    , "pericarditis_date"    , "Pericarditis"                              ,
+  "safety"        , "myocarditis"     , "myocarditis_date"     , "Myocarditis"                               ,
+  "safety"        , "menorrhagia"     , "menorrhagia_date"     , "Heavy menstrual bleeding"                  ,
+  "safety"        , "ery_multi"       , "ery_multi_date"       , "Erythema multiforme"                       ,
+  "safety"        , "anaphylaxis"     , "anaphylaxis_date"     , "Anaphylaxis"                               ,
 
   # negative control
-  # "noncovid_death", "noncovid_death_date", "Non-COVID-19 death",
-  # "fracture", "fracture_date", "Fracture",
-  # "acute_otitis", "acute_otitis_gp_date", "Acute otitis media"
-  # "cellulitis", "cellulitis_gp_date", "Cellulitis"
+  "negative"      , "noncovid_death"  , "noncovid_death_date"  , "Non-COVID-19 death"                        ,
+  "negative"      , "acute_otitis_gp" , "acute_otitis_gp_date" , "Acute otitis media"                        ,
+  "negative"      , "cellulitis_gp"   , "cellulitis_gp_date"   , "Cellulitis"
 )
 
+# use this to help calculate which campaign each person's prior vaccine occurred in
+campaigns_lookup <-
+  tribble(
+    ~campaign            , ~start_date  ,
+    "Before Autumn 2023" , "2020-04-01" ,
+    "Autumn 2023"        , "2023-08-28" ,
+    "Spring 2024"        , "2024-04-15" ,
+    "Autumn 2024"        , "2024-09-30" ,
+  ) |>
+  mutate(
+    start_date = as.Date(start_date),
+    end_date = lead(start_date) - 1L,
+  )
+  
 
-# maximum allowable prior count of covid vaccines (too high indicates unreliable data, but should increase each campaigns)
-# something like campaign number + 2 (to allow 2 vaccines in first campaign and maybe sneaky extra one somewhere)
-# TODO: figure out if certain populations had more than this routinely
-max_prior_vax_count <- 10L
-
-# output from https://jobs.opensafely.org/opensafely-internal/tpp-vaccination-names/ workspace
-# shows all possible covid vaccination names in TPP
-
-productA <- "pfizer_JN1"
-productB <- "moderna_JN1"
 
 # Analysis population definition with respect to influenza coadministration.
 # Options:
@@ -111,6 +116,20 @@ productB <- "moderna_JN1"
 # Note: flu coadministration descriptive analyses are always performed among all eligible individuals (i.e. regardless of this setting).
 restrict_to_coadmin_flu <- TRUE 
 
+
+# the products of interest this campaign
+
+productA <- "pfizer_JN1"
+productB <- "moderna_JN1"
+
+# look-up to rename coding-friendly product names to publication-friendly product names
+vax_shortname_lookup <- c(
+  "BNT162b2/JN.1" = "pfizer_JN1",
+  "mRNA-1273/JN.1" = "moderna_JN1"
+)
+
+# output from https://jobs.opensafely.org/opensafely-internal/tpp-vaccination-names/ workspace
+# shows all possible covid vaccination names in TPP
 
 # lookup to rename TPP product names to coding-friendly product names
 vax_product_lookup <- c(
@@ -201,11 +220,6 @@ vax_product_lookup <- c(
 )
 
 
-# look-up to rename coding-friendly product names to publication-friendly product names
-vax_shortname_lookup <- c(
-  "BNT162b2/JN.1" = "pfizer_JN1",
-  "mRNA-1273/JN.1" = "moderna_JN1"
-)
 
 
 treatment_lookup <-
@@ -267,83 +281,93 @@ recoder <-
 
 ## variable labels in tables and plots ----
 
-variable_labels <-
-  lst(
-    N = "Total N",
-    treatment_descr = "Vaccine product",
-    # vax_date = "Vaccination date",
-    vax_day = "Vaccination day",
-    prior_vax_interval = "Days since previous vaccine",
-    prior_vax_count_group = "Previous vaccine count",
-    age_eligible = "Age",
-    ageband = "Age band",
-    sex = "Sex",
-    ethnicity5 = "Ethnicity",
-    imd_Q5 = "Deprivation",
-    region = "Region",
-    cv = "Clinically at-risk",
+variables_lookup <-
+  tribble(
+    ~variable                , ~variable_label                                             ,
+    "N"                      , "Total N"                                                   ,
+    "treatment_descr"        , "Vaccine product"                                           ,
 
-    # housebound = "Clinically housebound",
-    # care_home_combined = "Care/nursing home resident",
+    #  covariates
+    #"vax_date"               , "Vaccination date"                                          ,
+    "vax_day"                , "Vaccination day"                                           ,
+    "prior_vax_interval"     , "Days since previous vaccine"                               ,
+    "prior_vax_count_group"  , "Previous vaccine count"                                    ,
+    "age_eligible"           , "Age"                                                       ,
+    "ageband"                , "Age band"                                                  ,
+    "sex"                    , "Sex"                                                       ,
+    "ethnicity5"             , "Ethnicity"                                                 ,
+    "imd_Q5"                 , "Deprivation"                                               ,
+    "region"                 , "Region"                                                    ,
+    #"housebound"            , "Clinically housebound"                                     ,
+    #"care_home_combined"    , "Care/nursing home resident"                                ,
 
-    severe_obesity = "Body Mass Index > 40 kg/m^2",
+    # green book conditions
+    "cv"                     , "Clinically at-risk"                                        ,
 
-    chd = "Chronic heart disease",
-    ckd = "Chronic kidney disease",
-    diabetes = "Diabetes",
-    cld = "Chronic liver disease",
-    crd = "Chronic respiratory disease",
-    # asthma = "Asthma",
-    cns = "Chronic neurological disease",
+    "crd"                    , "Chronic respiratory disease"                               ,
+    "chd"                    , "Chronic heart disease"                                     ,
+    "ckd"                    , "Chronic kidney disease"                                    ,
+    "cld"                    , "Chronic liver disease"                                     ,
+    "cns"                    , "Chronic neurological disease"                              ,
+    "learndis"               , "Learning disabilities"                                     ,
+    "diabetes"               , "Diabetes"                                                  ,
+    "immunosuppressed"       , "Immunosuppressed"                                          ,
+    "asplenia"               , "Aplenia or poor spleen function"                           ,
+    "severe_obesity"         , "Body Mass Index > 40 kg/m^2"                               ,
+    "smi"                    , "Serious mental illness"                                    ,
+    # "asthma"                , "Asthma"                                                    ,
 
-    immunosuppressed = "Immunosuppressed",
-    # immuno_any = "Immunosuppressed (all)",
+    # "immuno_any", "Immunosuppressed (all)",
+    # "immdx", "Immunocompromising diagnosis",
+    # "immrx", "Immunosuppressive medications, previous 3 years",
+    # "dxt_chemo", "Chemotherapy, previous 3 years",
+    # "cancer", "Cancer, previous 3 years",
+    # "solid_organ_transplant", "Solid organ transplant",
+    # "hiv_aids", "HIV/AIDS",
 
-    # immdx = "Immunocompromising diagnosis",
-    # immrx = "Immunosuppressive medications, previous 3 years",
-    # dxt_chemo = "Chemotherapy, previous 3 years",
-    # cancer = "Cancer, previous 3 years",
-    # asplenia = "Asplenia or poor spleen function",
-    # solid_organ_transplant = "Solid organ transplant",
-    # hiv_aids = "HIV/AIDS",
-
-    learndis = "Learning disabilities",
-    smi = "Serious mental illness",
-
-    cv_count = "Number of risk groups",
-    cv_count_grp = "Number of risk groups (cat)",
+    "cv_immuno"              , "Risk group type"                                           ,
+    "cv_count"               , "Risk group count"                                          ,
+    "cv_count_grp"           , "Risk group count (cat)"                                    ,
+    "cv_notimmuno_count_grp" , "Non-immuno risk group count (cat)"                         ,
 
     # prior events
 
+    "prior_vax_campaign"     , "Campaign of prior vaccine"                                 ,
+
     # COVID-related
-    covid_prior_emergency = "Prior (<1 year) COVID-19 A&E attendance",
-    covid_prior_admitted = "Prior (<1 year) COVID-19 hospitalisation",
-    covid_prior_critcare = "Prior (<1 year) COVID-19 critical care",
+    "covid_prior_emergency"  , "Prior (<1 year) COVID-19 A&E attendance"                   ,
+    "covid_prior_admitted"   , "Prior (<1 year) COVID-19 hospitalisation"                  ,
+    "covid_prior_critcare"   , "Prior (<1 year) COVID-19 critical care"                    ,
 
     # Safety
-    prior_emergency = "Prior (<1 year) A&E attendance",
-    prior_admitted = "Prior (<1 year) hospitalisation",
+    "prior_emergency"        , "Prior (<1 year) A&E attendance"                            ,
+    "prior_admitted"         , "Prior (<1 year) hospitalisation"                           ,
 
-    sgb_prior = "Prior (<1 year) Guillain-Barré syndrome",
-    bells_palsy_prior = "Prior (<1 year) Bell's palsy",
-    ttp_prior = "Prior (<1 year) Thrombocytopenia",
-    ami_prior = "Prior (<1 year) Acute myocardial infarction",
-    stroke_isch_prior = "Prior (<1 year) Ischaemic stroke",
-    ate_prior = "Prior (<1 year) Composite arterial thrombotic event (ATE)",
-    dvt_prior = "Prior (<1 year) Deep vein thrombosis (DVT)",
-    icvt_prior = "Prior (<1 year) Intracranial venous thrombosis (ICVT)",
-    pe_prior = "Prior (<1 year) Pulmonary embolism (PE)",
-    vte_prior = "Prior (<1 year) Composite venous thrombotic event (VTE)",
-    pericarditis_prior = "Prior (<1 year) Pericarditis",
-    myocarditis_prior = "Prior (<1 year) Myocarditis",
-    menorrhagia_prior = "Prior (<1 year) Heavy menstrual bleeding",
-    ery_multi_prior = "Prior (<1 year) Erythema multiforme",
-    anaphylaxis_prior = "Prior (<1 year) Anaphylaxis",
+    "sgb_prior"              , "Prior (<1 year) Guillain-Barré syndrome"                   ,
+    "bells_palsy_prior"      , "Prior (<1 year) Bell's palsy"                              ,
+    "ttp_prior"              , "Prior (<1 year) Thrombocytopenia"                          ,
+    "ami_prior"              , "Prior (<1 year) Acute myocardial infarction"               ,
+    "stroke_isch_prior"      , "Prior (<1 year) Ischaemic stroke"                          ,
+    "ate_prior"              , "Prior (<1 year) Composite arterial thrombotic event (ATE)" ,
+    "dvt_prior"              , "Prior (<1 year) Deep vein thrombosis (DVT)"                ,
+    "icvt_prior"             , "Prior (<1 year) Intracranial venous thrombosis (ICVT)"     ,
+    "pe_prior"               , "Prior (<1 year) Pulmonary embolism (PE)"                   ,
+    "vte_prior"              , "Prior (<1 year) Composite venous thrombotic event (VTE)"   ,
+    "pericarditis_prior"     , "Prior (<1 year) Pericarditis"                              ,
+    "myocarditis_prior"      , "Prior (<1 year) Myocarditis"                               ,
+    "menorrhagia_prior"      , "Prior (<1 year) Heavy menstrual bleeding"                  ,
+    "ery_multi_prior"        , "Prior (<1 year) Erythema multiforme"                       ,
+    "anaphylaxis_prior"      , "Prior (<1 year) Anaphylaxis"                               ,
 
-    # tests_cat_prior = "Prior number of SARS-CoV-2 tests",
-    # covid_infection_prior = "Prior documented SARS-CoV-2 infection",
+    # "tests_cat_prior"       , "Prior number of SARS-CoV-2 tests"                          ,
+    # "covid_infection_prior" , "Prior documented SARS-CoV-2 infection"                     ,
   )
 
+# for passing to table1_summary functions
+variable_labels <- as.list(set_names(
+  variables_lookup$variable_label,
+  variables_lookup$variable
+))
 
 ## model formulae ----
 

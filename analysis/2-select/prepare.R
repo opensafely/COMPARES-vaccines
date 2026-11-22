@@ -149,6 +149,12 @@ data_prepared <-
       severe_obesity |
       smi,
 
+    cv_immuno = fct_case_when(
+      immunosuppressed ~ "Immunosuppressed",
+      cv ~ "Other risk group",
+      !cv ~ "No risk group"
+    ),
+
     cv_count = crd +
       chd +
       ckd +
@@ -175,11 +181,16 @@ data_prepared <-
     ),
 
     ## process partial covid vaccine history
-
     prior_vax_count = vax_covid_prior_count,
     prior_vax_interval = as.integer(vax_date - vax_covid_prior_1_date),
+    prior_vax_campaign = vax_covid_prior_1_date |>
+      floor_date(unit = campaigns_lookup$start_date) |>
+      recode_values(
+        from = c(campaigns_lookup$start_date, as.Date(NA)),
+        to = c(campaigns_lookup$campaign, "No prior vaccine record")
+      ),
+
     prior_vax_interval_atleast12weeks = prior_vax_interval >= 12 * 7,
-    vax_count_realistic = prior_vax_count <= max_prior_vax_count, # earlier than 2020-12-08 to include trial participants, but excludes "unknowns" coded as eg 1900-01-01
     prior_vax_interval_bigM = if_else(
       prior_vax_count == 0,
       365L * 5L,

@@ -505,8 +505,8 @@ dataset.anaphylaxis_prior = any_of([
 ])
 
 # Negative control
-dataset.acute_otitis_gp = prior_gp_event(vax_date, 1, codelists.acute_otitis)
-dataset.cellulitis_gp = prior_gp_event(vax_date, 1, codelists.cellulitis)
+dataset.acute_otitis_gp_prior = prior_gp_event(vax_date, 1, codelists.acute_otitis)
+dataset.cellulitis_gp_prior = prior_gp_event(vax_date, 1, codelists.cellulitis)
 
 #######################################################################################
 # Post-baseline variables: outcomes, competing outcomes, and censoring
