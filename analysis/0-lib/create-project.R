@@ -285,7 +285,7 @@ actions_contrasts <- function(cohort, estimator) {
     estimator_action <- action_plr_contrast
   }
 
-  metaparams |>
+  metaparams_for_estimation |>
     filter(cohort == !!cohort) |>
     select(cohort, method, spec, subgroup, outcome) |>
     mutate(across(where(is.factor), as.character)) |>

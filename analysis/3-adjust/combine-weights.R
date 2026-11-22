@@ -43,7 +43,8 @@ data_cohort <- read_feather(here("output", "2-select", cohort, "data_cohort.arro
 ## create dataset of metaparameters to import
 
 # make sure we only use configuration for selected cohort
-metaparams_filtered <- metaparams |> filter(cohort == !!cohort)
+metaparams_filtered <-
+  metaparams |> filter(cohort == !!cohort)
 
 metaparams_cohort_method_spec <-
   metaparams_filtered |>

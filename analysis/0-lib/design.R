@@ -499,18 +499,40 @@ metaparams <-
     cohort = factor(c("age65plus", "cv")),
     method = factor(c("match", "weight", "lmw")),
     spec = c("A", "B", "C"),
-    subgroup = factor(recoder$subgroups),
-    outcome = factor(recoder$outcome),
+    subgroup = fct_inorder(recoder$subgroups),
+    outcome = fct_inorder(recoder$outcome),
   ) |>
   mutate(
+    outcome_type = recode_values(
+      outcome,
+      from = events_lookup$event,
+      to = events_lookup$event_type
+    ),
     cohort_descr = fct_recoderelevel(cohort, recoder$cohort),
     outcome_descr = fct_recoderelevel(outcome, recoder$outcome),
     subgroup_descr = fct_recoderelevel(subgroup, recoder$subgroups),
   ) |>
-  # select only some parameters to avoid too much dev work
+
   filter(
-    #    cohort == "age65plus",
-    method != "lmw",
+    # select only some parameters to avoid too much dev work
     subgroup %in% c("all", "ageband"),
-    spec %in% c("A", "B")
+    spec %in% c("A", "B"),
+
+    # do not use experimental lmw method
+    method != "lmw",
+  )
+
+
+# use this to select models to run
+# we still want to use the earlier metaparams object for pre-modelling work (eg to count events by subgroups)
+metaparams_for_estimation <-
+  metaparams |>
+  filter_out(
+    # do not do subgroup analyses for safety or negative control outcomes
+    (outcome_type %in% c("safety", "negative")) &
+      (outcome != "menorrhagia") &
+      (subgroup != "all"),
+
+    # only interested in menorrhagia for women
+    (outcome == "menorrhagia") & (subgroup != "sex"),
   )
