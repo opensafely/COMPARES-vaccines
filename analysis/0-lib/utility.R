@@ -483,7 +483,7 @@ table1_summary_smd <- function(.data, group, weight, label, threshold) {
       variable,
       variable_label = droplevels(factor(
         variable_label,
-        levels = map_chr(variable_labels, ~.)
+        levels = map_chr(label, ~.)
       )),
       variable_label,
       variable_level,
