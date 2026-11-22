@@ -98,14 +98,12 @@ data_all <-
     patient_id,
     vax_product,
     treatment,
-    vax_date,
+    treatment_date,
     all_of(subgroup),
     all_of(paste0(c(outcome, "death", "dereg"), "_date")),
     weight = glue("wt_{cohort}_{method}_{spec}")
   ) |>
   mutate(
-    # -1 because we assume vax occurs at the start of the day, and so outcomes occurring on the same day as treatment are assumed "1 day" long
-    treatment_date = vax_date - 1L,
     event_date = as.Date(.data[[glue("{outcome}_date")]]),
 
     # person-time is up to and including censor date

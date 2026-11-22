@@ -69,7 +69,12 @@ data_weights <-
           ) |>
           read_feather() |>
           select(patient_id, treatment, weight) |>
-          mutate(treatment = as.integer(treatment)) # something odd going on with typing for this when passed from WeightIt, so need to set as an integer
+          mutate(
+            # add one day of follow up so outcome/censoring events occurring on the same day as vaccination occur after baseline
+            treatment_date = vax_date - 1L,
+            # something odd going on with typing for this when passed from WeightIt, so need to set as an integer
+            treatment = as.integer(treatment)
+          )
         dat
       }
     )
@@ -147,9 +152,7 @@ data_event_counts <-
             } else {
               rep(1, nrow(data_all))
             },
-            treatment_date = vax_date - 1L,
-
-            event_date = as.Date(data_all[[paste0(outcome, "_date")]]),
+            event_date = as.Date(data_all[[glue("{outcome}_date")]]),
 
             # person-time is up to and including censor date
             censor_date = pmin(
@@ -178,7 +181,7 @@ data_event_counts <-
           group_by(subgroup_level, treatment) |>
           summarise(
             n = roundmid_any(sum(wt), sdc.limit),
-            persontime = sum(wt * as.numeric(censor_date - (vax_date - 1))),
+            persontime = sum(wt * as.numeric(censor_date - treatment_date)),
             weighted_event_count = sum(wt * event_indicator)
           )
       }
