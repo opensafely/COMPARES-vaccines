@@ -383,8 +383,7 @@ local({
   # matching specification A
   exact <- c(
     "ageband",
-    "cv",
-    "immunosuppressed",
+    "cv_immuno",
     # "sex",
     # "region",
     # "imd_Q5",
@@ -394,7 +393,6 @@ local({
   caliper <- c(
     vax_day = 3,
     age = 3,
-    #prior_vax_interval_bigM = 14,
     NULL
   )
   all <- c(exact, names(caliper))
@@ -403,19 +401,18 @@ local({
   # matching specification B
   exact <- c(
     "ageband",
-    "cv",
     "sex",
-    #"imd_Q5",
-    "prior_vax_count_group",
+    "cv",
     "immunosuppressed",
+    "cv_immuno",
+    "imd_Q5",
+    "prior_vax_campaign",
     "cv_notimmuno_count_grp",
     NULL
   )
   caliper <- c(
     vax_day = 3,
     age = 3,
-    #prior_vax_interval_bigM = 28,
-    imd = 5000,
     NULL
   )
   all <- c(exact, names(caliper))
@@ -441,13 +438,13 @@ local({
 
   # weighting specification A
 
-  weighting_formulae$A <- "vax_day + age + sex + imd_Q5 + cv"
+  weighting_formulae$A <- "ns(vax_day,3) + ns(age,2) + sex + cv_immuno"
 
   weighting_variables$A <- all.vars(as.formula(paste("~", weighting_formulae$A)))
 
   # weighting specification B
 
-  weighting_formulae$B <- "vax_day + age + sex + imd_Q5 + immunosuppressed + cv_notimmuno_count_grp"
+  weighting_formulae$B <- "ns(vax_day,3) + ns(age,2) + sex + imd_Q5 + cv_immuno + cv_notimmuno_count_grp"
 
   weighting_variables$B <- all.vars(as.formula(paste("~", weighting_formulae$B)))
 

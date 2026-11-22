@@ -27,6 +27,7 @@ library("here")
 library("glue")
 library("arrow")
 library("survival")
+library("splines")
 library("cobalt")
 
 ## Import custom user functions from lib
