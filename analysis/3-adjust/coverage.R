@@ -55,7 +55,7 @@ data_weights <- read_feather(here_glue("output", "3-adjust", cohort, "{method}-{
 
 # append relevant characteristics to match data
 
-data_balance <- 
+data_balance <-
   data_cohort |>
   select(patient_id, treatment, vax_date, any_of(variables_lookup$variable)) |>
   left_join(
