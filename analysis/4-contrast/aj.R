@@ -168,7 +168,7 @@ data_tte <-
     !!!subgroup_syms,
     .weight = .data[[weight]],
     event_date = as.Date(.data[[event_date]]),
-    origin_date = as.Date(.data[[origin_date]]),
+    origin_date = as.Date(.data[[origin_date]]) - 1L, # -1 because we assume vax occurs at the start of the day, and so outcomes occurring on the same day as treatment are assumed "1 day" long
     censoring_date = pmin(
       as.Date(.data[[censoring_date]]),
       origin_date + max_fup,

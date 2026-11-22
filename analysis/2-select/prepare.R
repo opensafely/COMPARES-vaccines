@@ -64,12 +64,10 @@ data_prepared <-
       TRUE ~ NA_integer_
     ),
 
-    vax_date = vax_date - 1L,
-
     # vaccination date represented as an integer, using for matching instead of date-formatted variable to avoid issues
     vax_day = as.integer(vax_date - study_dates$studystart_date),
 
-    #flu vaccination variables
+    # flu vaccination variables
     flu_vaccine_before_30_date = flu_vaccine_before_30_date - 1L,
     flu_vaccine_after_30_date = flu_vaccine_after_30_date - 1L,
     flu_vaccine_same_date = flu_vaccine_same_date - 1L,
