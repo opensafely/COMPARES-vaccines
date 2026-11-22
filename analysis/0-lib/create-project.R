@@ -181,7 +181,7 @@ action_aj_contrast <- function(
       "dir_output" = dir_output,
       "exposure" = "treatment",
       "subgroups" = glue("{subgroup}"),
-      "origin_date" = "vax_date",
+      "origin_date" = "treatment_date",
       "event_date" = glue("{outcome}_date"),
       "censoring_date" = "censor_date",
       "competing_date" = "death_date",

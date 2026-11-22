@@ -71,8 +71,6 @@ data_weights <-
           read_feather() |>
           select(patient_id, treatment, weight) |>
           mutate(
-            # add one day of follow up so outcome/censoring events occurring on the same day as vaccination occur after baseline
-            treatment_date = vax_date - 1L,
             # something odd going on with typing for this when passed from WeightIt, so need to set as an integer
             treatment = as.integer(treatment)
           )
@@ -101,7 +99,14 @@ data_all <-
     data_cohort,
     data_weights_wider,
     by = c("patient_id", "treatment")
+  ) |>
+  mutate(
+    # add one day of follow up so outcome/censoring events occurring on the same day as vaccination occur after baseline
+    # so use vax_date for original observed vaccination date
+    # and use treatment_date for the baseline_date in any modelling / estimation
+    treatment_date = vax_date - 1L,
   )
+      
 
 write_feather(data_all, fs::path(output_dir, "data_weights.arrow"))
 
