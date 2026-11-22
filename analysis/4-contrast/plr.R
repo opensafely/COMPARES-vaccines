@@ -122,12 +122,27 @@ data_all <-
       na.rm = TRUE
     ),
 
-    event_time = tte(treatment_date, event_date, censor_date, na.censor = FALSE),
+    event_time = tte(
+      treatment_date,
+      event_date,
+      censor_date,
+      na.censor = FALSE
+    ),
     event_indicator = censor_indicator(event_date, censor_date),
 
     # possible competing events
-    death_time = tte(treatment_date, death_date, noncompetingcensor_date, na.censor = FALSE),
-    censor_time = tte(treatment_date, censor_date, censor_date, na.censor = FALSE),
+    death_time = tte(
+      treatment_date,
+      death_date,
+      noncompetingcensor_date,
+      na.censor = FALSE
+    ),
+    censor_time = tte(
+      treatment_date,
+      censor_date,
+      censor_date,
+      na.censor = FALSE
+    ),
   )
 
 stopifnot("censoring dates must be non-missing" = all(!is.na(data_all$censor_date)))
@@ -140,7 +155,9 @@ if (!identical(as.integer(times_count), c(0L, 0L, nrow(data_all)))) {
   stop("all event times must be strictly positive")
 }
 
-formula_time_treatment <- event_indicator ~ treatment + ns(time, 4) + treatment:ns(time, 4)
+formula_time_treatment <- event_indicator ~ treatment +
+  ns(time, 3) +
+  treatment:ns(time, 3)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # standard errors calculated using pooled logistic regression,
@@ -182,8 +199,7 @@ subgroup_models <-
               data = plrdata,
               method = fastglm_fit,
               model = TRUE, # this needs to be true for vcovCL to work as needed - shame because it takes up a lot of memory
-              x = FALSE,
-              y = FALSE
+              x = FALSE
             )
           } else {
             stop("Not enough events")
@@ -213,16 +229,29 @@ subgroup_models <-
 
         if (!is.null(model)) {
           # sandwich::vcovCL doesn't handle formulae properly! hence inclusion of "model=TRUE" above - be careful
-          #vcov <- vcovCL(x = model, cluster = plrdata$patient_id, type = "HC0") # or use `marginaleffects::get_vcov(model, vcov = ~patient_id)`
-          vcov <- marginaleffects::get_vcov(model, vcov = ~patient_id)
-          
+          vcov <- vcovCL(x = model, cluster = plrdata$patient_id, type = "HC0") # or use `marginaleffects::get_vcov(model, vcov = ~patient_id)`
+          #vcov <- marginaleffects::get_vcov(model, vcov = ~patient_id)
+
           estimates_scaffold %>%
             mutate(
               # this uses the ipw.model to get the estimated incidence at each time point for each treatment, assuming the entire population received treatment A
               # it works correctly for the ATE because of the weights (ie as if setting treatment=1 or treatment=0 for entire population)
-              inc = predict(model, newdata = estimates_scaffold, type = "response"),
-              inc.se = predict(model, newdata = estimates_scaffold, type = "response", se.fit = TRUE)$se.fit, # this does not use vcov from vcovCL, so not cluster-robust
-              inc.logit.se = predict.glm.custom.vcov(model, vcov = vcov, newdata = estimates_scaffold)$se.fit, # cluster robust, but on the linear scale, not response scale
+              inc = predict(
+                model,
+                newdata = estimates_scaffold,
+                type = "response"
+              ),
+              inc.se = predict(
+                model,
+                newdata = estimates_scaffold,
+                type = "response",
+                se.fit = TRUE
+              )$se.fit, # this does not use vcov from vcovCL, so not cluster-robust
+              inc.logit.se = predict.glm.custom.vcov(
+                model,
+                vcov = vcov,
+                newdata = estimates_scaffold
+              )$se.fit, # cluster robust, but on the linear scale, not response scale
               inc.low = plogis(qlogis(inc) + (qnorm(0.025) * inc.logit.se)),
               inc.high = plogis(qlogis(inc) + (qnorm(0.975) * inc.logit.se)),
             ) |>
@@ -230,7 +259,14 @@ subgroup_models <-
             mutate(
               dummy_id_weight = 1L,
               surv = cumprod(1 - inc),
-              surv.se = sqrt(cmlinc_variance(model = model, vcov = vcov, newdata = tibble(treatment = treatment, time = time), id = dummy_id_weight, time = time, weights = dummy_id_weight)),
+              surv.se = sqrt(cmlinc_variance(
+                model = model,
+                vcov = vcov,
+                newdata = tibble(treatment = treatment, time = time),
+                id = dummy_id_weight,
+                time = time,
+                weights = dummy_id_weight
+              )),
               surv.low = surv + (qnorm(0.025) * surv.se),
               surv.high = surv + (qnorm(0.975) * surv.se),
 
@@ -242,9 +278,8 @@ subgroup_models <-
               # rmst.se = sqrt(((2* cumsum(time*surv)) - (rmst^2))/n.risk), # this only works if one row per day using fill_times! otherwise need sqrt(((2* cumsum(time*interval*surv)) - (rmst^2))/n.risk)
               # rmst.low = rmst + (qnorm(0.025) * rmst.se),
               # rmst.high = rmst + (qnorm(0.975) * rmst.se),
-
-            ) |> select(-dummy_id_weight)
-
+            ) |>
+            select(-dummy_id_weight)
         } else {
           estimates_scaffold
         }
@@ -267,7 +302,7 @@ write_csv(data_estimates, fs::path(output_dir, glue("estimates.csv")))
 
 # calculate contrasts between treatment groups ----
 
-# could do this within `subgroup_models` step above but bring out to avoid overloading high memory stuff
+# could do this within `subgroup_models` step above but bringing out to avoid overloading high memory stuff
 data_contrasts <-
   
   data_estimates |>
