@@ -197,7 +197,7 @@ subgroup_models <-
               family = binomial(),
               weights = weight,
               data = plrdata,
-              method = fastglm_fit,
+              # method = fastglm::fastglm_fit, # don't use fastglm for now as v0.1.2 doesn't work well with predict function (v0.1.4 does, so wait for update)
               model = TRUE, # this needs to be true for vcovCL to work as needed - shame because it takes up a lot of memory
               x = FALSE
             )
