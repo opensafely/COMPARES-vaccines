@@ -95,7 +95,7 @@ action <- function(
 action_select <- function(cohort) {
   action(
     name = glue("select_{cohort}"),
-    run = "r:v2 analysis/2-select/select.R",
+    run = "r:v3 analysis/2-select/select.R",
     arguments = c(cohort),
     needs = list("prepare"),
     highly_sensitive = lst(
@@ -112,10 +112,9 @@ action_select <- function(cohort) {
 action_balance <- function(cohort, method, spec) {
 
   splice2(
-
     action(
       name = glue("adjust_{cohort}_{method}_{spec}"),
-      run = "r:v2 analysis/3-adjust/balance.R",
+      run = "r:v3 analysis/3-adjust/balance.R",
       arguments = c(cohort, method, spec),
       needs = list(glue("select_{cohort}")),
       highly_sensitive = lst(
@@ -125,7 +124,7 @@ action_balance <- function(cohort, method, spec) {
 
     action(
       name = glue("adjust_{cohort}_{method}_{spec}_report"),
-      run = "r:v2 analysis/3-adjust/report.R",
+      run = "r:v3 analysis/3-adjust/report.R",
       arguments = c(cohort, method, spec),
       needs = list(
         glue("select_{cohort}"),
@@ -149,7 +148,7 @@ action_combine_weights <- function(cohort) {
 
   action(
     name = glue("adjust_combine_{cohort}"),
-    run = glue("r:v2 analysis/3-adjust/combine-weights.R {cohort}"),
+    run = glue("r:v3 analysis/3-adjust/combine-weights.R {cohort}"),
     needs = list(
       glue("select_{cohort}"),
       glue_data(
@@ -158,7 +157,8 @@ action_combine_weights <- function(cohort) {
           filter(cohort == !!cohort),
         "adjust_{cohort}_{method}_{spec}"
       )
-    ) |> list_c(),
+    ) |>
+      list_c(),
 
     highly_sensitive = lst(
       arrow = glue("output/3-adjust/{cohort}/combine/*.arrow"),
@@ -174,14 +174,14 @@ action_aj_contrast <- function(
 
   action(
     name = glue("aj_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
-    run = "r:v2 analysis/4-contrast/aj.R",
+    run = "r:v3 analysis/4-contrast/aj.R",
     # arguments = c(cohort, method, spec, subgroup, outcome),
     arguments = c(
       "df_input" = glue("output/3-adjust/{cohort}/combine/data_weights.arrow"),
       "dir_output" = dir_output,
       "exposure" = "treatment",
       "subgroups" = glue("{subgroup}"),
-      "origin_date" = "vax_date",
+      "origin_date" = "treatment_date",
       "event_date" = glue("{outcome}_date"),
       "censoring_date" = "censor_date",
       "competing_date" = "death_date",
@@ -216,7 +216,7 @@ action_plr_contrast <- function(
 
   action(
     name = glue("plr_{cohort}_{method}_{spec}_{subgroup}_{outcome}"),
-    run = "r:v2 analysis/4-contrast/plr.R",
+    run = "r:v3 analysis/4-contrast/plr.R",
     arguments = c(
       "cohort" = glue("{cohort}"),
       "method" = glue("{method}"),
@@ -245,7 +245,7 @@ action_contrasts_combine <- function(
 
   action(
     name = glue("combine_{cohort}_contrasts"),
-    run = glue("r:v2 analysis/4-contrast/combine-contrasts.R"),
+    run = glue("r:v3 analysis/4-contrast/combine-contrasts.R"),
     arguments = c(cohort),
     needs = glue_data(
       .x = metaparams |>
@@ -285,7 +285,7 @@ actions_contrasts <- function(cohort, estimator) {
     estimator_action <- action_plr_contrast
   }
 
-  metaparams |>
+  metaparams_for_estimation |>
     filter(cohort == !!cohort) |>
     select(cohort, method, spec, subgroup, outcome) |>
     mutate(across(where(is.factor), as.character)) |>
@@ -304,27 +304,34 @@ defaults_list <- lst(
 
 ## actions ----
 actions_list <- splice(
-
-  comment("# # # # # # # # # # # # # # # # # # #",
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
     "DO NOT EDIT project.yaml DIRECTLY",
     "This file is created by create-project.R",
     "Edit and run create-project.R to update the project.yaml",
     "# # # # # # # # # # # # # # # # # # #"
   ),
 
-
-  comment("# # # # # # # # # # # # # # # # # # #", "Pre-server scripts", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Pre-server scripts",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   # doesn't currently work as "project.yaml is not an allowed file type"
   # action(
   #   name = "checkyaml",
-  #   run = "r:v2 create-project.R",
+  #   run = "r:v3 create-project.R",
   #   moderately_sensitive = lst(
   #     project = "project.yaml"
   #   )
   # ),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "Extract and tidy", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Extract and tidy",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   action(
     name = "extract",
@@ -342,34 +349,52 @@ actions_list <- splice(
     )
   ),
 
-
   action(
     name = "prepare",
-    run = "r:v2 analysis/2-select/prepare.R",
+    run = "r:v3 analysis/2-select/prepare.R",
     needs = list("extract"),
     highly_sensitive = lst(
       arrow = "output/2-select/*.arrow",
     )
   ),
 
-
-  comment("# # # # # # # # # # # # # # # # # # #", "Cohort: age65plus", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Cohort: age65plus",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   action_select("age65plus"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "Matching", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Matching",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   actions_balance("age65plus", "match"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "Weighting", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Weighting",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   actions_balance("age65plus", "weight"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "combine weights from all adjustment strategies", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "combine weights from all adjustment strategies",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   action_combine_weights("age65plus"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "Estimate cumulative incidence curves", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Estimate cumulative incidence curves",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   comment("### Aalen-Johansen estimates"),
 
@@ -379,30 +404,51 @@ actions_list <- splice(
 
   actions_contrasts("age65plus", "plr"),
 
-
-  comment("# # # # # # # # # # # # # # # # # # #", "Combine estimates across specs, outcomes and subgroups", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Combine estimates across specs, outcomes and subgroups",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   action_contrasts_combine("age65plus"),
 
-
-
-  comment("# # # # # # # # # # # # # # # # # # #", "Cohort: CV", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Cohort: CV",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   action_select("cv"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "Matching", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Matching",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   actions_balance("cv", "match"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "Weighting", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Weighting",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   actions_balance("cv", "weight"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "combine weights from all adjustment strategies", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "combine weights from all adjustment strategies",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   action_combine_weights("cv"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "Estimate cumulative incidence curves", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Estimate cumulative incidence curves",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   comment("### Aalen-Johansen estimates"),
 
@@ -412,12 +458,19 @@ actions_list <- splice(
 
   actions_contrasts("cv", "plr"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "Combine estimates across specs, outcomes and subgroups", "# # # # # # # # # # # # # # # # # # #"),
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "Combine estimates across specs, outcomes and subgroups",
+    "# # # # # # # # # # # # # # # # # # #"
+  ),
 
   action_contrasts_combine("cv"),
 
-  comment("# # # # # # # # # # # # # # # # # # #", "End", "# # # # # # # # # # # # # # # # # # #")
-
+  comment(
+    "# # # # # # # # # # # # # # # # # # #",
+    "End",
+    "# # # # # # # # # # # # # # # # # # #"
+  )
 )
 
 

@@ -31,8 +31,8 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age65plus"
-  method <- "lmw"
+  cohort <- "cv"
+  method <- "match"
   spec <- "A"
 } else {
   removeobjects <- TRUE
@@ -56,9 +56,9 @@ data_weights <- read_feather(here_glue("output", "3-adjust", cohort, "{method}-{
 
 
 # append relevant characteristics and weights
-data_balance <- 
+data_balance <-
   data_cohort |>
-  select(patient_id, treatment, any_of(names(variable_labels))) |>
+  select(patient_id, treatment, any_of(variables_lookup$variable)) |>
   left_join(
     data_weights |> select(patient_id, weight),
     by = "patient_id"
@@ -72,7 +72,7 @@ table_balance <-
     N = 1L,
   ) |>
   table1_summary_smd(
-    treatment = treatment,
+    group = treatment,
     weight = weight, 
     label = variable_labels,
     threshold = sdc.limit

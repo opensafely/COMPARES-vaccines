@@ -25,7 +25,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 0) {
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age65plus"
+  cohort <- "cv"
 } else {
   removeobjects <- TRUE
   cohort <- args[[1]]
@@ -43,7 +43,8 @@ data_cohort <- read_feather(here("output", "2-select", cohort, "data_cohort.arro
 ## create dataset of metaparameters to import
 
 # make sure we only use configuration for selected cohort
-metaparams_filtered <- metaparams |> filter(cohort == !!cohort)
+metaparams_filtered <-
+  metaparams |> filter(cohort == !!cohort)
 
 metaparams_cohort_method_spec <-
   metaparams_filtered |>
@@ -60,9 +61,19 @@ data_weights <-
       list(cohort, method, spec),
       function(cohort, method, spec) {
         dat <-
-          here("output", "3-adjust", cohort, glue("{method}-{spec}"), "data_adjusted.arrow") |>
+          here(
+            "output",
+            "3-adjust",
+            cohort,
+            glue("{method}-{spec}"),
+            "data_adjusted.arrow"
+          ) |>
           read_feather() |>
-          select(patient_id, treatment, weight)
+          select(patient_id, treatment, weight) |>
+          mutate(
+            # something odd going on with typing for this when passed from WeightIt, so need to set as an integer
+            treatment = as.integer(treatment)
+          )
         dat
       }
     )
@@ -88,7 +99,14 @@ data_all <-
     data_cohort,
     data_weights_wider,
     by = c("patient_id", "treatment")
+  ) |>
+  mutate(
+    # add one day of follow up so outcome/censoring events occurring on the same day as vaccination occur after baseline
+    # so use vax_date for original observed vaccination date
+    # and use treatment_date for the baseline_date in any modelling / estimation
+    treatment_date = vax_date - 1L,
   )
+      
 
 write_feather(data_all, fs::path(output_dir, "data_weights.arrow"))
 
@@ -108,6 +126,7 @@ table_ess <-
     values_from = ess
   )
 
+write_csv(table_ess, fs::path(output_dir, "table_ess.csv"))
 write_feather(table_ess, fs::path(output_dir, "table_ess.arrow"))
 
 
@@ -139,9 +158,7 @@ data_event_counts <-
             } else {
               rep(1, nrow(data_all))
             },
-            treatment_date = vax_date - 1L,
-
-            event_date = as.Date(data_all[[paste0(outcome, "_date")]]),
+            event_date = as.Date(data_all[[glue("{outcome}_date")]]),
 
             # person-time is up to and including censor date
             censor_date = pmin(
@@ -159,13 +176,18 @@ data_event_counts <-
               na.rm = TRUE
             ),
 
-            event_time = tte(treatment_date, event_date, censor_date, na.censor = FALSE),
+            event_time = tte(
+              treatment_date,
+              event_date,
+              censor_date,
+              na.censor = FALSE
+            ),
             event_indicator = censor_indicator(event_date, censor_date),
           ) |>
           group_by(subgroup_level, treatment) |>
           summarise(
             n = roundmid_any(sum(wt), sdc.limit),
-            persontime = sum(wt * as.numeric(censor_date - (vax_date - 1))),
+            persontime = sum(wt * as.numeric(censor_date - treatment_date)),
             weighted_event_count = sum(wt * event_indicator)
           )
       }
@@ -181,4 +203,6 @@ data_event_counts <-
   ) |>
   ungroup()
 
+write_csv(data_event_counts, fs::path(output_dir, "table_event_counts.csv"))
 write_feather(data_event_counts, fs::path(output_dir, "table_event_counts.arrow"))
+

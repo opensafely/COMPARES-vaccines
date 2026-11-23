@@ -187,10 +187,6 @@ ggplot(ipw.graph, aes(x=timesincevax)) +
 # from prior sequential trial work in opensafely
 # standard errors calculated but do not account for uncerainty in the weights
 ##############################################################
-
-# TODO: incorporate competing risks
-# TODO: incorporate standard errors
-
 data_persontime <- 
   data_all  |>
   expandRows("event_time", drop=F) %>%
@@ -486,7 +482,7 @@ ggplot(avg_curves5|> filter(timesincevax %in% 1:15))+
 
 
 # This provides contrasts for the discrete-time hazards, not for the cumulative survival / incidence!
-# TODO: can we get this with marginaleffects with appropriate standard errors? delta method?
+
 model_comparisons <-
   comparisons(
     ipw.model,

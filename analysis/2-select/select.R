@@ -22,7 +22,7 @@ source(here("analysis", "0-lib", "utility.R"))
 source(here("analysis", "0-lib", "design.R"))
 
 ## Import redaction functions
-source(here("analysis", "0-lib", "redaction.R"))
+#source(here("analysis", "0-lib", "redaction.R"))
 
 
 ## import command-line arguments ----
@@ -154,29 +154,66 @@ data_cohort <-
 write_feather(data_cohort, fs::path(output_dir, "data_cohort.arrow"))
 
 
-## report unadjusted balance for baseline variables between levels  of treatment ---- 
+## report unadjusted balance for baseline variables between levels  of treatment ----
 # This output includes SDC
 
-table_cohort <- 
+table_cohort <-
   data_cohort |>
   mutate(
     N = 1L,
     weight = 1L
-  ) %>%
+  ) |>
   table1_summary_smd(
-    treatment = treatment,
-    weight = weight, 
+    group = treatment,
+    weight = weight,
     label = variable_labels,
     threshold = sdc.limit
   )
 
 write_csv(table_cohort, fs::path(output_dir, "table_cohort.csv"))
 
+## report unadjusted outcome rates for baseline variables between levels of treatment ----
+# This output includes SDC
+
+outcome_labels <-
+  c(
+    N = "Total N",
+    set_names(events_lookup$event_descr, events_lookup$event_var)
+  ) |>
+  as.list()
+
+table_outcomes <-
+  data_cohort |>
+  select(
+    treatment,
+    vax_date,
+    any_of(events_lookup$event_var)
+  ) |>
+  mutate(
+    N = 1L,
+    weight = 1L,
+  ) |>
+  mutate(
+    across(
+      any_of(events_lookup$event_var),
+      \(x) {
+        coalesce(x <= (vax_date + maxfup), FALSE)
+      }
+    )
+  ) %>%
+  table1_summary(
+    group = treatment,
+    label = outcome_labels,
+    threshold = sdc.limit
+  )
+
+
+write_csv(table_outcomes, fs::path(output_dir, "table_outcomes.csv"))
+
+
 remove(data_cohort)
 
 ## output simple dataset containing exclusions criteria met ----
-
-## TODO: check if outputting this is necessary
 
 data_inclusioncriteria <- data_criteria |>
   transmute(

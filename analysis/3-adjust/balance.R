@@ -27,6 +27,7 @@ library("here")
 library("glue")
 library("arrow")
 library("survival")
+library("splines")
 library("cobalt")
 
 ## Import custom user functions from lib
@@ -44,9 +45,9 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 0) {
   # use for interactive testing
   removeobjects <- FALSE
-  cohort <- "age65plus" # currently `age65plus` or `cv`
-  method <- "lmw"
-  spec <- "A"
+  cohort <- "cv" # currently `age65plus` or `cv`
+  method <- "match"
+  spec <- "B"
 } else {
   removeobjects <- TRUE
   cohort <- args[[1]]

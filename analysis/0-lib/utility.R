@@ -82,7 +82,6 @@ ethnicity_16_to_5 <- function(x) {
 # using this in mutate like this: `mutate(!!!standardise_characteristics)`
 standardise_characteristics <-
   rlang::quos(
-
     ## --VARIABLES--
     ## demographics
     ageband = cut(
@@ -107,10 +106,7 @@ standardise_characteristics <-
       labels = c("1 (most deprived)", "2", "3", "4", "5 (least deprived)"),
       include.lowest = TRUE,
       right = FALSE
-    ) # ,
-    ## PRIMIS clinical variables
-    # cv = crd | ast | chd | ckd | cld | cns | learndis | diab | immuno | asplen | obes | sev_ment
-    # FIXME add additional vulnerability variables when defined and extracted
+    )
   )
 
 
@@ -240,38 +236,54 @@ table1_summary <- function(.data, group, label, threshold) {
     tab_summary$cards$tbl_summary |>
     mutate(
       variable = factor(variable, levels = names(label)),
-      variable_label = factor(variable, levels = names(label),  labels = label),
+      variable_label = factor(variable, levels = names(label), labels = label),
     ) |>
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
     select(-warning, -error, -gts_column) |>
     pivot_wider(
-      id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"),
+      id_cols = c(
+        "group1",
+        "group1_level",
+        "variable",
+        "variable_label",
+        "variable_level",
+        "context"
+      ),
       names_from = stat_name,
       values_from = stat
     ) |>
     mutate(
       across(
-        c(n, N),
+        any_of(c("n", "N")),
         ~ {
-          map_int(., ~ {
-            if (is.null(.)) NA else as.integer(.)
-          })
+          map_int(
+            .,
+            ~ {
+              if (is.null(.)) NA else as.integer(.)
+            }
+          )
         }
       ),
       across(
-        c(p, median, p10, p25, p75, p90, mean, sd),
+        any_of(c("p", "median", "p10", "p25", "p75", "p90", "mean", "sd")),
         ~ {
-          map_dbl(., ~ {
-            if (is.null(.)) NA else as.numeric(.)
-          })
+          map_dbl(
+            .,
+            ~ {
+              if (is.null(.)) NA else as.numeric(.)
+            }
+          )
         }
       ),
       across(
-        c(group1_level, variable_level),
+        any_of(c("group1_level", "variable_level")),
         ~ {
-          map_chr(., ~ {
-            if (is.null(.)) NA else as.character(.)
-          })
+          map_chr(
+            .,
+            ~ {
+              if (is.null(.)) NA else as.character(.)
+            }
+          )
         }
       ),
     ) |>
@@ -329,38 +341,54 @@ table1_svysummary <- function(.data, group, weight, label, threshold) {
     tab_svysummary$cards$tbl_svysummary |>
     mutate(
       variable = factor(variable, levels = names(label)),
-      variable_label = factor(variable, levels = names(label),  labels = label),
+      variable_label = factor(variable, levels = names(label), labels = label),
     ) |>
     filter(!(context %in% c("missing", "attributes", "total_n"))) |>
     select(-warning, -error, -gts_column) |>
     pivot_wider(
-      id_cols = c("group1", "group1_level", "variable", "variable_label", "variable_level", "context"),
+      id_cols = c(
+        "group1",
+        "group1_level",
+        "variable",
+        "variable_label",
+        "variable_level",
+        "context"
+      ),
       names_from = stat_name,
       values_from = stat
     ) |>
     mutate(
       across(
-        c(n, N),
+        any_of(c("n", "N")),
         ~ {
-          map_int(., ~ {
-            if (is.null(.)) NA else as.integer(.)
-          })
+          map_int(
+            .,
+            ~ {
+              if (is.null(.)) NA else as.integer(.)
+            }
+          )
         }
       ),
       across(
-        c(p, median, p10, p25, p75, p90, mean, sd),
+        any_of(c("p", "median", "p10", "p25", "p75", "p90", "mean", "sd")),
         ~ {
-          map_dbl(., ~ {
-            if (is.null(.)) NA else as.numeric(.)
-          })
+          map_dbl(
+            .,
+            ~ {
+              if (is.null(.)) NA else as.numeric(.)
+            }
+          )
         }
       ),
       across(
-        c(group1_level, variable_level),
+        any_of(c("group1_level", "variable_level")),
         ~ {
-          map_chr(., ~ {
-            if (is.null(.)) NA else as.character(.)
-          })
+          map_chr(
+            .,
+            ~ {
+              if (is.null(.)) NA else as.character(.)
+            }
+          )
         }
       ),
     ) |>
@@ -391,15 +419,14 @@ table1_svysummary <- function(.data, group, weight, label, threshold) {
 # so it's easier just to grab from cobalt than to get the weighted and unweighted
 # stats each time
 
-table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
-
-  treatment_quo <- enquo(treatment)
+table1_summary_smd <- function(.data, group, weight, label, threshold) {
+  group_quo <- enquo(group)
   weight_quo <- enquo(weight)
 
   table1 <-
     .data |>
     table1_svysummary(
-      group = !!treatment_quo,
+      group = !!group_quo,
       weight = !!weight_quo,
       label = label,
       threshold = sdc.limit
@@ -412,7 +439,7 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
 
   cobalt_variable_names <-
     table1 |>
-    filter(group1 == quo_name(enquo(treatment))) |>
+    filter(group1 == quo_name(enquo(group))) |>
     transmute(
       variable,
       variable_label,
@@ -430,7 +457,7 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
   obj_balance <-
     cobalt::bal.tab(
       x = .data |> select(any_of(names(label))),
-      data = .data |> select(!!weight_quo, !!treatment_quo),
+      data = .data |> select(!!weight_quo, !!group_quo),
       weights = "weight",
       treat = "treatment",
       stats = c("mean.diffs"),
@@ -454,7 +481,10 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
     ) |>
     transmute(
       variable,
-      variable_label = droplevels(factor(variable_label, levels = map_chr(variable_labels, ~.))),
+      variable_label = droplevels(factor(
+        variable_label,
+        levels = map_chr(label, ~.)
+      )),
       variable_label,
       variable_level,
       smd = Diff.Adj,
@@ -464,12 +494,23 @@ table1_summary_smd <- function(.data, treatment, weight, label, threshold) {
   table_balance <-
     table1 |>
     select(-group1) |>
-    filter(!is.na(group1_level))  |>
+    filter(!is.na(group1_level)) |>
     pivot_wider(
       id_cols = c(variable, variable_label, variable_level, context),
       names_from = group1_level,
       names_sep = "_",
-      values_from = c(n, N, p, mean, sd, p10, p25, median, p75, p90),
+      values_from = any_of(c(
+        "n",
+        "N",
+        "p",
+        "mean",
+        "sd",
+        "p10",
+        "p25",
+        "median",
+        "p75",
+        "p90"
+      )),
       names_vary = "slowest"
     ) |>
     left_join(

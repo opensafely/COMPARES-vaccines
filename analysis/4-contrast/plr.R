@@ -13,6 +13,9 @@ library("WeightIt")
 library("survival")
 library("splines")
 library("sandwich")
+library("fastglm")
+library("parglm")
+
 # library("marginaleffects")
 
 ## Import custom user functions from lib
@@ -32,8 +35,8 @@ if (length(args) == 0) {
   cohort <- "cv"
   method <- "match"
   spec <- "A"
-  subgroup <- "ageband"
-  outcome <- "covid_death"
+  subgroup <- "all"
+  outcome <- "covid_admitted"
 } else {
 
   removeobjects <- TRUE
@@ -96,14 +99,12 @@ data_all <-
     patient_id,
     vax_product,
     treatment,
-    vax_date,
+    treatment_date,
     all_of(subgroup),
     all_of(paste0(c(outcome, "death", "dereg"), "_date")),
     weight = glue("wt_{cohort}_{method}_{spec}")
   ) |>
   mutate(
-
-    treatment_date = vax_date - 1L, # -1 because we assume vax occurs at the start of the day, and so outcomes occurring on the same day as treatment are assumed "1 day" long
     event_date = as.Date(.data[[glue("{outcome}_date")]]),
 
     # person-time is up to and including censor date
@@ -122,12 +123,27 @@ data_all <-
       na.rm = TRUE
     ),
 
-    event_time = tte(treatment_date, event_date, censor_date, na.censor = FALSE),
+    event_time = tte(
+      treatment_date,
+      event_date,
+      censor_date,
+      na.censor = FALSE
+    ),
     event_indicator = censor_indicator(event_date, censor_date),
 
     # possible competing events
-    death_time = tte(treatment_date, death_date, noncompetingcensor_date, na.censor = FALSE),
-    censor_time = tte(treatment_date, censor_date, censor_date, na.censor = FALSE),
+    death_time = tte(
+      treatment_date,
+      death_date,
+      noncompetingcensor_date,
+      na.censor = FALSE
+    ),
+    censor_time = tte(
+      treatment_date,
+      censor_date,
+      censor_date,
+      na.censor = FALSE
+    ),
   )
 
 stopifnot("censoring dates must be non-missing" = all(!is.na(data_all$censor_date)))
@@ -140,14 +156,13 @@ if (!identical(as.integer(times_count), c(0L, 0L, nrow(data_all)))) {
   stop("all event times must be strictly positive")
 }
 
-formula_time_treatment <- event_indicator ~ treatment + ns(time, 4) + treatment:ns(time, 4)
+formula_time_treatment <- event_indicator ~ treatment +
+  ns(time, 3) +
+  treatment:ns(time, 3)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # standard errors calculated using pooled logistic regression,
 # but this does not account for uncertainty in the weights
-# TODO: maybe incorporate competing risks with death as a competing risk - see https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8471
-#       currently not in the protocol and not too important given death rare, but sensible
-# TODO: incorporate proper standard errors incorporating weighting uncertainty
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 data_persontime <-
@@ -155,8 +170,11 @@ data_persontime <-
   uncount(event_time, .remove = FALSE) |> # may change this from event_time to final censoring time in case we want keep dead people under follow up
   mutate(
     time = sequence(rle(patient_id)$lengths), # equivalent-ish to group_by(patient_id) |> mutate(row_number())
-    event_indicator = (time == event_time) & (event_indicator == TRUE)
+    event_indicator = ((time == event_time) & (event_indicator == TRUE))*1L
   )
+
+# create control spec if using parglm for model fitting
+parglm_control <- parglm.control(maxit = 40, nthreads = 2)
 
 # create dataset to link estimates onto
 estimates_scaffold <- expand_grid(
@@ -183,9 +201,10 @@ subgroup_models <-
               family = binomial(),
               weights = weight,
               data = plrdata,
-              model = TRUE, # this needs to be true for vcovCL to work as needed - shame because it takes up a lot of memory
-              x = FALSE,
-              y = FALSE
+              method = fastglm::fastglm_fit, # use this if using fastglm -  don't use fastglm for now as v0.1.2 doesn't work well with predict function (v0.1.4 does, so wait for update)
+              #control = parglm_control, # use this if using parglm 
+              model = TRUE#, # this needs to be true for vcovCL to work as needed - shame because it takes up a lot of memory
+              #x = FALSE
             )
           } else {
             stop("Not enough events")
@@ -216,14 +235,33 @@ subgroup_models <-
         if (!is.null(model)) {
           # sandwich::vcovCL doesn't handle formulae properly! hence inclusion of "model=TRUE" above - be careful
           vcov <- vcovCL(x = model, cluster = plrdata$patient_id, type = "HC0") # or use `marginaleffects::get_vcov(model, vcov = ~patient_id)`
+          #vcov <- marginaleffects::get_vcov(model, vcov = ~patient_id)
           
+          # cluster robust, on the linear scale not response scale
+          predict_logit_obj <- 
+            predict.glm.custom.vcov(
+              model,
+              vcov = vcov,
+              newdata = estimates_scaffold
+            ) 
+
           estimates_scaffold %>%
             mutate(
               # this uses the ipw.model to get the estimated incidence at each time point for each treatment, assuming the entire population received treatment A
               # it works correctly for the ATE because of the weights (ie as if setting treatment=1 or treatment=0 for entire population)
-              inc = predict(model, newdata = estimates_scaffold, type = "response"),
-              inc.se = predict(model, newdata = estimates_scaffold, type = "response", se.fit = TRUE)$se.fit, # this does not use vcov from vcovCL, so not cluster-robust
-              inc.logit.se = predict.glm.custom.vcov(model, vcov = vcov, newdata = estimates_scaffold)$se.fit, # cluster robust, but on the linear scale, not response scale
+              # inc = predict(
+              #   model,
+              #   newdata = estimates_scaffold,
+              #   type = "response"
+              # ),
+              # inc.se = predict(
+              #   model,
+              #   newdata = estimates_scaffold,
+              #   type = "response",
+              #   se.fit = TRUE
+              # )$se.fit, # this does not use vcov from vcovCL, so not cluster-robust
+              inc = plogis(predict_logit_obj$fit),
+              inc.logit.se = predict_logit_obj$se.fit,
               inc.low = plogis(qlogis(inc) + (qnorm(0.025) * inc.logit.se)),
               inc.high = plogis(qlogis(inc) + (qnorm(0.975) * inc.logit.se)),
             ) |>
@@ -231,7 +269,14 @@ subgroup_models <-
             mutate(
               dummy_id_weight = 1L,
               surv = cumprod(1 - inc),
-              surv.se = sqrt(cmlinc_variance(model = model, vcov = vcov, newdata = tibble(treatment = treatment, time = time), id = dummy_id_weight, time = time, weights = dummy_id_weight)),
+              surv.se = sqrt(cmlinc_variance(
+                model = model,
+                vcov = vcov,
+                newdata = tibble(treatment = treatment, time = time),
+                id = dummy_id_weight,
+                time = time,
+                weights = dummy_id_weight
+              )),
               surv.low = surv + (qnorm(0.025) * surv.se),
               surv.high = surv + (qnorm(0.975) * surv.se),
 
@@ -243,9 +288,8 @@ subgroup_models <-
               # rmst.se = sqrt(((2* cumsum(time*surv)) - (rmst^2))/n.risk), # this only works if one row per day using fill_times! otherwise need sqrt(((2* cumsum(time*interval*surv)) - (rmst^2))/n.risk)
               # rmst.low = rmst + (qnorm(0.025) * rmst.se),
               # rmst.high = rmst + (qnorm(0.975) * rmst.se),
-
-            ) |> select(-dummy_id_weight)
-
+            ) |>
+            select(-dummy_id_weight)
         } else {
           estimates_scaffold
         }
@@ -268,7 +312,7 @@ write_csv(data_estimates, fs::path(output_dir, glue("estimates.csv")))
 
 # calculate contrasts between treatment groups ----
 
-# could do this within `subgroup_models` step above but bring out to avoid overloading high memory stuff
+# could do this within `subgroup_models` step above but bringing out to avoid overloading high memory stuff
 data_contrasts <-
   
   data_estimates |>
