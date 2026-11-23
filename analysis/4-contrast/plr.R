@@ -14,6 +14,7 @@ library("survival")
 library("splines")
 library("sandwich")
 library("fastglm")
+library("parglm")
 
 # library("marginaleffects")
 
@@ -34,8 +35,8 @@ if (length(args) == 0) {
   cohort <- "cv"
   method <- "match"
   spec <- "A"
-  subgroup <- "ageband"
-  outcome <- "covid_death"
+  subgroup <- "all"
+  outcome <- "covid_admitted"
 } else {
 
   removeobjects <- TRUE
@@ -172,6 +173,9 @@ data_persontime <-
     event_indicator = ((time == event_time) & (event_indicator == TRUE))*1L
   )
 
+# create control spec if using parglm for model fitting
+parglm_control <- parglm.control(maxit = 40, nthreads = 2)
+
 # create dataset to link estimates onto
 estimates_scaffold <- expand_grid(
   treatment =  c(0L, 1L),
@@ -197,9 +201,10 @@ subgroup_models <-
               family = binomial(),
               weights = weight,
               data = plrdata,
-              # method = fastglm::fastglm_fit, # don't use fastglm for now as v0.1.2 doesn't work well with predict function (v0.1.4 does, so wait for update)
-              model = TRUE, # this needs to be true for vcovCL to work as needed - shame because it takes up a lot of memory
-              x = FALSE
+              method = fastglm::fastglm_fit, # use this if using fastglm -  don't use fastglm for now as v0.1.2 doesn't work well with predict function (v0.1.4 does, so wait for update)
+              #control = parglm_control, # use this if using parglm 
+              model = TRUE#, # this needs to be true for vcovCL to work as needed - shame because it takes up a lot of memory
+              #x = FALSE
             )
           } else {
             stop("Not enough events")
@@ -231,27 +236,32 @@ subgroup_models <-
           # sandwich::vcovCL doesn't handle formulae properly! hence inclusion of "model=TRUE" above - be careful
           vcov <- vcovCL(x = model, cluster = plrdata$patient_id, type = "HC0") # or use `marginaleffects::get_vcov(model, vcov = ~patient_id)`
           #vcov <- marginaleffects::get_vcov(model, vcov = ~patient_id)
+          
+          # cluster robust, on the linear scale not response scale
+          predict_logit_obj <- 
+            predict.glm.custom.vcov(
+              model,
+              vcov = vcov,
+              newdata = estimates_scaffold
+            ) 
 
           estimates_scaffold %>%
             mutate(
               # this uses the ipw.model to get the estimated incidence at each time point for each treatment, assuming the entire population received treatment A
               # it works correctly for the ATE because of the weights (ie as if setting treatment=1 or treatment=0 for entire population)
-              inc = predict(
-                model,
-                newdata = estimates_scaffold,
-                type = "response"
-              ),
-              inc.se = predict(
-                model,
-                newdata = estimates_scaffold,
-                type = "response",
-                se.fit = TRUE
-              )$se.fit, # this does not use vcov from vcovCL, so not cluster-robust
-              inc.logit.se = predict.glm.custom.vcov(
-                model,
-                vcov = vcov,
-                newdata = estimates_scaffold
-              )$se.fit, # cluster robust, but on the linear scale, not response scale
+              # inc = predict(
+              #   model,
+              #   newdata = estimates_scaffold,
+              #   type = "response"
+              # ),
+              # inc.se = predict(
+              #   model,
+              #   newdata = estimates_scaffold,
+              #   type = "response",
+              #   se.fit = TRUE
+              # )$se.fit, # this does not use vcov from vcovCL, so not cluster-robust
+              inc = plogis(predict_logit_obj$fit),
+              inc.logit.se = predict_logit_obj$se.fit,
               inc.low = plogis(qlogis(inc) + (qnorm(0.025) * inc.logit.se)),
               inc.high = plogis(qlogis(inc) + (qnorm(0.975) * inc.logit.se)),
             ) |>
