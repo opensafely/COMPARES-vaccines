@@ -355,6 +355,9 @@ actions_list <- splice(
     needs = list("extract"),
     highly_sensitive = lst(
       arrow = "output/2-select/*.arrow",
+    ),
+    moderately_sensitive = lst(
+      txt = "output/2-select/skim/*.txt",
     )
   ),
 

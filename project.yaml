@@ -30,6 +30,8 @@ actions:
     outputs:
       highly_sensitive:
         arrow: output/2-select/*.arrow
+      moderately_sensitive:
+        txt: output/2-select/skim/*.txt
 
   ## # # # # # # # # # # # # # # # # # # # 
   ## Cohort: age65plus 

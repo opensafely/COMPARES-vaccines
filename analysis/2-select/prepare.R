@@ -35,7 +35,7 @@ data_extract <- read_feather(here("output", "1-extract", "extract.arrow"))
 # print details about extracted dataset
 capture.output(
   skimr::skim_without_charts(data_extract),
-  file = fs::path(output_dir, "data_extract_skim.txt"),
+  file = fs::path(output_dir, "skim", "data_extract_skim.txt"),
   split = FALSE
 )
 
@@ -251,7 +251,7 @@ data_prepared <-
 # print details about prepared dataset
 capture.output(
   skimr::skim_without_charts(data_prepared),
-  file = fs::path(output_dir, "data_prepared_skim.txt"),
+  file = fs::path(output_dir, "skim", "data_prepared_skim.txt"),
   split = FALSE
 )
 

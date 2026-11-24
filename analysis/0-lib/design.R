@@ -96,7 +96,7 @@ events_lookup <- tribble(
 campaigns_lookup <-
   tribble(
     ~campaign            , ~start_date  ,
-    "Before Autumn 2023" , "2020-04-01" ,
+    "Before Autumn 2023" , "1899-01-01" , # this assumes covid vaccines recorded as occurring prior to ~ April 2020 (which is impossible) happened to have occurred before autumn 2023, which may not be the case, but there won't be many such records
     "Autumn 2023"        , "2023-08-28" ,
     "Spring 2024"        , "2024-04-15" ,
     "Autumn 2024"        , "2024-09-30" ,
