@@ -248,7 +248,7 @@ action_contrasts_combine <- function(
     run = glue("r:v3 analysis/4-contrast/combine-contrasts.R"),
     arguments = c(cohort),
     needs = glue_data(
-      .x = metaparams |>
+      .x = metaparams_for_estimation |>
         select(spec, method, subgroup, outcome) |>
         unique() |>
         expand_grid(strategy = c("plr", "aj")),
