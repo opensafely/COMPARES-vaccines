@@ -104,7 +104,7 @@ data_all <-
     # add one day of follow up so outcome/censoring events occurring on the same day as vaccination occur after baseline
     # so use vax_date for original observed vaccination date
     # and use treatment_date for the baseline_date in any modelling / estimation
-    treatment_date = vax_date - 1L,
+    treatment_date = vax_date - 1L
   )
       
 
@@ -184,11 +184,11 @@ data_event_counts <-
             ),
             event_indicator = censor_indicator(event_date, censor_date),
           ) |>
-          group_by(subgroup_level, treatment) |>
           summarise(
             n = roundmid_any(sum(wt), sdc.limit),
             persontime = sum(wt * as.numeric(censor_date - treatment_date)),
-            weighted_event_count = sum(wt * event_indicator)
+            weighted_event_count = sum(wt * event_indicator),
+            .by = c(subgroup_level, treatment)
           )
       }
     )

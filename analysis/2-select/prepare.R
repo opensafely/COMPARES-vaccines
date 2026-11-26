@@ -96,6 +96,9 @@ data_prepared <-
 
     # all subgroup dummy variable
     all = factor("all"),
+    
+    # removing ordering inherited from arrow file
+    sex = factor(sex, ordered = FALSE),
 
     ageband = cut(
       age_eligible, # use fixed date to ascertain age so that age bands align with eligibility. because age and vax date are closely matched, this doesn't cause any problems
