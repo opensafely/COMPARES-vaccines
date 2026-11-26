@@ -235,7 +235,6 @@ sdc.limit <- 6L
 
 ## lookups to convert coded variables to full, descriptive variables ----
 
-
 recoder <-
   lst(
     cohort = c(
@@ -245,6 +244,7 @@ recoder <-
     ),
     subgroups = c(
       `Main` = "all",
+      `Sex` = "sex",
       `Age` = "ageband",
       `Clinically at-risk` = "cv",
       `Ethnicity` = "ethnicity",
@@ -262,7 +262,11 @@ recoder <-
     outcome = set_names(events_lookup$event, events_lookup$event_descr),
     all = c(` ` = "all"),
     ageband = c(
-      "50-64", "65-74", "75-79", "80-84", "85+"
+      "50-64",
+      "65-74",
+      "75-79",
+      "80-84",
+      "85+"
     ) %>%
       {
         set_names(., .)
@@ -272,7 +276,10 @@ recoder <-
       `Not clinically at-risk` = "FALSE"
     ),
     prior_vax_count_group = c(
-      "0", "1-2", "3-5", "6+"
+      "0",
+      "1-2",
+      "3-5",
+      "6+"
     ) %>%
       {
         set_names(., .)
@@ -512,7 +519,7 @@ metaparams <-
 
   filter(
     # select only some parameters to avoid too much dev work
-    subgroup %in% c("all", "ageband"),
+    subgroup %in% c("all", "sex", "ageband"),
     spec %in% c("A", "B"),
 
     # do not use experimental lmw method
@@ -528,8 +535,9 @@ metaparams_for_estimation <-
     # do not do subgroup analyses for safety or negative control outcomes
     (outcome_type %in% c("safety", "negative")) &
       (outcome != "menorrhagia") &
-      (subgroup != "all"),
-
+      (subgroup != "all")
+  ) |>
+  filter_out(
     # only interested in menorrhagia for women
     (outcome == "menorrhagia") & (subgroup != "sex"),
   )
