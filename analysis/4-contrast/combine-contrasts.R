@@ -37,7 +37,7 @@ if (length(args) == 0) {
 
 
 metaparams <-
-  metaparams |>
+  metaparams_for_estimation |>
   filter(cohort == !!cohort)
 
 output_dir <- here("output", "4-contrast", cohort, "contrasts")
