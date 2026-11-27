@@ -64,6 +64,45 @@ data_balance <-
     by = "patient_id"
   )
 
+## distribution of balancing weights ----
+# output distrubtion of balancing weights
+
+plot_weight_distr <- 
+  data_balance |>
+  mutate(
+    # covert to log weight for symmetric plotting, except for matching which has 0/1 support
+    weight = if(method != "match") {log(weight)} else {weight}
+  ) |>
+  ggplot()+
+  geom_histogram(aes(x=weight))+
+  facet_grid(
+    rows=vars(treatment)
+  )+
+  theme_bw()
+
+ggsave(plot_weight_distr, filename="plot_weight_distr.png", path=output_dir)
+
+table_weight_distr <-
+  data_balance |>
+  summarise(
+    n = n(),
+    n_over_1 = sum(weight >= 1),
+    n_under_1 = sum(weight < 1),
+    mean = mean(weight),
+    median = median(weight),
+    min = min(weight),
+    p05 = quantile(weight, p=0.05),
+    p10 = quantile(weight, p=0.10),
+    p25 = quantile(weight, p=0.25),
+    p75 = quantile(weight, p=0.75),
+    p90 = quantile(weight, p=0.90),
+    p95 = quantile(weight, p=0.95),
+    max = max(weight),
+    .by = c(treatment)
+  )
+
+write_csv(table_weight_distr, fs::path(output_dir, "table_weight_distr.csv"))
+
 # create table object using function in utility script
 # this includes SDC
 table_balance <- 
