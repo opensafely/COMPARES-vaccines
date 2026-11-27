@@ -91,7 +91,18 @@ total_n_rounded <-
 write_csv(total_n_rounded, fs::path(output_dir, "total_allcohorts_rounded.csv"))
 
 
+# get dates between which both vaccines were being used
 
+vax_date_limits <-
+  data_prepared |>
+  summarise(
+    min =vax_date(vax_date),
+    max = max(vax_date),
+    .by = vax_product
+  )
+
+both_products_used_from_date <- max(vax_date_limits$min)
+both_products_used_to_date <- min(vax_date_limits$max)
 
 
 ## Define selection criteria ----
@@ -104,6 +115,7 @@ data_criteria <-
     vax_product,
     prior_vax_interval_atleast12weeks,
     vax_product_of_interest = vax_product %in% c(productA, productB),
+    during_period_both_products_used = between(vax_date, both_products_used_from_date, both_products_used_to_date,
     codamin_flu = !is.na(flu_vaccine_same_date),
     select_coadmin_only_if_required = !(restrict_to_coadmin_flu & !codamin_flu), #if restrict_to_coadmin_flu==TRUE and codamin_flu==FALSE then 0, otherwise 1
     # no_prior_productA = !vaxhist_productA,
@@ -122,25 +134,24 @@ data_criteria <-
     # has_norecentcovid = ((vax_date - anycovid_0_date) >= 28) | is.na(anycovid_0_date),
     isnot_inhospital = !inhospital,
 
-    include_regardless_of_flu_coadmin = (
-      prior_vax_interval_atleast12weeks &
-        vax_product_of_interest &
-        # no_prior_productA &
-        # no_prior_productB &
-        prior_vax_1plus &
-        has_age &
-        has_sex &
-        has_imd &
-        has_region &
-        # has_ethnicity5 &
-        # isnot_hscworker &
-        # isnot_endoflife &
-        # has_norecentcovid &
-        isnot_inhospital
-    ),
-    
-    include = include_regardless_of_flu_coadmin & select_coadmin_only_if_required
+    include_regardless_of_flu_coadmin = (prior_vax_interval_atleast12weeks &
+      vax_product_of_interest &
+      during_period_both_products_used &
+      # no_prior_productA &
+      # no_prior_productB &
+      prior_vax_1plus &
+      has_age &
+      has_sex &
+      has_imd &
+      has_region &
+      # has_ethnicity5 &
+      # isnot_hscworker &
+      # isnot_endoflife &
+      # has_norecentcovid &
+      isnot_inhospital),
 
+    include = include_regardless_of_flu_coadmin &
+      select_coadmin_only_if_required
   )
 
 
@@ -222,13 +233,14 @@ data_inclusioncriteria <- data_criteria |>
     c0 = TRUE,
     c1 = c0 & vax_product_of_interest,
     # Apply the same-day influenza coadministration criterion only when
-    c2 = c1 & select_coadmin_only_if_required,
-    c3 = c2 & prior_vax_interval_atleast12weeks, #& no_prior_productA & no_prior_productB,
-    c4 = c3 & prior_vax_1plus,
-    c5_1 = c4 & (has_age & has_sex & has_imd & has_region)
-    # c4_3 = c3 & (isnot_endoflife),
-    # c4_4 = c3 & (has_norecentcovid),
-    # c4_5 = c3 & (isnot_inhospital),
+    c2 = c1 & during_period_both_products_used,
+    c3 = c2 & select_coadmin_only_if_required,
+    c4 = c3 & prior_vax_interval_atleast12weeks, #& no_prior_productA & no_prior_productB,
+    c5 = c4 & prior_vax_1plus,
+    c6_1 = c5 & (has_age & has_sex & has_imd & has_region)
+    # c6_3 = c6 & (isnot_endoflife),
+    # c6_4 = c6 & (has_norecentcovid),
+    # c6_5 = c6 & (isnot_inhospital),
     #c4 = c4_1 & c4_2 & c4_3 & c4_4 & c4_5
   ) 
 
@@ -245,41 +257,46 @@ create_flowchart <- function(round_level = 1){
     filter(c1) |>
     group_by(vax_product) |>
     summarise(
-      across(.cols=everything(), .fns=~ceiling_any(sum(., na.rm = TRUE), round_level))
+      across(
+        .cols = everything(),
+        .fns = ~ ceiling_any(sum(., na.rm = TRUE), round_level)
+      )
     ) |>
     pivot_longer(
-      cols=-c(vax_product),
-      names_to="criteria",
-      values_to="n"
+      cols = -c(vax_product),
+      names_to = "criteria",
+      values_to = "n"
     ) |>
     # When influenza coadministration is not an inclusion criterion,
     # omit c2 from the flowchart rather than showing a redundant step.
     filter(!(criteria == "c2" & !restrict_to_coadmin_flu)) |>
     mutate(
       level = if_else(str_detect(criteria, "c\\d+$"), 1, 2),
-      n_level1 = if_else(level==1, n, NA_real_),
+      n_level1 = if_else(level == 1, n, NA_real_),
       n_level1_fill = n_level1
     ) |>
     fill(n_level1_fill) |>
     group_by(vax_product) |>
     mutate(
       n_exclude = lag(n_level1_fill) - n,
-      pct_exclude = n_exclude/lag(n_level1_fill),
+      pct_exclude = n_exclude / lag(n_level1_fill),
       pct_all = n_level1 / first(n),
       pct_step = n_level1 / lag(n_level1_fill),
       #crit = str_extract(criteria, "^c\\d+"),
       crit = criteria,
       criteria = fct_case_when(
-        crit == "c1" ~ "Received COVID-19 vaccine between X and X",
-        crit == "c2" ~ "  with influenza vaccine on the same day",
-        crit == "c3" ~ "  with no prior Covid-19 vaccine within 12 weeks",
-        crit == "c4" ~ "  with at least 1 prior COVID-19 vaccine dose",
-        crit == "c5_1" ~ "    no missing demographic information",
-        crit == "c5_2" ~ "    not a health and social care worker",
-        crit == "c5_3" ~ "    not end-of-life",
-        crit == "c5_4" ~ "    no documented COVID-19 infection/disease within prior 28 days",
-        crit == "c5_5" ~ "    not admitted in hospital at time of booster",
-        crit == "c5" ~ "  included in matching run",
+        crit == "c1" ~ "Received COVID-19 vaccine during Autumn 2024 campaign",
+        crit == "c2" ~ "  during period where both vaccines in use",
+        crit == "c3" ~ "  with influenza vaccine on the same day",
+        crit == "c4" ~ "  with no prior Covid-19 vaccine within 12 weeks",
+        crit == "c5" ~ "  with at least 1 prior COVID-19 vaccine dose",
+        crit == "c6_1" ~ "    no missing demographic information",
+        crit == "c6_2" ~ "    not a health and social care worker",
+        crit == "c6_3" ~ "    not end-of-life",
+        crit ==
+          "c6_4" ~ "    no documented COVID-19 infection/disease within prior 28 days",
+        crit == "c6_5" ~ "    not admitted in hospital at time of booster",
+        crit == "c7" ~ "  included in matching run",
         TRUE ~ "NA_character_boop" # should not appear
       )
     )
