@@ -115,7 +115,11 @@ data_criteria <-
     vax_product,
     prior_vax_interval_atleast12weeks,
     vax_product_of_interest = vax_product %in% c(productA, productB),
-    during_period_both_products_used = between(vax_date, both_products_used_from_date, both_products_used_to_date,
+    during_period_both_products_used = between(
+      vax_date,
+      both_products_used_from_date,
+      both_products_used_to_date
+    ),
     codamin_flu = !is.na(flu_vaccine_same_date),
     select_coadmin_only_if_required = !(restrict_to_coadmin_flu & !codamin_flu), #if restrict_to_coadmin_flu==TRUE and codamin_flu==FALSE then 0, otherwise 1
     # no_prior_productA = !vaxhist_productA,
